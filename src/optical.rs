@@ -26,11 +26,17 @@ pub struct Media{
 impl Media{
     // IMAPI physical media enum: CD-R=2, DVD+R=5, DVD+R DL=8,
     // DVD-R=9, DVD-R DL=10, BD-R=18. Unknown/rewriteable media fail closed.
+    pub fn type_name(&self)->&'static str{
+        match self.physical_type{2=>"CD-R",5=>"DVD+R",8=>"DVD+R DL",9=>"DVD-R",10=>"DVD-R DL",18=>"BD-R",_=>"Other / unsupported"}
+    }
     pub fn write_once(&self)->bool{matches!(self.physical_type,2|5|8|9|10|18)}
     pub fn blank_candidate(&self)->bool{
         self.supported&&self.write_once()&&self.physically_blank&&self.heuristically_blank
         &&self.free_sectors>0&&self.total_sectors>=self.free_sectors
-        &&self.status&0x8000==0 // unsupported media flag
+        &&matches!(self.status,0|2) // unknown or blank only; preliminary inspection
+    }
+    pub fn fits_image(&self,bytes:u64)->bool{
+        self.blank_candidate()&&bytes>0&&bytes%2048==0&&self.free_bytes().is_some_and(|free|bytes<=free)
     }
     pub fn free_bytes(&self)->Option<u64>{
         u64::try_from(self.free_sectors).ok()?.checked_mul(2048)
@@ -79,6 +85,8 @@ mod tests{
         let mut m=media(18);m.free_sectors=-1;assert_eq!(m.free_bytes(),None);assert!(!m.blank_candidate());
         let mut m=media(18);m.status=0x8000;assert!(!m.blank_candidate());
         let m=media(18);assert_eq!(m.free_bytes(),Some(204800));
+        assert!(m.fits_image(204800));assert!(!m.fits_image(206848));assert!(!m.fits_image(1));assert!(!m.fits_image(0));
+        for status in [1,4,8,16,0x4000,0x8000,-1]{let mut m=media(18);m.status=status;assert!(!m.fits_image(2048));}
     }
     #[test]fn empty_discovery_and_duplicate_ids(){
         let d:Discovery=serde_json::from_str(r#"{"recorders":[],"errors":[]}"#).unwrap();d.validate().unwrap();
