@@ -152,35 +152,68 @@ pub(crate) fn validate_authorization(id:&str,hash:&str,confirmation:&str)->Resul
     if confirmation!="WRITE-ONCE"{bail!("Explicit WRITE-ONCE confirmation required");}
     Ok(())
 }
+#[derive(Debug,Clone,Copy,PartialEq,Eq,Serialize)]
+#[serde(rename_all="snake_case")]
+pub enum BurnStage{VerifyingImage,InspectingRecorder,CheckingMedia,WritingAndFinalizing,ReleasingRecorder,WrittenUnverified}
+fn parse_stage(line:&str)->Option<BurnStage>{
+    match line.trim(){
+        "DAS_STAGE CHECKING_MEDIA"=>Some(BurnStage::CheckingMedia),
+        "DAS_STAGE WRITING"=>Some(BurnStage::WritingAndFinalizing),
+        "DAS_STAGE RELEASING"=>Some(BurnStage::ReleasingRecorder),
+        _=>None,
+    }
+}
 #[cfg(windows)]
-fn burn(manifest:&crate::image::PreparedDisc,image:&std::path::Path,id:&str,hash:&str,confirmation:&str)->Result<BurnReceipt>{
+fn burn(manifest:&crate::image::PreparedDisc,image:&std::path::Path,id:&str,hash:&str,confirmation:&str,progress:&mut dyn FnMut(BurnStage))->Result<BurnReceipt>{
     use anyhow::Context;
     use std::{os::windows::fs::OpenOptionsExt,process::Command};
     validate_authorization(id,hash,confirmation)?;
     let image=image.canonicalize()?;
     // Deny modification and deletion until the helper has completed.
     let guard=std::fs::OpenOptions::new().read(true).share_mode(1).open(&image)?;
+    progress(BurnStage::VerifyingImage);
     let verified=crate::image::verify_udf(manifest,&image)?;
     if !verified.sha256.eq_ignore_ascii_case(hash){bail!("Image differs from explicitly approved checksum");}
+    progress(BurnStage::InspectingRecorder);
     let discovery=discover()?;
     let media=eligible(&discovery,id,verified.image_bytes)?;
     let work=tempfile::Builder::new().prefix("das-burn-").tempdir()?;
     let script=work.path().join("burn.ps1");
     std::fs::write(&script,include_str!("imapi_burn.ps1"))?;
-    let result=Command::new("powershell.exe")
+    use std::io::{BufRead,BufReader,Read};
+    use std::process::Stdio;
+    let mut child=Command::new("powershell.exe")
         .args(["-NoLogo","-NoProfile","-NonInteractive","-ExecutionPolicy","Bypass","-File"])
         .arg(script).env("DAS_BURN_IMAGE",&image).env("DAS_BURN_ID",id)
         .env("DAS_BURN_HASH",hash).env("DAS_BURN_BYTES",verified.image_bytes.to_string())
         .env("DAS_BURN_MEDIA",media.physical_type.to_string())
         .env("DAS_BURN_CONFIRM",confirmation)
-        .output().context("Starting experimental writer; if interrupted, inspect media before retrying")?;
+        .stdout(Stdio::piped()).stderr(Stdio::piped()).spawn().context("Starting experimental writer; if interrupted, inspect media before retrying")?;
+    let stderr=child.stderr.take().context("Missing writer stderr")?;
+    // Drain stderr concurrently to prevent pipe deadlock during the physical write.
+    let drain=std::thread::spawn(move||{let mut data=Vec::new();let mut reader=stderr;let result=reader.read_to_end(&mut data);(result,data)});
+    let stdout=child.stdout.take().context("Missing writer stdout")?;
+    let mut completed=false;
+    let mut unexpected=false;
+    let mut read_error=None;
+    for line in BufReader::new(stdout).lines(){
+        match line{
+            Ok(line)=>{if let Some(stage)=parse_stage(&line){progress(stage);}
+                else if line.trim()=="WRITE_COMPLETED"&&!completed{completed=true;}
+                else if !line.trim().is_empty(){unexpected=true;}}
+            Err(e)=>{read_error=Some(e);break;}
+        }
+    }
+    let status=child.wait()?;
+    let (stderr_result,stderr)=drain.join().map_err(|_|anyhow::anyhow!("Writer diagnostics worker failed"))?;
     drop(guard);
-    if !result.status.success(){bail!("Writer failed; media may be partially written. Do not retry automatically: {}",String::from_utf8_lossy(&result.stderr));}
-    if String::from_utf8_lossy(&result.stdout).trim()!="WRITE_COMPLETED"{bail!("Unknown write outcome; inspect media before retrying");}
+    stderr_result?;
+    if !status.success(){bail!("Writer failed; media may be partially written. Do not retry automatically: {}",String::from_utf8_lossy(&stderr));}
+    if !completed||unexpected||read_error.is_some(){bail!("Unknown write outcome; inspect media before retrying");}
     Ok(BurnReceipt{recorder_id:id.into(),image_sha256:verified.sha256,image_bytes:verified.image_bytes,status:"written_unverified".into()})
 }
 #[cfg(not(windows))]
-fn burn(_manifest:&crate::image::PreparedDisc,_image:&std::path::Path,id:&str,hash:&str,confirmation:&str)->Result<BurnReceipt>{
+fn burn(_manifest:&crate::image::PreparedDisc,_image:&std::path::Path,id:&str,hash:&str,confirmation:&str,_progress:&mut dyn FnMut(BurnStage))->Result<BurnReceipt>{
     validate_authorization(id,hash,confirmation)?;
     bail!("Native physical writing requires Windows")
 }
@@ -205,13 +238,25 @@ mod burn_tests{
     }
 }
 
-pub fn burn_logged(journal:&crate::jobs::Journal,manifest:&crate::image::PreparedDisc,image:&std::path::Path,id:&str,hash:&str,confirmation:&str)->Result<BurnReceipt>{
+pub fn burn_logged_with_progress(journal:&crate::jobs::Journal,manifest:&crate::image::PreparedDisc,image:&std::path::Path,id:&str,hash:&str,confirmation:&str,progress:&mut dyn FnMut(BurnStage))->Result<BurnReceipt>{
     validate_authorization(id,hash,confirmation)?;
     let image=image.canonicalize()?;
     let _guard=crate::jobs::RecorderGuard::acquire(id)?;
     let attempt=journal.begin(id,&image,hash,manifest.number,&manifest.label)?;
-    match burn(manifest,&image,id,hash,confirmation){
-        Ok(receipt)=>{journal.finish(attempt,true,"Native writer returned successfully; physical readback pending")?;Ok(receipt)}
+    match burn(manifest,&image,id,hash,confirmation,progress){
+        Ok(receipt)=>{journal.finish(attempt,true,"Native writer returned successfully; physical readback pending")?;progress(BurnStage::WrittenUnverified);Ok(receipt)}
         Err(e)=>{journal.finish(attempt,false,&format!("{e:#}"))?;Err(e)}
     }
+}
+
+pub fn burn_logged(journal:&crate::jobs::Journal,manifest:&crate::image::PreparedDisc,image:&std::path::Path,id:&str,hash:&str,confirmation:&str)->Result<BurnReceipt>{
+    burn_logged_with_progress(journal,manifest,image,id,hash,confirmation,&mut |_|{})
+}
+#[cfg(test)]
+#[test]fn stage_protocol(){
+    assert_eq!(parse_stage("DAS_STAGE WRITING"),Some(BurnStage::WritingAndFinalizing));
+    assert_eq!(parse_stage("DAS_STAGE CHECKING_MEDIA"),Some(BurnStage::CheckingMedia));
+    assert_eq!(parse_stage("DAS_STAGE RELEASING"),Some(BurnStage::ReleasingRecorder));
+    assert_eq!(parse_stage("WRITE_COMPLETED"),None);
+    assert_eq!(parse_stage("DAS_STAGE UNKNOWN"),None);
 }

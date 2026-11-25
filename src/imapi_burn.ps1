@@ -37,6 +37,7 @@ try {
     try { $hash = [BitConverter]::ToString($sha.ComputeHash($guard)).Replace('-','') }
     finally { $sha.Dispose() }
     if ($hash -ne $env:DAS_BURN_HASH) { throw 'Image checksum changed' }
+    [Console]::WriteLine('DAS_STAGE CHECKING_MEDIA')
     $rec = New-Object -ComObject IMAPI2.MsftDiscRecorder2
     $rec.InitializeDiscRecorder($env:DAS_BURN_ID)
     $rec.AcquireExclusiveAccess($false,'Disc Archive Studio')
@@ -54,7 +55,9 @@ try {
     if ($free -le 0 -or $free -gt [long]$format.TotalSectorsOnMedia -or ($bytes / 2048) -gt $free) { throw 'Insufficient writable capacity' }
     $format.ForceMediaToBeClosed = $true
     $stream = [DasBurnStream]::Open($image)
+    [Console]::WriteLine('DAS_STAGE WRITING')
     $format.Write($stream)
+    [Console]::WriteLine('DAS_STAGE RELEASING')
 } finally {
     if ($null -ne $stream) { [void][Runtime.InteropServices.Marshal]::ReleaseComObject($stream) }
     if ($null -ne $format) { [void][Runtime.InteropServices.Marshal]::ReleaseComObject($format) }

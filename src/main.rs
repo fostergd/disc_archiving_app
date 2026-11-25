@@ -96,7 +96,7 @@ fn run()->Result<()> {
         Command::Burn{manifest,image,journal,recorder,sha256,confirm}=>{
             let m:disc_archive::image::PreparedDisc=serde_json::from_reader(BufReader::new(File::open(manifest)?))?;
             let j=disc_archive::jobs::Journal::open(&journal)?;
-            let receipt=disc_archive::optical::burn_logged(&j,&m,&image,&recorder,&sha256,&confirm)?;
+            let receipt=disc_archive::optical::burn_logged_with_progress(&j,&m,&image,&recorder,&sha256,&confirm,&mut |stage| eprintln!("Burn stage: {stage:?}"))?;
             println!("{}",serde_json::to_string_pretty(&receipt)?);
         },
         Command::JobsCreate{journal}=>{disc_archive::jobs::Journal::create(&journal)?;println!("Burn journal created");},
