@@ -83,3 +83,76 @@ mod tests{
         assert!(check_paths(&[f("Media/音楽.flac")]).is_ok());
     }
 }
+
+
+#[derive(Debug,Serialize)]
+pub struct ImageReceipt {
+    pub number:usize,pub label:String,pub bytes:u64,pub sha256:String,pub filesystem:String,
+    pub output:PathBuf,
+}
+
+#[cfg(windows)]
+pub fn create_udf(p:&Plan,number:usize,output:&Path)->Result<ImageReceipt>{
+    use std::io::Write;
+    use std::process::Command;
+    if output.exists(){bail!("Image output already exists");}
+    let prepared=prepare(p,number)?;
+    let parent=output.parent().filter(|p|!p.as_os_str().is_empty()).unwrap_or(Path::new("."));
+    let parent=parent.canonicalize()?;
+    let filename=output.file_name().context("Invalid image filename")?;
+    let final_path=parent.join(filename);
+    let work=tempfile::Builder::new().prefix("das-image-").tempdir_in(&parent)?;
+    let stage=work.path().join("stage");
+    std::fs::create_dir(&stage)?;
+    for f in &prepared.files{
+        let dest=stage.join(f.archive.replace('/',"\\"));
+        std::fs::create_dir_all(dest.parent().context("Invalid staging path")?)?;
+        let mut input=File::open(&f.source)?;
+        let mut target=File::options().write(true).create_new(true).open(&dest)?;
+        let mut hash=Sha256::new();
+        let mut copied=0u64;
+        let mut buf=vec![0u8;1024*1024];
+        loop{
+            let n=input.read(&mut buf)?;
+            if n==0{break;}
+            copied=copied.checked_add(n as u64).context("Size overflow")?;
+            if copied>f.bytes{bail!("Source grew during staging: {}",f.archive);}
+            target.write_all(&buf[..n])?;
+            hash.update(&buf[..n]);
+        }
+        if copied!=f.bytes||format!("{:x}",hash.finalize())!=f.sha256{bail!("Source changed during staging: {}",f.archive);}
+        target.sync_all()?;
+    }
+    // The script is embedded in the binary and receives data via environment variables.
+    // No user path or label is interpolated into PowerShell source.
+    let script=work.path().join("build.ps1");
+    std::fs::write(&script,include_str!("imapi_image.ps1"))?;
+    let image=work.path().join("image.iso");
+    let usable=prepared.capacity.checked_sub(prepared.reserve).context("Invalid reserve")?;
+    let result=Command::new("powershell.exe")
+        .args(["-NoLogo","-NoProfile","-NonInteractive","-ExecutionPolicy","Bypass","-File"])
+        .arg(&script)
+        .env("DAS_STAGE",&stage).env("DAS_IMAGE",&image)
+        .env("DAS_LABEL",&prepared.label).env("DAS_MAX_BLOCKS",(usable/2048).to_string())
+        .output().context("Starting Windows IMAPI image helper")?;
+    if !result.status.success(){bail!("IMAPI image generation failed: {}",String::from_utf8_lossy(&result.stderr));}
+    let bytes=std::fs::metadata(&image)?.len();
+    if bytes==0||bytes%2048!=0||bytes>usable{bail!("Generated image has invalid size or exceeds usable capacity: {bytes}");}
+    // Publish through a no-clobber temporary-file operation on the same volume.
+    let sha256=digest(&image)?;
+    let temp=tempfile::NamedTempFile::new_in(&parent)?;
+    let (file,path)=temp.into_parts();
+    let mut file=file;
+    let mut input=File::open(&image)?;
+    let copied=std::io::copy(&mut input,&mut file)?;
+    if copied!=bytes{bail!("Image changed during publication");}
+    file.sync_all()?;
+    drop(file);
+    if digest(&path)?!=sha256{bail!("Image checksum changed during publication");}
+    path.persist_noclobber(&final_path)?;
+    Ok(ImageReceipt{number,label:prepared.label,bytes,sha256,filesystem:"UDF 2.01".into(),output:final_path})
+}
+#[cfg(not(windows))]
+pub fn create_udf(_p:&Plan,_number:usize,_output:&Path)->Result<ImageReceipt>{
+    bail!("Native IMAPI image creation requires Windows");
+}
