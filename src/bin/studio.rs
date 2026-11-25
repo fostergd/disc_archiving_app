@@ -3,18 +3,19 @@ use disc_archive::{scan,plan_mixed,ScanOptions,Inventory,Plan,Strategy,MEDIA};
 use disc_archive::editing;
 use eframe::egui;
 use std::{path::PathBuf,sync::mpsc::{self,Receiver},fs::File,io::{BufReader,BufWriter,Write}};
-enum Work { Inventory(Inventory), Plan(Plan), Comparison(Vec<editing::Summary>), Duplicates(Vec<Vec<String>>), Saved(String), Error(String) }
+enum Work { Inventory(Inventory), Plan(Plan), Comparison(Vec<editing::Summary>), Duplicates(Vec<Vec<String>>), Saved(String), Project(disc_archive::project::Project), Error(String) }
 struct Studio {
     sources:Vec<PathBuf>, source_text:String, extensions:String, exclusions:String, hash:bool,
     capacities:String, reserve:String, strategy:Strategy, inventory:Option<Inventory>, plan:Option<Plan>,
     comparison:Vec<editing::Summary>, worker:Option<Receiver<Work>>, status:String, selected:Option<usize>,
     pattern:String, move_path:String, destination:usize, search:String, tab:usize,
     inventory_search:String, duplicate_groups:Vec<Vec<String>>, dirty:bool, close_prompt:bool,
+    project_name:String,
 }
 impl Default for Studio {
     fn default()->Self{Self{sources:vec![],source_text:String::new(),extensions:String::new(),exclusions:String::new(),hash:false,
         capacities:"50000000000".into(),reserve:"50000000".into(),strategy:Strategy::Hybrid,inventory:None,plan:None,comparison:vec![],
-        worker:None,status:"Add files or folders to begin.".into(),selected:None,pattern:"DISC_{n:03}".into(),move_path:String::new(),destination:1,search:String::new(),tab:0,inventory_search:String::new(),duplicate_groups:vec![],dirty:false,close_prompt:false}}
+        worker:None,status:"Add files or folders to begin.".into(),selected:None,pattern:"DISC_{n:03}".into(),move_path:String::new(),destination:1,search:String::new(),tab:0,inventory_search:String::new(),duplicate_groups:vec![],dirty:false,close_prompt:false,project_name:"Untitled archive".into()}}
 }
 fn caps(text:&str)->anyhow::Result<Vec<u64>> {let v=text.split(',').map(|s|s.trim().parse::<u64>()).collect::<Result<Vec<_>,_>>()?;Ok(v)}
 fn save_new<T:serde::Serialize>(path:PathBuf,value:&T)->anyhow::Result<()>{
@@ -39,10 +40,15 @@ impl Studio{
                 Work::Plan(p)=>{self.status=format!("{} discs; {} unassigned files",p.discs.len(),p.oversized.len());self.selected=p.discs.first().map(|d|d.number);self.reserve=p.reserve.to_string();self.strategy=p.strategy;self.plan=Some(p);self.comparison.clear();self.dirty=true;self.tab=1;}
                 Work::Comparison(v)=>{self.comparison=v;self.status="Comparison complete".into();self.tab=2;}
                 Work::Duplicates(v)=>{self.status=format!("{} duplicate groups",v.len());self.duplicate_groups=v;self.tab=4;}
+                Work::Project(p)=>{self.project_name=p.name;self.sources=p.sources;self.extensions=p.extensions.join(",");self.exclusions=p.exclusions.join("\n");self.hash=p.hash;self.capacities=p.capacities.iter().map(u64::to_string).collect::<Vec<_>>().join(",");self.reserve=p.reserve.to_string();self.strategy=p.strategy;self.pattern=p.naming_pattern;self.inventory=p.inventory;self.plan=p.plan;self.selected=self.plan.as_ref().and_then(|p|p.discs.first()).map(|d|d.number);self.comparison.clear();self.duplicate_groups.clear();self.tab=if self.plan.is_some(){1}else{0};self.dirty=false;self.status="Project opened".into();}
                 Work::Saved(message)=>{self.status=message;self.dirty=false;}
                 Work::Error(e)=>self.status=e,
             }
         }
+    }
+    fn snapshot(&self)->anyhow::Result<disc_archive::project::Project>{
+        let (reserve,strategy)=self.plan.as_ref().map(|p|(p.reserve,p.strategy)).unwrap_or((self.reserve.trim().parse()?,self.strategy));
+        Ok(disc_archive::project::Project{name:self.project_name.clone(),sources:self.sources.clone(),extensions:self.extensions.split(',').map(str::trim).filter(|s|!s.is_empty()).map(str::to_owned).collect(),exclusions:self.exclusions.lines().map(str::trim).filter(|s|!s.is_empty()).map(str::to_owned).collect(),hash:self.hash,capacities:caps(&self.capacities)?,reserve,strategy,naming_pattern:self.pattern.clone(),inventory:self.inventory.clone(),plan:self.plan.clone(),..Default::default()})
     }
     fn begin_plan(&mut self,ctx:&egui::Context,compare:bool){
         let result=(||->anyhow::Result<_>{
@@ -175,6 +181,9 @@ impl eframe::App for Studio{
             });
             ui.add_enabled_ui(self.worker.is_none(),|ui|{
                 ui.horizontal_wrapped(|ui|{
+                    if ui.add_enabled(!self.dirty&&self.plan.is_none()&&self.inventory.is_none(),egui::Button::new("Open project")).clicked(){if let Some(path)=rfd::FileDialog::new().add_filter("Archive project",&["json"]).pick_file(){self.spawn(ctx,move||Ok(Work::Project(disc_archive::project::load(&path)?)));}}
+                    if ui.button("Save project as").clicked(){match self.snapshot(){Ok(p)=>{if let Some(path)=rfd::FileDialog::new().set_file_name("archive.das.json").save_file(){self.spawn(ctx,move||{disc_archive::project::save(&path,&p)?;Ok(Work::Saved("Project saved".into()))});}},Err(e)=>self.status=e.to_string()}}
+                    if ui.button("Close project").clicked(){self.tab=5;}
                     if ui.button("Load inventory").clicked()&&self.plan.is_none(){if let Some(path)=rfd::FileDialog::new().add_filter("JSON",&["json"]).pick_file(){
                         self.spawn(ctx,move||Ok(Work::Inventory(serde_json::from_reader(BufReader::new(File::open(path)?))?)));
                     }}
@@ -184,6 +193,7 @@ impl eframe::App for Studio{
                     if ui.add_enabled(self.plan.is_some(),egui::Button::new("Close plan")).clicked(){self.status="Save the plan before closing; use the separate confirmation below.".into();self.tab=3;}
                 });
             });
+            ui.horizontal(|ui|{ui.label("Project name");if ui.text_edit_singleline(&mut self.project_name).changed(){self.dirty=true;}});
             ui.horizontal(|ui|{ui.selectable_value(&mut self.tab,0,"Sources");ui.selectable_value(&mut self.tab,1,"Planner");ui.selectable_value(&mut self.tab,2,"Comparison");ui.selectable_value(&mut self.tab,4,"Duplicates");});
         });
         egui::TopBottomPanel::bottom("status").show(ctx,|ui|{ui.horizontal(|ui|{if self.worker.is_some(){ui.spinner();}ui.label(&self.status);});});
@@ -193,6 +203,7 @@ impl eframe::App for Studio{
                 1=>self.planner_ui(ui,ctx),
                 2=>{ui.heading("Distribution comparison");for s in &self.comparison{ui.label(format!("{:?}: {} discs | {} assigned | {} unassigned | {} split folders | {:.2} GB used / {:.2} GB capacity",s.strategy,s.discs,s.files,s.unassigned,s.split_folders,s.estimated_used_bytes as f64/1e9,s.capacity_bytes as f64/1e9));}},
                 4=>{ui.heading("Duplicate content");ui.label("Identical SHA-256 and file size. No files are removed.");for (i,group) in self.duplicate_groups.iter().enumerate(){ui.collapsing(format!("Group {} - {} files",i+1,group.len()),|ui|{for path in group{ui.label(path);}});}},
+                5=>{ui.label("Closing the project discards all unsaved project settings, inventory and plan. Save a new project revision first if needed.");if ui.button("Confirm close project").clicked(){*self=Self::default();}if ui.button("Cancel").clicked(){self.tab=0;}},
                 _=>{ui.label("Closing disc plan discards unsaved edits.");if ui.button("Confirm close plan").clicked(){self.plan=None;self.selected=None;self.dirty=false;self.tab=0;self.status="Plan closed".into();}if ui.button("Cancel").clicked(){self.tab=1;}}
             });});
         });

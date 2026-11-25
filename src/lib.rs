@@ -12,7 +12,7 @@ pub struct Entry {
     pub bytes: u64,
     pub sha256: Option<String>,
 }
-#[derive(Debug, Default, Serialize, Deserialize)]
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
 pub struct Inventory {
     pub files: Vec<Entry>,
     pub excluded: Vec<String>,
@@ -411,3 +411,5 @@ mod tests {
 }
 
 pub mod editing;
+
+pub mod project;

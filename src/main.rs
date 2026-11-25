@@ -20,6 +20,9 @@ enum Command {
     Compare { inventory: PathBuf, #[arg(long,default_value_t=50_000_000_000)] capacity:u64, #[arg(long,value_delimiter=',')] capacities:Vec<u64>, #[arg(long,default_value_t=50_000_000)] reserve:u64 },
     Edit { plan:PathBuf, #[arg(short,long)] output:PathBuf, #[command(subcommand)] action:EditAction },
     Validate { plan:PathBuf },
+    ProjectCheck { project:PathBuf },
+    ProjectPack { inventory:PathBuf, plan:PathBuf, #[arg(short,long)] output:PathBuf, #[arg(long,default_value="Archive")] name:String },
+    ProjectExtract { project:PathBuf, #[arg(long)] inventory:Option<PathBuf>, #[arg(long)] plan:Option<PathBuf> },
 }
 #[derive(Subcommand)]
 enum EditAction {
@@ -75,6 +78,24 @@ fn run()->Result<()> {
                 EditAction::Replan{capacities,mode,pattern}=>p=replan(&p,&capacities,mode.into(),pattern.as_deref())?,
             }
             write_new(output,&p)?;
+        },
+        Command::ProjectCheck{project}=>{
+            let p=disc_archive::project::load(&project)?;
+            println!("Project validated: {}",p.name);
+            if let Some(plan)=p.plan{println!("{}",serde_json::to_string_pretty(&disc_archive::editing::summary(&plan))?);}
+        },
+        Command::ProjectPack{inventory,plan,output,name}=>{
+            let i:Inventory=serde_json::from_reader(BufReader::new(File::open(inventory)?))?;
+            let p:disc_archive::Plan=serde_json::from_reader(BufReader::new(File::open(plan)?))?;
+            let caps=if p.discs.is_empty(){vec![p.reserve.checked_add(1).ok_or_else(||anyhow::anyhow!("Invalid reserve"))?]}else{p.discs.iter().map(|d|d.capacity).collect()};
+            let project=disc_archive::project::Project{name,capacities:caps,reserve:p.reserve,strategy:p.strategy,inventory:Some(i),plan:Some(p),..Default::default()};
+            disc_archive::project::save(&output,&project)?;
+        },
+        Command::ProjectExtract{project,inventory,plan}=>{
+            let p=disc_archive::project::load(&project)?;
+            if inventory.is_none()&&plan.is_none(){bail!("Select at least one output");}
+            if let Some(path)=inventory{write_new(path,p.inventory.as_ref().ok_or_else(||anyhow::anyhow!("No inventory stored"))?)?;}
+            if let Some(path)=plan{write_new(path,p.plan.as_ref().ok_or_else(||anyhow::anyhow!("No plan stored"))?)?;}
         },
         Command::Duplicates{inventory}=>{
             let i:Inventory=serde_json::from_reader(BufReader::new(File::open(inventory)?))?;
