@@ -3,7 +3,7 @@ use disc_archive::{scan,plan_mixed,ScanOptions,Inventory,Plan,Strategy,MEDIA};
 use disc_archive::editing;
 use eframe::egui;
 use std::{path::PathBuf,sync::mpsc::{self,Receiver},fs::File,io::{BufReader,BufWriter,Write}};
-enum Work { Inventory(Inventory), Plan(Plan), Comparison(Vec<editing::Summary>), Duplicates(Vec<Vec<String>>), Saved(String), Project(disc_archive::project::Project), CatalogOpened(PathBuf,Vec<disc_archive::catalog::ProjectRow>), CatalogResults(Vec<disc_archive::catalog::Match>,usize), CatalogImported(i64,Vec<disc_archive::catalog::ProjectRow>), Error(String) }
+enum Work { Inventory(Inventory), Plan(Plan), Comparison(Vec<editing::Summary>), Duplicates(Vec<Vec<String>>), Saved(String), Project(disc_archive::project::Project), CatalogOpened(PathBuf,Vec<disc_archive::catalog::ProjectRow>), CatalogResults(Vec<disc_archive::catalog::Match>,usize), CatalogImported(i64,Vec<disc_archive::catalog::ProjectRow>), ImageCreated(disc_archive::image::ImageReceipt), ImageVerified(disc_archive::image::VerificationReceipt), ManifestSaved(PathBuf), Error(String) }
 struct Studio {
     sources:Vec<PathBuf>, source_text:String, extensions:String, exclusions:String, hash:bool,
     capacities:String, reserve:String, strategy:Strategy, inventory:Option<Inventory>, plan:Option<Plan>,
@@ -11,12 +11,13 @@ struct Studio {
     pattern:String, move_path:String, destination:usize, search:String, tab:usize,
     inventory_search:String, duplicate_groups:Vec<Vec<String>>, dirty:bool, close_prompt:bool,
     project_name:String,
+    image_disc:usize, image_receipt:Option<disc_archive::image::ImageReceipt>, verify_receipt:Option<disc_archive::image::VerificationReceipt>, image_path:Option<PathBuf>, manifest_path:Option<PathBuf>,
     catalog_path:Option<PathBuf>, catalog_projects:Vec<disc_archive::catalog::ProjectRow>, catalog_rows:Vec<disc_archive::catalog::Match>, catalog_term:String, catalog_project:Option<i64>, catalog_offset:usize, catalog_has_next:bool, catalog_query:Option<(String,Option<i64>)>,
 }
 impl Default for Studio {
     fn default()->Self{Self{sources:vec![],source_text:String::new(),extensions:String::new(),exclusions:String::new(),hash:false,
         capacities:"50000000000".into(),reserve:"50000000".into(),strategy:Strategy::Hybrid,inventory:None,plan:None,comparison:vec![],
-        worker:None,status:"Add files or folders to begin.".into(),selected:None,pattern:"DISC_{n:03}".into(),move_path:String::new(),destination:1,search:String::new(),tab:0,inventory_search:String::new(),duplicate_groups:vec![],dirty:false,close_prompt:false,project_name:"Untitled archive".into(),catalog_path:None,catalog_projects:vec![],catalog_rows:vec![],catalog_term:String::new(),catalog_project:None,catalog_offset:0,catalog_has_next:false,catalog_query:None}}
+        worker:None,status:"Add files or folders to begin.".into(),selected:None,pattern:"DISC_{n:03}".into(),move_path:String::new(),destination:1,search:String::new(),tab:0,inventory_search:String::new(),duplicate_groups:vec![],dirty:false,close_prompt:false,project_name:"Untitled archive".into(),image_disc:1,image_receipt:None,verify_receipt:None,image_path:None,manifest_path:None,catalog_path:None,catalog_projects:vec![],catalog_rows:vec![],catalog_term:String::new(),catalog_project:None,catalog_offset:0,catalog_has_next:false,catalog_query:None}}
 }
 fn caps(text:&str)->anyhow::Result<Vec<u64>> {let v=text.split(',').map(|s|s.trim().parse::<u64>()).collect::<Result<Vec<_>,_>>()?;Ok(v)}
 fn save_new<T:serde::Serialize>(path:PathBuf,value:&T)->anyhow::Result<()>{
@@ -46,6 +47,9 @@ impl Studio{
                 Work::CatalogOpened(path,projects)=>{self.catalog_path=Some(path);self.catalog_projects=projects;self.catalog_rows.clear();self.catalog_project=None;self.catalog_offset=0;self.catalog_has_next=false;self.catalog_query=None;self.status="Catalog opened".into();self.tab=6;}
                 Work::CatalogResults(mut rows,offset)=>{self.catalog_has_next=rows.len()>100;rows.truncate(100);self.catalog_rows=rows;self.catalog_offset=offset;self.status=format!("Catalog page {}",offset/100+1);}
                 Work::CatalogImported(id,projects)=>{self.catalog_projects=projects;self.catalog_rows.clear();self.catalog_query=None;self.catalog_has_next=false;self.catalog_offset=0;self.catalog_project=Some(id);self.status=format!("Imported planned snapshot {}",id);}
+                Work::ImageCreated(receipt)=>{self.status=format!("Image created and {} files verified",receipt.verified_files);self.image_path=Some(receipt.output.clone());self.image_receipt=Some(receipt);}
+                Work::ImageVerified(receipt)=>{self.status=format!("Image verified: {} files",receipt.files);self.verify_receipt=Some(receipt);}
+                Work::ManifestSaved(path)=>{self.status=format!("Preparation manifest saved: {}",path.display());self.manifest_path=Some(path);}
                 Work::Error(e)=>self.status=e,
             }
         }
@@ -136,6 +140,62 @@ impl Studio{
                 });
             }
         });
+    }
+    fn image_ui(&mut self,ui:&mut egui::Ui,ctx:&egui::Context){
+        ui.heading("Disc images");
+        ui.label("Create UDF 2.01 images and verify their contents. No physical media is written.");
+        ui.label("Use a local NTFS destination with free space for staging and the image; Windows mounting must be available.");
+        let mut chosen=None;
+        if let Some(p)=self.plan.as_ref(){
+            if !p.discs.iter().any(|d|d.number==self.image_disc){self.image_disc=p.discs.first().map(|d|d.number).unwrap_or(0);}
+            egui::ComboBox::from_label("Disc to prepare").selected_text(format!("Disc {}",self.image_disc)).show_ui(ui,|ui|{
+                for d in &p.discs{ui.selectable_value(&mut self.image_disc,d.number,format!("{} - {} files",d.label,d.files.len()));}
+            });
+            if let Some(d)=p.discs.iter().find(|d|d.number==self.image_disc){
+                ui.label(format!("{} | {} files | {} estimated / {} usable",d.label,d.files.len(),gb(d.estimated_used),gb(d.capacity-p.reserve)));
+                let mut prepare=false;let mut create=false;
+                ui.horizontal(|ui|{
+                    prepare=ui.add_enabled(!d.files.is_empty(),egui::Button::new("Save preparation manifest")).clicked();
+                    create=ui.add_enabled(!d.files.is_empty(),egui::Button::new("Create verified image")).clicked();
+                });
+                if prepare||create{chosen=Some((p.clone(),d.number,d.label.clone(),create));}
+            }
+        }else{ui.label("Open or create a disc plan to generate an image.");}
+        if let Some((p,n,label,create))=chosen{
+            if create{
+                if let Some(path)=rfd::FileDialog::new().add_filter("UDF image",&["iso"]).set_file_name(format!("{label}.iso")).save_file(){
+                    self.image_receipt=None;self.verify_receipt=None;
+                    self.spawn(ctx,move||Ok(Work::ImageCreated(disc_archive::image::create_udf(&p,n,&path)?)));
+                }
+            }else if let Some(path)=rfd::FileDialog::new().add_filter("Preparation manifest",&["json"]).set_file_name(format!("{label}.prepared.json")).save_file(){
+                self.spawn(ctx,move||{let manifest=disc_archive::image::prepare(&p,n)?;save_new(path.clone(),&manifest)?;Ok(Work::ManifestSaved(path))});
+            }
+        }
+        ui.separator();
+        ui.heading("Verify an existing image");
+        ui.horizontal_wrapped(|ui|{
+            if ui.button("Choose manifest").clicked(){if let Some(path)=rfd::FileDialog::new().add_filter("JSON",&["json"]).pick_file(){self.manifest_path=Some(path);self.verify_receipt=None;}}
+            ui.label(self.manifest_path.as_ref().map(|p|p.display().to_string()).unwrap_or_else(||"No manifest selected".into()));
+        });
+        ui.horizontal_wrapped(|ui|{
+            if ui.button("Choose image").clicked(){if let Some(path)=rfd::FileDialog::new().add_filter("UDF image",&["iso"]).pick_file(){self.image_path=Some(path);self.verify_receipt=None;}}
+            ui.label(self.image_path.as_ref().map(|p|p.display().to_string()).unwrap_or_else(||"No image selected".into()));
+        });
+        if ui.add_enabled(self.manifest_path.is_some()&&self.image_path.is_some(),egui::Button::new("Verify image against manifest")).clicked(){
+            let manifest=self.manifest_path.clone().unwrap();let image=self.image_path.clone().unwrap();
+            self.verify_receipt=None;
+            self.spawn(ctx,move||{let p:disc_archive::image::PreparedDisc=serde_json::from_reader(BufReader::new(File::open(manifest)?))?;Ok(Work::ImageVerified(disc_archive::image::verify_udf(&p,&image)?))});
+        }
+        if let Some(r)=&self.image_receipt{
+            ui.separator();ui.heading("Last successful image creation");
+            ui.label(r.output.display().to_string());ui.label(format!("{} | {} bytes | {} verified files",r.label,r.bytes,r.verified_files));
+            ui.label(format!("SHA-256: {}",r.sha256));
+        }
+        if let Some(r)=&self.verify_receipt{
+            ui.separator();ui.heading("Last successful independent verification");
+            ui.label(format!("{} files | {} payload bytes | {} image bytes",r.files,r.payload_bytes,r.image_bytes));
+            ui.label(format!("SHA-256: {}",r.sha256));
+        }
     }
     fn sources_ui(&mut self,ui:&mut egui::Ui,ctx:&egui::Context){
         ui.heading("Archive sources");
@@ -240,14 +300,14 @@ impl eframe::App for Studio{
     fn update(&mut self,ctx:&egui::Context,_frame:&mut eframe::Frame){
         self.poll();
         if ctx.input(|i|i.viewport().close_requested()) && (self.dirty||self.worker.is_some()) {ctx.send_viewport_cmd(egui::ViewportCommand::CancelClose);self.close_prompt=true;}
-        if self.close_prompt {egui::Window::new("Close application?").collapsible(false).show(ctx,|ui|{ui.label("Unsaved plan changes or running work may be lost.");if ui.button("Keep working").clicked(){self.close_prompt=false;}if ui.button("Discard and exit").clicked(){self.close_prompt=false;self.dirty=false;self.worker=None;ctx.send_viewport_cmd(egui::ViewportCommand::Close);}});}
+        if self.close_prompt {egui::Window::new("Close application?").collapsible(false).show(ctx,|ui|{ui.label("Wait for running work to finish before exiting; unsaved plan changes may be lost.");if ui.button("Keep working").clicked(){self.close_prompt=false;}if ui.add_enabled(self.worker.is_none(),egui::Button::new("Discard and exit")).clicked(){self.close_prompt=false;self.dirty=false;self.worker=None;ctx.send_viewport_cmd(egui::ViewportCommand::Close);}});}
         if self.worker.is_none(){
             let dropped=ctx.input(|i|i.raw.dropped_files.clone());
             for f in dropped{if let Some(p)=f.path{self.add(p);}}
         }
         egui::TopBottomPanel::top("top").show(ctx,|ui|{
             ui.horizontal_wrapped(|ui|{
-                ui.heading("Disc Archive Studio");ui.label("Planning preview - no optical writing");if self.dirty{ui.label("Unsaved plan");}
+                ui.heading("Disc Archive Studio");ui.label("Archive planning and verified images - no physical writing");if self.dirty{ui.label("Unsaved plan");}
                 if ui.button("Toggle theme").clicked(){let dark=ctx.style().visuals.dark_mode;ctx.set_visuals(if dark{egui::Visuals::light()}else{egui::Visuals::dark()});}
             });
             ui.add_enabled_ui(self.worker.is_none(),|ui|{
@@ -265,7 +325,7 @@ impl eframe::App for Studio{
                 });
             });
             ui.horizontal(|ui|{ui.label("Project name");if ui.text_edit_singleline(&mut self.project_name).changed(){self.dirty=true;}});
-            ui.horizontal(|ui|{ui.selectable_value(&mut self.tab,0,"Sources");ui.selectable_value(&mut self.tab,1,"Planner");ui.selectable_value(&mut self.tab,2,"Comparison");ui.selectable_value(&mut self.tab,4,"Duplicates");ui.selectable_value(&mut self.tab,6,"Catalog");});
+            ui.horizontal(|ui|{ui.selectable_value(&mut self.tab,0,"Sources");ui.selectable_value(&mut self.tab,1,"Planner");ui.selectable_value(&mut self.tab,2,"Comparison");ui.selectable_value(&mut self.tab,4,"Duplicates");ui.selectable_value(&mut self.tab,6,"Catalog");ui.selectable_value(&mut self.tab,7,"Images");});
         });
         egui::TopBottomPanel::bottom("status").show(ctx,|ui|{ui.horizontal(|ui|{if self.worker.is_some(){ui.spinner();}ui.label(&self.status);});});
         egui::CentralPanel::default().show(ctx,|ui|{
@@ -275,6 +335,7 @@ impl eframe::App for Studio{
                 2=>{ui.heading("Distribution comparison");for s in &self.comparison{ui.label(format!("{:?}: {} discs | {} assigned | {} unassigned | {} split folders | {:.2} GB used / {:.2} GB capacity",s.strategy,s.discs,s.files,s.unassigned,s.split_folders,s.estimated_used_bytes as f64/1e9,s.capacity_bytes as f64/1e9));}},
                 4=>{ui.heading("Duplicate content");ui.label("Identical SHA-256 and file size. No files are removed.");for (i,group) in self.duplicate_groups.iter().enumerate(){ui.collapsing(format!("Group {} - {} files",i+1,group.len()),|ui|{for path in group{ui.label(path);}});}},
                 6=>self.catalog_ui(ui,ctx),
+                7=>self.image_ui(ui,ctx),
                 5=>{ui.label("Closing the project discards all unsaved project settings, inventory and plan. Save a new project revision first if needed.");if ui.button("Confirm close project").clicked(){*self=Self::default();}if ui.button("Cancel").clicked(){self.tab=0;}},
                 _=>{ui.label("Closing disc plan discards unsaved edits.");if ui.button("Confirm close plan").clicked(){self.plan=None;self.selected=None;self.dirty=false;self.tab=0;self.status="Plan closed".into();}if ui.button("Cancel").clicked(){self.tab=1;}}
             });});
