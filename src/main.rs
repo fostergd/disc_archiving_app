@@ -21,6 +21,7 @@ enum Command {
     Edit { plan:PathBuf, #[arg(short,long)] output:PathBuf, #[command(subcommand)] action:EditAction },
     Validate { plan:PathBuf },
     Drives,
+    BurnPreview { manifest:PathBuf, image:PathBuf, #[arg(long)] recorder:String },
     ImageVerify { manifest:PathBuf, image:PathBuf },
     ImageCreate { plan:PathBuf, disc:usize, #[arg(short,long)] output:PathBuf },
     ImagePrepare { plan:PathBuf, disc:usize, #[arg(short,long)] output:PathBuf },
@@ -86,6 +87,11 @@ fn run()->Result<()> {
                 EditAction::Replan{capacities,mode,pattern}=>p=replan(&p,&capacities,mode.into(),pattern.as_deref())?,
             }
             write_new(output,&p)?;
+        },
+        Command::BurnPreview{manifest,image,recorder}=>{
+            let m:disc_archive::image::PreparedDisc=serde_json::from_reader(BufReader::new(File::open(manifest)?))?;
+            let preview=disc_archive::optical::burn_preview(&m,&image,&recorder)?;
+            println!("{}",serde_json::to_string_pretty(&preview)?);
         },
         Command::Drives=>{println!("{}",serde_json::to_string_pretty(&disc_archive::optical::discover()?)?);},
         Command::ImageVerify{manifest,image}=>{

@@ -96,3 +96,46 @@ mod tests{
     #[cfg(windows)]
     #[test]fn native_discovery_smoke(){discover().expect("Native IMAPI discovery").validate().unwrap();}
 }
+
+
+/// Read-only authorization preview. This is never permission to write later:
+/// the actual writer must repeat all checks under exclusive access.
+#[derive(Debug,Serialize)]
+pub struct BurnPreview{
+    pub recorder_id:String,pub image_bytes:u64,pub image_sha256:String,
+    pub media_type:String,pub free_bytes:u64,pub verified_files:usize,
+}
+fn eligible<'a>(d:&'a Discovery,id:&str,bytes:u64)->Result<&'a Media>{
+    use anyhow::Context;
+    d.validate()?;
+    let r=d.recorders.iter().find(|r|r.id==id).context("Selected recorder not found")?;
+    let m=r.media.as_ref().context("Selected recorder has no inspected medium")?;
+    if !m.fits_image(bytes){bail!("Selected medium is not an eligible blank write-once disc or lacks capacity");}
+    Ok(m)
+}
+pub fn burn_preview(manifest:&crate::image::PreparedDisc,image:&std::path::Path,id:&str)->Result<BurnPreview>{
+    if id.trim().is_empty(){bail!("Explicit recorder identity required");}
+    // Image verification mounts a virtual ISO only, never a physical recorder.
+    let verified=crate::image::verify_udf(manifest,image)?;
+    let discovery=discover()?;
+    let m=eligible(&discovery,id,verified.image_bytes)?;
+    Ok(BurnPreview{recorder_id:id.to_owned(),image_bytes:verified.image_bytes,image_sha256:verified.sha256,
+        media_type:m.type_name().into(),free_bytes:m.free_bytes().unwrap_or(0),verified_files:verified.files})
+}
+#[cfg(test)]
+mod preview_tests{
+    use super::*;
+    #[test]fn explicit_target_and_capacity(){
+        let m=Media{physical_type:18,supported:true,physically_blank:true,heuristically_blank:true,status:2,free_sectors:100,total_sectors:100};
+        let r=Recorder{id:"drive-A".into(),vendor:"test".into(),product:"test".into(),revision:String::new(),paths:vec![],profiles:vec![],media:Some(m),inspection_error:None};
+        let mut d=Discovery{recorders:vec![r],errors:vec![]};
+        assert!(eligible(&d,"drive-A",204800).is_ok());
+        assert!(eligible(&d,"drive-B",2048).is_err());
+        assert!(eligible(&d,"drive-A",206848).is_err());
+        assert!(eligible(&d,"drive-A",2047).is_err());
+        d.recorders[0].media.as_mut().unwrap().physically_blank=false;
+        assert!(eligible(&d,"drive-A",2048).is_err());
+        d.recorders[0].media=None;
+        assert!(eligible(&d,"drive-A",2048).is_err());
+    }
+}
