@@ -103,16 +103,22 @@ pub fn duplicates(files: &[Entry]) -> Vec<Vec<String>> {
 
 #[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq, Eq)]
 pub enum Strategy { Sequential, Folder, Maximum, Hybrid }
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Disc {
     pub number: usize,
+    #[serde(default)]
+    pub locked: bool,
+    #[serde(default)]
+    pub label: String,
     pub capacity: u64,
     pub estimated_used: u64,
     pub files: Vec<Entry>,
 }
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Plan {
     pub strategy: Strategy,
+    #[serde(default)]
+    pub reserve: u64,
     pub discs: Vec<Disc>,
     pub oversized: Vec<Entry>,
 }
@@ -176,7 +182,7 @@ pub fn plan(files: &[Entry], capacity: u64, reserve: u64, strategy: Strategy) ->
 pub fn plan_mixed(files: &[Entry], capacities: &[u64], reserve: u64, strategy: Strategy) -> Result<Plan> {
     if capacities.is_empty() || capacities.iter().any(|&c|c<=reserve) {bail!("Every capacity must exceed reserve");}
     let limit=capacities.iter().copied().max().unwrap()-reserve;
-    let mut result=Plan {strategy,discs:vec![],oversized:vec![]};
+    let mut result=Plan {strategy,reserve,discs:vec![],oversized:vec![]};
     let mut sorted=files.to_vec();
     let mut paths=HashSet::new();
     for f in &sorted {
@@ -211,7 +217,7 @@ pub fn plan_mixed(files: &[Entry], capacities: &[u64], reserve: u64, strategy: S
                 continue;
             };
             let i=result.discs.len();
-            result.discs.push(Disc{number:i+1,capacity:cap,estimated_used:0,files:vec![]});
+            result.discs.push(Disc{number:i+1,locked:false,label:format!("DISC_{:03}",i+1),capacity:cap,estimated_used:0,files:vec![]});
             i
         };
         result.discs[i].estimated_used+=size;
@@ -266,3 +272,5 @@ mod tests {
         assert_eq!(i.files.len(),2); assert_eq!(i.excluded.len(),2);
     }
 }
+
+pub mod editing;
