@@ -20,6 +20,7 @@ enum Command {
     Compare { inventory: PathBuf, #[arg(long,default_value_t=50_000_000_000)] capacity:u64, #[arg(long,value_delimiter=',')] capacities:Vec<u64>, #[arg(long,default_value_t=50_000_000)] reserve:u64 },
     Edit { plan:PathBuf, #[arg(short,long)] output:PathBuf, #[command(subcommand)] action:EditAction },
     Validate { plan:PathBuf },
+    ImageVerify { manifest:PathBuf, image:PathBuf },
     ImageCreate { plan:PathBuf, disc:usize, #[arg(short,long)] output:PathBuf },
     ImagePrepare { plan:PathBuf, disc:usize, #[arg(short,long)] output:PathBuf },
     CatalogCreate { database:PathBuf },
@@ -84,6 +85,10 @@ fn run()->Result<()> {
                 EditAction::Replan{capacities,mode,pattern}=>p=replan(&p,&capacities,mode.into(),pattern.as_deref())?,
             }
             write_new(output,&p)?;
+        },
+        Command::ImageVerify{manifest,image}=>{
+            let p:disc_archive::image::PreparedDisc=serde_json::from_reader(BufReader::new(File::open(manifest)?))?;
+            println!("{}",serde_json::to_string_pretty(&disc_archive::image::verify_udf(&p,&image)?)?);
         },
         Command::ImageCreate{plan,disc,output}=>{
             let p:disc_archive::Plan=serde_json::from_reader(BufReader::new(File::open(plan)?))?;

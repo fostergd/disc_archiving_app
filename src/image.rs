@@ -2,14 +2,14 @@
 use super::*;
 use serde::Serialize;
 
-#[derive(Debug,Serialize)]
+#[derive(Debug,Serialize,Deserialize)]
 pub struct PreparedFile {
     pub source:PathBuf,
     pub archive:String,
     pub bytes:u64,
     pub sha256:String,
 }
-#[derive(Debug,Serialize)]
+#[derive(Debug,Serialize,Deserialize)]
 pub struct PreparedDisc {
     pub number:usize,
     pub label:String,
@@ -85,10 +85,11 @@ mod tests{
 }
 
 
-#[derive(Debug,Serialize)]
+#[derive(Debug,Serialize,Deserialize)]
 pub struct ImageReceipt {
     pub number:usize,pub label:String,pub bytes:u64,pub sha256:String,pub filesystem:String,
     pub output:PathBuf,
+    pub verified_files:usize,
 }
 
 #[cfg(windows)]
@@ -142,8 +143,10 @@ pub fn create_udf(p:&Plan,number:usize,output:&Path)->Result<ImageReceipt>{
     // Windows CreateHardLink fails if the destination exists. Unsupported
     // destination filesystems fail closed rather than replacing anything.
     let sha256=digest(&image)?;
+    verify_udf(&prepared,&image)?;
+    if digest(&image)?!=sha256{bail!("Image changed during verification");}
     std::fs::hard_link(&image,&final_path).context("Publishing image requires hard-link support on the destination filesystem (NTFS recommended)")?;
-    Ok(ImageReceipt{number,label:prepared.label,bytes,sha256,filesystem:"UDF 2.01".into(),output:final_path})
+    Ok(ImageReceipt{number,label:prepared.label,bytes,sha256,filesystem:"UDF 2.01".into(),output:final_path,verified_files:prepared.files.len()})
 }
 #[cfg(not(windows))]
 pub fn create_udf(_p:&Plan,_number:usize,_output:&Path)->Result<ImageReceipt>{
@@ -167,6 +170,10 @@ mod native_tests{
         let p=plan(&entries,64*1024*1024,1024*1024,Strategy::Sequential).unwrap();
         let output=tmp.path().join("DISC_001.iso");
         let receipt=create_udf(&p,1,&output).expect("Native Windows IMAPI image generation");
+        assert_eq!(receipt.verified_files,entries.len());
+        let mut manifest=prepare(&p,1).unwrap();
+        manifest.files[0].sha256="0".repeat(64);
+        assert!(verify_udf(&manifest,&output).is_err());
         assert_eq!(receipt.bytes,std::fs::metadata(&output).unwrap().len());
         assert_eq!(receipt.sha256,digest(&output).unwrap());
         assert_eq!(receipt.bytes%2048,0);
@@ -179,4 +186,44 @@ mod native_tests{
         assert_eq!(std::fs::read(&src).unwrap(),payload);
         assert!(!std::fs::read_dir(tmp.path()).unwrap().any(|e|e.unwrap().file_name().to_string_lossy().starts_with("das-image-")));
     }
+}
+
+
+#[derive(Debug,Serialize)]
+pub struct VerificationReceipt{
+    pub files:usize,pub payload_bytes:u64,pub image_bytes:u64,pub sha256:String,
+}
+fn validate_manifest(p:&PreparedDisc)->Result<()>{
+    if p.files.is_empty()||p.reserve>=p.capacity{bail!("Invalid prepared disc");}
+    let entries:Vec<_>=p.files.iter().map(|f|Entry{source:f.source.clone(),archive:f.archive.clone(),bytes:f.bytes,sha256:Some(f.sha256.clone())}).collect();
+    check_paths(&entries)?;
+    if p.files.iter().any(|f|f.sha256.len()!=64||!f.sha256.bytes().all(|b|b.is_ascii_hexdigit())){bail!("Invalid manifest checksum");}
+    Ok(())
+}
+#[cfg(windows)]
+pub fn verify_udf(p:&PreparedDisc,image:&Path)->Result<VerificationReceipt>{
+    use std::process::Command;
+    validate_manifest(p)?;
+    let image=image.canonicalize()?;
+    let meta=std::fs::metadata(&image)?;
+    let bytes=meta.len();
+    if !meta.is_file()||bytes==0||bytes%2048!=0||bytes>p.capacity-p.reserve{bail!("Invalid image size");}
+    let sha256=digest(&image)?;
+    let work=tempfile::Builder::new().prefix("das-verify-").tempdir()?;
+    let script=work.path().join("verify.ps1");
+    let manifest=work.path().join("manifest.json");
+    std::fs::write(&script,include_str!("imapi_verify.ps1"))?;
+    std::fs::write(&manifest,serde_json::to_vec(p)?)?;
+    let result=Command::new("powershell.exe")
+        .args(["-NoLogo","-NoProfile","-NonInteractive","-ExecutionPolicy","Bypass","-File"])
+        .arg(&script).env("DAS_VERIFY_IMAGE",&image).env("DAS_VERIFY_MANIFEST",&manifest)
+        .output().context("Starting mounted image verifier")?;
+    if !result.status.success(){bail!("Mounted image verification failed: {}",String::from_utf8_lossy(&result.stderr));}
+    if digest(&image)?!=sha256{bail!("Image changed during verification");}
+    let payload_bytes=p.files.iter().try_fold(0u64,|sum,f|sum.checked_add(f.bytes).context("Payload size overflow"))?;
+    Ok(VerificationReceipt{files:p.files.len(),payload_bytes,image_bytes:bytes,sha256})
+}
+#[cfg(not(windows))]
+pub fn verify_udf(_p:&PreparedDisc,_image:&Path)->Result<VerificationReceipt>{
+    bail!("Mounted UDF verification requires Windows")
 }
