@@ -138,21 +138,45 @@ pub fn create_udf(p:&Plan,number:usize,output:&Path)->Result<ImageReceipt>{
     if !result.status.success(){bail!("IMAPI image generation failed: {}",String::from_utf8_lossy(&result.stderr));}
     let bytes=std::fs::metadata(&image)?.len();
     if bytes==0||bytes%2048!=0||bytes>usable{bail!("Generated image has invalid size or exceeds usable capacity: {bytes}");}
-    // Publish through a no-clobber temporary-file operation on the same volume.
+    // A hard link publishes the already flushed image without a second full copy.
+    // Windows CreateHardLink fails if the destination exists. Unsupported
+    // destination filesystems fail closed rather than replacing anything.
     let sha256=digest(&image)?;
-    let temp=tempfile::NamedTempFile::new_in(&parent)?;
-    let (file,path)=temp.into_parts();
-    let mut file=file;
-    let mut input=File::open(&image)?;
-    let copied=std::io::copy(&mut input,&mut file)?;
-    if copied!=bytes{bail!("Image changed during publication");}
-    file.sync_all()?;
-    drop(file);
-    if digest(&path)?!=sha256{bail!("Image checksum changed during publication");}
-    path.persist_noclobber(&final_path)?;
+    std::fs::hard_link(&image,&final_path).context("Publishing image requires hard-link support on the destination filesystem (NTFS recommended)")?;
     Ok(ImageReceipt{number,label:prepared.label,bytes,sha256,filesystem:"UDF 2.01".into(),output:final_path})
 }
 #[cfg(not(windows))]
 pub fn create_udf(_p:&Plan,_number:usize,_output:&Path)->Result<ImageReceipt>{
     bail!("Native IMAPI image creation requires Windows");
+}
+
+#[cfg(all(test,windows))]
+mod native_tests{
+    use super::*;
+    #[test]
+    fn native_udf_image_smoke(){
+        let tmp=tempfile::tempdir().unwrap();
+        let src=tmp.path().join("source.bin");
+        let payload:Vec<u8>=(0..65536).map(|i|(i%251) as u8).collect();
+        std::fs::write(&src,&payload).unwrap();
+        let empty=tmp.path().join("empty.bin");std::fs::write(&empty,[]).unwrap();
+        let entries=vec![
+            Entry{source:src.clone(),archive:"Media/音楽.bin".into(),bytes:payload.len() as u64,sha256:Some(digest(&src).unwrap())},
+            Entry{source:empty,archive:"Media/empty.bin".into(),bytes:0,sha256:None}
+        ];
+        let p=plan(&entries,64*1024*1024,1024*1024,Strategy::Sequential).unwrap();
+        let output=tmp.path().join("DISC_001.iso");
+        let receipt=create_udf(&p,1,&output).expect("Native Windows IMAPI image generation");
+        assert_eq!(receipt.bytes,std::fs::metadata(&output).unwrap().len());
+        assert_eq!(receipt.sha256,digest(&output).unwrap());
+        assert_eq!(receipt.bytes%2048,0);
+        assert!(receipt.bytes<=p.discs[0].capacity-p.reserve);
+        let image=std::fs::read(&output).unwrap();
+        assert!(image.windows(5).any(|w|w==b"NSR03"),"Missing UDF volume recognition marker");
+        assert!(image.windows(32).enumerate().any(|(i,w)|w==&payload[..32] && image.get(i..i+payload.len())==Some(payload.as_slice())),"Missing exact fixture bytes");
+        assert!(create_udf(&p,1,&output).is_err());
+        assert_eq!(receipt.sha256,digest(&output).unwrap());
+        assert_eq!(std::fs::read(&src).unwrap(),payload);
+        assert!(!std::fs::read_dir(tmp.path()).unwrap().any(|e|e.unwrap().file_name().to_string_lossy().starts_with("das-image-")));
+    }
 }
