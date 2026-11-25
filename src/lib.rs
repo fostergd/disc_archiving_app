@@ -421,3 +421,5 @@ pub mod image;
 pub mod optical;
 
 pub mod jobs;
+
+pub mod batch;

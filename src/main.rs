@@ -23,6 +23,7 @@ enum Command {
     Drives,
     /// Experimental physical write; requires manual hardware acceptance.
     Burn { manifest:PathBuf, image:PathBuf, #[arg(long)] journal:PathBuf, #[arg(long)] recorder:String, #[arg(long)] sha256:String, #[arg(long)] confirm:String },
+    BurnBatch { requests:PathBuf, #[arg(long)] journal:PathBuf, #[arg(long)] confirm:String },
     JobsCreate { journal:PathBuf },
     JobsList { journal:PathBuf },
     JobsReconcile { journal:PathBuf, attempt:i64, #[arg(long)] confirm:String, #[arg(long)] note:String },
@@ -98,6 +99,12 @@ fn run()->Result<()> {
             let j=disc_archive::jobs::Journal::open(&journal)?;
             let receipt=disc_archive::optical::burn_logged_with_progress(&j,&m,&image,&recorder,&sha256,&confirm,&mut |stage| eprintln!("Burn stage: {stage:?}"))?;
             println!("{}",serde_json::to_string_pretty(&receipt)?);
+        },
+        Command::BurnBatch{requests,journal,confirm}=>{
+            let requests:Vec<disc_archive::batch::Request>=serde_json::from_reader(BufReader::new(File::open(requests)?))?;
+            let outcomes=disc_archive::batch::execute(requests,&journal,&confirm,|id,stage|eprintln!("{id}: {stage:?}"))?;
+            println!("{}",serde_json::to_string_pretty(&outcomes)?);
+            if outcomes.iter().any(|o|o.error.is_some()){bail!("One or more jobs failed; inspect individual outcomes and journal");}
         },
         Command::JobsCreate{journal}=>{disc_archive::jobs::Journal::create(&journal)?;println!("Burn journal created");},
         Command::JobsReconcile{journal,attempt,confirm,note}=>{disc_archive::jobs::Journal::open(&journal)?.reconcile(attempt,&confirm,&note)?;println!("Operator reconciliation recorded; no verified outcome asserted");},
