@@ -28,6 +28,7 @@ enum EditAction {
     Unlock { disc:usize },
     Rename { pattern:String },
     AddDisc { capacity:u64 },
+    Replan { #[arg(long,value_delimiter=',',required=true)] capacities:Vec<u64>, #[arg(long,value_enum,default_value="hybrid")] mode:Mode, #[arg(long)] pattern:Option<String> },
 }
 fn write_new<T:serde::Serialize>(path:PathBuf,value:&T)->Result<()> {
     let mut out=BufWriter::new(File::options().write(true).create_new(true).open(path)?);
@@ -71,6 +72,7 @@ fn run()->Result<()> {
                 EditAction::Unlock{disc}=>set_lock(&mut p,disc,false)?,
                 EditAction::Rename{pattern}=>rename(&mut p,&pattern)?,
                 EditAction::AddDisc{capacity}=>add_disc(&mut p,capacity)?,
+                EditAction::Replan{capacities,mode,pattern}=>p=replan(&p,&capacities,mode.into(),pattern.as_deref())?,
             }
             write_new(output,&p)?;
         },

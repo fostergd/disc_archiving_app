@@ -87,6 +87,31 @@ pub fn add_disc(p:&mut Plan,capacity:u64)->Result<()> {
     let mut next=p.clone();next.discs.push(Disc{number,capacity,estimated_used:0,files:vec![],locked:false,label:format!("DISC_{:03}",number)});
     validate(&next)?;*p=next;Ok(())
 }
+// Capacities describe only the unlocked portion. Existing locked media are excluded.
+pub fn replan(p:&Plan,capacities:&[u64],strategy:Strategy,pattern:Option<&str>)->Result<Plan> {
+    validate(p)?;
+    let files:Vec<_>=p.discs.iter().filter(|d|!d.locked).flat_map(|d|d.files.iter().cloned()).chain(p.oversized.iter().cloned()).collect();
+    let mut next=plan_mixed(&files,capacities,p.reserve,strategy)?;
+    let locked:Vec<_>=p.discs.iter().filter(|d|d.locked).cloned().collect();
+    let mut used:HashSet<_>=locked.iter().map(|d|d.number).collect();
+    let mut number=1usize;
+    for d in &mut next.discs {
+        while used.contains(&number){number=number.checked_add(1).context("Disc number overflow")?;}
+        d.number=number;
+        d.label=format!("DISC_{:03}",number);
+        used.insert(number);
+    }
+    next.discs.extend(locked);
+    next.discs.sort_by_key(|d|d.number);
+    // Apply the naming pattern before final validation, allowing default labels
+    // to collide temporarily with existing custom locked names.
+    if let Some(pattern)=pattern {
+        if !pattern.contains("{n}")&&!pattern.contains("{n:03}")&&!pattern.contains("{n:04}") {bail!("Pattern requires a disc number placeholder");}
+        for d in &mut next.discs {if !d.locked {d.label=pattern.replace("{n:03}",&format!("{:03}",d.number)).replace("{n:04}",&format!("{:04}",d.number)).replace("{n}",&d.number.to_string());}}
+    }
+    validate(&next)?;
+    Ok(next)
+}
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -107,6 +132,23 @@ mod tests {
         let mut p=plan(&[entry("a",20000),entry("b",40000)],30000,0,Strategy::Sequential).unwrap();
         assert!(move_file(&mut p,"b",1).is_err());assert_eq!(p.oversized.len(),1);
         add_disc(&mut p,60000).unwrap();move_file(&mut p,"b",2).unwrap();assert!(p.oversized.is_empty());validate(&p).unwrap();
+    }
+    #[test] fn replan_preserves_locked_disc_and_every_entry(){
+        let mut p=plan(&[entry("A/1",20000),entry("A/2",20000),entry("B/1",40000)],30000,0,Strategy::Sequential).unwrap();
+        rename(&mut p,"VIDEO_{n:03}").unwrap();set_lock(&mut p,1,true).unwrap();
+        let locked=serde_json::to_value(&p.discs[0]).unwrap();
+        let q=replan(&p,&[80000],Strategy::Hybrid,Some("VIDEO_{n:03}")).unwrap();
+        assert_eq!(serde_json::to_value(&q.discs[0]).unwrap(),locked);
+        assert_eq!(summary(&q).files,3);assert!(q.oversized.is_empty());assert_eq!(q.discs.len(),2);
+        let mut before:Vec<_>=p.discs.iter().flat_map(|d|&d.files).chain(&p.oversized).map(|f|f.archive.clone()).collect();
+        let mut after:Vec<_>=q.discs.iter().flat_map(|d|&d.files).chain(&q.oversized).map(|f|f.archive.clone()).collect();
+        before.sort();after.sort();assert_eq!(before,after);
+    }
+    #[test] fn replan_all_locked(){
+        let mut p=plan(&[entry("A/1",20000)],30000,0,Strategy::Sequential).unwrap();
+        set_lock(&mut p,1,true).unwrap();
+        let q=replan(&p,&[50000],Strategy::Maximum,None).unwrap();
+        assert_eq!(serde_json::to_value(&q.discs).unwrap(),serde_json::to_value(&p.discs).unwrap());
     }
     #[test] fn compare_all_modes(){assert_eq!(compare(&[entry("A/1",100)],&[50000],0).unwrap().len(),4);}
 }
