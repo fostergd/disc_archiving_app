@@ -243,6 +243,7 @@ pub fn burn_logged_with_progress(journal:&crate::jobs::Journal,manifest:&crate::
     let image=image.canonicalize()?;
     let _guard=crate::jobs::RecorderGuard::acquire(id)?;
     let attempt=journal.begin(id,&image,hash,manifest.number,&manifest.label)?;
+    journal.bind_manifest(attempt,manifest)?;
     match burn(manifest,&image,id,hash,confirmation,progress){
         Ok(receipt)=>{journal.finish(attempt,true,"Native writer returned successfully; physical readback pending")?;progress(BurnStage::WrittenUnverified);Ok(receipt)}
         Err(e)=>{journal.finish(attempt,false,&format!("{e:#}"))?;Err(e)}
@@ -294,5 +295,13 @@ mod readback_tests{
     #[test]fn malformed_manifest_rejected(){
         let p=crate::image::PreparedDisc{number:1,label:"DISC_001".into(),capacity:10000,estimated_used:0,reserve:0,files:vec![]};
         assert!(verify_disc(&p,"").is_err());
+    }
+}
+
+pub fn verify_logged_disc(journal:&crate::jobs::Journal,attempt:i64,recorder:&str)->Result<DiscReadback>{
+    let manifest=journal.verification_manifest(attempt)?;
+    match verify_disc(&manifest,recorder){
+        Ok(receipt)=>{journal.record_readback(attempt,recorder,true,&serde_json::to_string(&receipt)?)?;Ok(receipt)}
+        Err(e)=>{journal.record_readback(attempt,recorder,false,&format!("{e:#}"))?;Err(e)}
     }
 }
