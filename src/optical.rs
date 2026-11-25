@@ -139,3 +139,68 @@ mod preview_tests{
         assert!(eligible(&d,"drive-A",2048).is_err());
     }
 }
+
+
+#[derive(Debug,Serialize)]
+pub struct BurnReceipt {
+    pub recorder_id:String,pub image_sha256:String,pub image_bytes:u64,
+    pub status:String,
+}
+fn validate_authorization(id:&str,hash:&str,confirmation:&str)->Result<()>{
+    if id.trim().is_empty(){bail!("Explicit recorder identity required");}
+    if hash.len()!=64||!hash.bytes().all(|b|b.is_ascii_hexdigit()){bail!("Expected SHA-256 required");}
+    if confirmation!="WRITE-ONCE"{bail!("Explicit WRITE-ONCE confirmation required");}
+    Ok(())
+}
+#[cfg(windows)]
+pub fn burn(manifest:&crate::image::PreparedDisc,image:&std::path::Path,id:&str,hash:&str,confirmation:&str)->Result<BurnReceipt>{
+    use anyhow::Context;
+    use std::{os::windows::fs::OpenOptionsExt,process::Command};
+    validate_authorization(id,hash,confirmation)?;
+    let image=image.canonicalize()?;
+    // Deny modification and deletion until the helper has completed.
+    let guard=std::fs::OpenOptions::new().read(true).share_mode(1).open(&image)?;
+    let verified=crate::image::verify_udf(manifest,&image)?;
+    if !verified.sha256.eq_ignore_ascii_case(hash){bail!("Image differs from explicitly approved checksum");}
+    let discovery=discover()?;
+    let media=eligible(&discovery,id,verified.image_bytes)?;
+    let work=tempfile::Builder::new().prefix("das-burn-").tempdir()?;
+    let script=work.path().join("burn.ps1");
+    std::fs::write(&script,include_str!("imapi_burn.ps1"))?;
+    let result=Command::new("powershell.exe")
+        .args(["-NoLogo","-NoProfile","-NonInteractive","-ExecutionPolicy","Bypass","-File"])
+        .arg(script).env("DAS_BURN_IMAGE",&image).env("DAS_BURN_ID",id)
+        .env("DAS_BURN_HASH",hash).env("DAS_BURN_BYTES",verified.image_bytes.to_string())
+        .env("DAS_BURN_MEDIA",media.physical_type.to_string())
+        .env("DAS_BURN_CONFIRM",confirmation)
+        .output().context("Starting experimental writer; if interrupted, inspect media before retrying")?;
+    drop(guard);
+    if !result.status.success(){bail!("Writer failed; media may be partially written. Do not retry automatically: {}",String::from_utf8_lossy(&result.stderr));}
+    if String::from_utf8_lossy(&result.stdout).trim()!="WRITE_COMPLETED"{bail!("Unknown write outcome; inspect media before retrying");}
+    Ok(BurnReceipt{recorder_id:id.into(),image_sha256:verified.sha256,image_bytes:verified.image_bytes,status:"written_unverified".into()})
+}
+#[cfg(not(windows))]
+pub fn burn(_manifest:&crate::image::PreparedDisc,_image:&std::path::Path,id:&str,hash:&str,confirmation:&str)->Result<BurnReceipt>{
+    validate_authorization(id,hash,confirmation)?;
+    bail!("Native physical writing requires Windows")
+}
+#[cfg(test)]
+mod burn_tests{
+    use super::*;
+    #[test]fn explicit_authorization(){
+        let hash="a".repeat(64);
+        assert!(validate_authorization("drive",&hash,"WRITE-ONCE").is_ok());
+        assert!(validate_authorization("",&hash,"WRITE-ONCE").is_err());
+        assert!(validate_authorization("drive","bad","WRITE-ONCE").is_err());
+        assert!(validate_authorization("drive",&hash,"yes").is_err());
+    }
+    #[cfg(windows)]
+    #[test]fn writer_helper_rejects_missing_confirmation(){
+        let tmp=tempfile::tempdir().unwrap();let script=tmp.path().join("burn.ps1");
+        std::fs::write(&script,include_str!("imapi_burn.ps1")).unwrap();
+        let result=std::process::Command::new("powershell.exe").args(["-NoProfile","-NonInteractive","-ExecutionPolicy","Bypass","-File"]).arg(script)
+            .env("DAS_BURN_CONFIRM","").output().unwrap();
+        assert!(!result.status.success());
+        assert!(String::from_utf8_lossy(&result.stderr).contains("Explicit WRITE-ONCE confirmation required"));
+    }
+}

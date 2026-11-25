@@ -21,6 +21,8 @@ enum Command {
     Edit { plan:PathBuf, #[arg(short,long)] output:PathBuf, #[command(subcommand)] action:EditAction },
     Validate { plan:PathBuf },
     Drives,
+    /// Experimental physical write; requires manual hardware acceptance.
+    Burn { manifest:PathBuf, image:PathBuf, #[arg(long)] recorder:String, #[arg(long)] sha256:String, #[arg(long)] confirm:String },
     BurnPreview { manifest:PathBuf, image:PathBuf, #[arg(long)] recorder:String },
     ImageVerify { manifest:PathBuf, image:PathBuf },
     ImageCreate { plan:PathBuf, disc:usize, #[arg(short,long)] output:PathBuf },
@@ -87,6 +89,11 @@ fn run()->Result<()> {
                 EditAction::Replan{capacities,mode,pattern}=>p=replan(&p,&capacities,mode.into(),pattern.as_deref())?,
             }
             write_new(output,&p)?;
+        },
+        Command::Burn{manifest,image,recorder,sha256,confirm}=>{
+            let m:disc_archive::image::PreparedDisc=serde_json::from_reader(BufReader::new(File::open(manifest)?))?;
+            let receipt=disc_archive::optical::burn(&m,&image,&recorder,&sha256,&confirm)?;
+            println!("{}",serde_json::to_string_pretty(&receipt)?);
         },
         Command::BurnPreview{manifest,image,recorder}=>{
             let m:disc_archive::image::PreparedDisc=serde_json::from_reader(BufReader::new(File::open(manifest)?))?;
