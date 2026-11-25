@@ -3,6 +3,11 @@ on:
   push:
   pull_request:
   workflow_dispatch:
+    inputs:
+      publish_preview:
+        description: Upload the Windows preview executable (requires available artifact quota)
+        type: boolean
+        default: false
 permissions:
   contents: read
 jobs:
@@ -14,7 +19,11 @@ jobs:
       - run: cargo test --all-targets
       - run: cargo build --release
       - run: target/release/disc-archive.exe --help
-      - uses: actions/upload-artifact@v4
+      - name: Publish requested preview
+        if: ${{ github.event_name == 'workflow_dispatch' && inputs.publish_preview }}
+        uses: actions/upload-artifact@v4
         with:
           name: disc-archive-windows-x64-preview
           path: target/release/disc-archive.exe
+          if-no-files-found: error
+          retention-days: 3
