@@ -1,0 +1,20 @@
+name: Windows build and tests
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  windows:
+    runs-on: windows-2022
+    steps:
+      - uses: actions/checkout@v4
+      - run: rustup default stable-x86_64-pc-windows-msvc
+      - run: cargo test --all-targets
+      - run: cargo build --release
+      - run: target/release/disc-archive.exe --help
+      - uses: actions/upload-artifact@v4
+        with:
+          name: disc-archive-windows-x64-preview
+          path: target/release/disc-archive.exe
