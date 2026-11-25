@@ -20,6 +20,7 @@ enum Command {
     Compare { inventory: PathBuf, #[arg(long,default_value_t=50_000_000_000)] capacity:u64, #[arg(long,value_delimiter=',')] capacities:Vec<u64>, #[arg(long,default_value_t=50_000_000)] reserve:u64 },
     Edit { plan:PathBuf, #[arg(short,long)] output:PathBuf, #[command(subcommand)] action:EditAction },
     Validate { plan:PathBuf },
+    ImagePrepare { plan:PathBuf, disc:usize, #[arg(short,long)] output:PathBuf },
     CatalogCreate { database:PathBuf },
     CatalogImport { database:PathBuf, project:PathBuf },
     CatalogProjects { database:PathBuf },
@@ -82,6 +83,12 @@ fn run()->Result<()> {
                 EditAction::Replan{capacities,mode,pattern}=>p=replan(&p,&capacities,mode.into(),pattern.as_deref())?,
             }
             write_new(output,&p)?;
+        },
+        Command::ImagePrepare{plan,disc,output}=>{
+            let p:disc_archive::Plan=serde_json::from_reader(BufReader::new(File::open(plan)?))?;
+            let prepared=disc_archive::image::prepare(&p,disc)?;
+            write_new(output,&prepared)?;
+            println!("Disc preflight passed. No image or physical media written.");
         },
         Command::CatalogCreate{database}=>{disc_archive::catalog::Catalog::create(&database)?;println!("Catalog created");},
         Command::CatalogImport{database,project}=>{let p=disc_archive::project::load(&project)?;let id=disc_archive::catalog::Catalog::open(&database,true)?.import(&p)?;println!("Imported planned snapshot {id}");},
