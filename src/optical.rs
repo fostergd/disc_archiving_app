@@ -260,3 +260,39 @@ pub fn burn_logged(journal:&crate::jobs::Journal,manifest:&crate::image::Prepare
     assert_eq!(parse_stage("WRITE_COMPLETED"),None);
     assert_eq!(parse_stage("DAS_STAGE UNKNOWN"),None);
 }
+
+
+#[derive(Debug,Serialize)]
+pub struct DiscReadback{
+    pub recorder_id:String,pub disc_number:usize,pub label:String,pub files:usize,pub payload_bytes:u64,
+    pub status:String,
+}
+#[cfg(windows)]
+pub fn verify_disc(manifest:&crate::image::PreparedDisc,id:&str)->Result<DiscReadback>{
+    use anyhow::Context;
+    crate::image::validate_manifest(manifest)?;
+    let _guard=crate::jobs::RecorderGuard::acquire(id)?;
+    let payload_bytes=manifest.files.iter().try_fold(0u64,|sum,f|sum.checked_add(f.bytes).context("Payload size overflow"))?;
+    let work=tempfile::Builder::new().prefix("das-readback-").tempdir()?;
+    let script=work.path().join("readback.ps1");
+    let path=work.path().join("manifest.json");
+    std::fs::write(&script,include_str!("imapi_readback.ps1"))?;
+    std::fs::write(&path,serde_json::to_vec(manifest)?)?;
+    let result=std::process::Command::new("powershell.exe")
+        .args(["-NoLogo","-NoProfile","-NonInteractive","-ExecutionPolicy","Bypass","-File"])
+        .arg(script).env("DAS_READBACK_ID",id).env("DAS_READBACK_MANIFEST",path)
+        .output().context("Starting physical readback verifier")?;
+    if !result.status.success(){bail!("Physical readback failed: {}",String::from_utf8_lossy(&result.stderr));}
+    if String::from_utf8_lossy(&result.stdout).trim()!="READBACK_COMPLETED"{bail!("Unknown readback outcome");}
+    Ok(DiscReadback{recorder_id:id.into(),disc_number:manifest.number,label:manifest.label.clone(),files:manifest.files.len(),payload_bytes,status:"content_verified".into()})
+}
+#[cfg(not(windows))]
+pub fn verify_disc(_manifest:&crate::image::PreparedDisc,_id:&str)->Result<DiscReadback>{bail!("Physical readback requires Windows")}
+#[cfg(test)]
+mod readback_tests{
+    use super::*;
+    #[test]fn malformed_manifest_rejected(){
+        let p=crate::image::PreparedDisc{number:1,label:"DISC_001".into(),capacity:10000,estimated_used:0,reserve:0,files:vec![]};
+        assert!(verify_disc(&p,"").is_err());
+    }
+}

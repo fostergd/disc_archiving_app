@@ -196,7 +196,7 @@ mod native_tests{
 pub struct VerificationReceipt{
     pub files:usize,pub payload_bytes:u64,pub image_bytes:u64,pub sha256:String,
 }
-fn validate_manifest(p:&PreparedDisc)->Result<()>{
+pub(crate) fn validate_manifest(p:&PreparedDisc)->Result<()>{
     if p.files.is_empty()||p.reserve>=p.capacity{bail!("Invalid prepared disc");}
     let entries:Vec<_>=p.files.iter().map(|f|Entry{source:f.source.clone(),archive:f.archive.clone(),bytes:f.bytes,sha256:Some(f.sha256.clone())}).collect();
     check_paths(&entries)?;

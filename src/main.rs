@@ -21,6 +21,7 @@ enum Command {
     Edit { plan:PathBuf, #[arg(short,long)] output:PathBuf, #[command(subcommand)] action:EditAction },
     Validate { plan:PathBuf },
     Drives,
+    DiscVerify { manifest:PathBuf, #[arg(long)] recorder:String },
     /// Experimental physical write; requires manual hardware acceptance.
     Burn { manifest:PathBuf, image:PathBuf, #[arg(long)] journal:PathBuf, #[arg(long)] recorder:String, #[arg(long)] sha256:String, #[arg(long)] confirm:String },
     BurnBatch { requests:PathBuf, #[arg(long)] journal:PathBuf, #[arg(long)] confirm:String },
@@ -113,6 +114,10 @@ fn run()->Result<()> {
             let m:disc_archive::image::PreparedDisc=serde_json::from_reader(BufReader::new(File::open(manifest)?))?;
             let preview=disc_archive::optical::burn_preview(&m,&image,&recorder)?;
             println!("{}",serde_json::to_string_pretty(&preview)?);
+        },
+        Command::DiscVerify{manifest,recorder}=>{
+            let m:disc_archive::image::PreparedDisc=serde_json::from_reader(BufReader::new(File::open(manifest)?))?;
+            println!("{}",serde_json::to_string_pretty(&disc_archive::optical::verify_disc(&m,&recorder)?)?);
         },
         Command::Drives=>{println!("{}",serde_json::to_string_pretty(&disc_archive::optical::discover()?)?);},
         Command::ImageVerify{manifest,image}=>{
