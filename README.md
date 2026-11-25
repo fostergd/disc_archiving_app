@@ -1,6 +1,6 @@
 # Disc Archive Studio
 
-Phase 2 development preview: read-only inventory and estimated disc planning. No optical writing or GUI yet. Windows 10/11 x64 target.
+Phase 3A development preview: read-only inventory and estimated disc planning via CLI and desktop GUI. No optical writing yet. Windows 10/11 x64 target.
 
 All regular file types are included by default. No source deletion, transcoding, recovery data, incremental archive, rewritable management, disc copying, label printing, periodic audits, multisession, audio CD or movie authoring.
 
@@ -21,3 +21,5 @@ Phase 2B: compare inventory.json, validate plan.json, edit plan.json --output re
 Phase 2C: edit plan.json --output revised.json replan --capacities 25000000000,50000000000 --mode hybrid --pattern "VIDEO_{n:03}". Capacities apply only to unlocked files and the existing reserve remains unchanged. Previously unassigned files are reconsidered; locked discs retain their exact records. Unlocked disc numbers may change. A naming collision fails validation rather than overwriting a locked label.
 
 Phase 2D.2: natural sorting caches folded keys per sort; first-fit packing uses an indexed free-capacity tree (logarithmic lookup/update, amortized growth), preserving first-fit order. CI exercises 50,000 synthetic file entries in every strategy and checks indexed lookup against a linear reference. Inventory and plan metadata still reside in RAM; no claim of bounded-memory million-file operation or real disk throughput is made.
+
+GUI preview: cargo run --features gui --bin disc-archive-studio. Windows CI builds both executables. Source selection supports drag-and-drop, folder/file dialogs and typed UNC paths. Scan, plan, compare and replan use background workers. The planner supports locks, manual moves, naming and JSON import/export; outputs cannot overwrite existing files. GUI runtime, drag/drop and usability still require Windows desktop acceptance. No physical optical functionality is exposed yet.

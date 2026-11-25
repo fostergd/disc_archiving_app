@@ -16,14 +16,18 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - run: rustup default stable-x86_64-pc-windows-msvc
-      - run: cargo test --all-targets
-      - run: cargo build --release
+      - run: cargo test --all-targets --features gui
+      - run: cargo build --release --features gui
       - run: target/release/disc-archive.exe --help
+      - name: Verify GUI executable exists
+        run: if (-not (Test-Path target/release/disc-archive-studio.exe)) { throw 'GUI executable missing' }
       - name: Publish requested preview
         if: ${{ github.event_name == 'workflow_dispatch' && inputs.publish_preview }}
         uses: actions/upload-artifact@v4
         with:
           name: disc-archive-windows-x64-preview
-          path: target/release/disc-archive.exe
+          path: |
+            target/release/disc-archive.exe
+            target/release/disc-archive-studio.exe
           if-no-files-found: error
           retention-days: 3
