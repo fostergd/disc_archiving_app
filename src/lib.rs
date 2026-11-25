@@ -413,3 +413,5 @@ mod tests {
 pub mod editing;
 
 pub mod project;
+
+pub mod catalog;

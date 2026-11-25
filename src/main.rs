@@ -20,6 +20,10 @@ enum Command {
     Compare { inventory: PathBuf, #[arg(long,default_value_t=50_000_000_000)] capacity:u64, #[arg(long,value_delimiter=',')] capacities:Vec<u64>, #[arg(long,default_value_t=50_000_000)] reserve:u64 },
     Edit { plan:PathBuf, #[arg(short,long)] output:PathBuf, #[command(subcommand)] action:EditAction },
     Validate { plan:PathBuf },
+    CatalogCreate { database:PathBuf },
+    CatalogImport { database:PathBuf, project:PathBuf },
+    CatalogProjects { database:PathBuf },
+    CatalogSearch { database:PathBuf, term:String, #[arg(long)] project_id:Option<i64>, #[arg(long,default_value_t=100)] limit:usize, #[arg(long,default_value_t=0)] offset:usize },
     ProjectCheck { project:PathBuf },
     ProjectPack { inventory:PathBuf, plan:PathBuf, #[arg(short,long)] output:PathBuf, #[arg(long,default_value="Archive")] name:String },
     ProjectExtract { project:PathBuf, #[arg(long)] inventory:Option<PathBuf>, #[arg(long)] plan:Option<PathBuf> },
@@ -79,6 +83,10 @@ fn run()->Result<()> {
             }
             write_new(output,&p)?;
         },
+        Command::CatalogCreate{database}=>{disc_archive::catalog::Catalog::create(&database)?;println!("Catalog created");},
+        Command::CatalogImport{database,project}=>{let p=disc_archive::project::load(&project)?;let id=disc_archive::catalog::Catalog::open(&database,true)?.import(&p)?;println!("Imported planned snapshot {id}");},
+        Command::CatalogProjects{database}=>{println!("{}",serde_json::to_string_pretty(&disc_archive::catalog::Catalog::open(&database,false)?.projects()?)?);},
+        Command::CatalogSearch{database,term,project_id,limit,offset}=>{println!("{}",serde_json::to_string_pretty(&disc_archive::catalog::Catalog::open(&database,false)?.search(&term,project_id,limit,offset)?)?);},
         Command::ProjectCheck{project}=>{
             let p=disc_archive::project::load(&project)?;
             println!("Project validated: {}",p.name);
