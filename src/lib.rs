@@ -27,8 +27,9 @@ pub struct ScanOptions {
 
 // Compare arbitrary-length ASCII digit runs numerically without integer overflow.
 pub fn natural_cmp(a: &str, b: &str) -> Ordering {
-    let aa = a.to_lowercase();
-    let bb = b.to_lowercase();
+    natural_cmp_folded(a,b,&a.to_lowercase(),&b.to_lowercase())
+}
+fn natural_cmp_folded(a:&str,b:&str,aa:&str,bb:&str)->Ordering {
     let (mut x, mut y) = (aa.as_bytes(), bb.as_bytes());
     while !x.is_empty() && !y.is_empty() {
         if x[0].is_ascii_digit() && y[0].is_ascii_digit() {
@@ -47,6 +48,13 @@ pub fn natural_cmp(a: &str, b: &str) -> Ordering {
         }
     }
     x.len().cmp(&y.len()).then_with(|| a.cmp(b))
+}
+
+// Cache case-folded keys once per sort rather than allocating on every comparison.
+fn sort_entries(files:&mut Vec<Entry>) {
+    let mut keyed:Vec<_>=std::mem::take(files).into_iter().map(|f|(f.archive.to_lowercase(),f)).collect();
+    keyed.sort_by(|(ka,a),(kb,b)|natural_cmp_folded(&a.archive,&b.archive,ka,kb));
+    *files=keyed.into_iter().map(|(_,f)|f).collect();
 }
 
 pub fn digest(path: &Path) -> Result<String> {
@@ -136,7 +144,7 @@ pub fn scan(roots:&[PathBuf], options:&ScanOptions)->Result<Inventory>{
             match result{Ok(e)=>inventory.files.push(e),Err(e)=>inventory.errors.push(format!("{archive}: {e:#}"))}
         }
     }
-    inventory.files.sort_by(|a,b|natural_cmp(&a.archive,&b.archive));
+    sort_entries(&mut inventory.files);
     inventory.excluded.sort();inventory.errors.sort();
     Ok(inventory)
 }
@@ -213,7 +221,7 @@ fn folder_units(files: Vec<Entry>, depth: usize, limit: u64, out: &mut Vec<Vec<E
     for (key,mut g) in groups {
         if key.starts_with("D:") { folder_units(g,depth+1,limit,out); }
         else if !g.is_empty() {
-            g.sort_by(|a,b|natural_cmp(&a.archive,&b.archive));
+            sort_entries(&mut g);
             if g.iter().fold(0u64,|n,f|n.saturating_add(cost(f)))<=limit {out.push(g);}
             else {out.extend(g.into_iter().map(|f|vec![f]));}
         }
@@ -222,6 +230,32 @@ fn folder_units(files: Vec<Entry>, depth: usize, limit: u64, out: &mut Vec<Vec<E
 
 pub fn plan(files: &[Entry], capacity: u64, reserve: u64, strategy: Strategy) -> Result<Plan> {
     plan_mixed(files, &[capacity], reserve, strategy)
+}
+
+// Dynamic segment tree for first-fit packing. Leaves are disc free capacities.
+#[derive(Default)]
+struct FreeIndex { len:usize, base:usize, tree:Vec<u64> }
+impl FreeIndex {
+    fn push(&mut self,value:u64){
+        if self.len==self.base{
+            let base=self.base.max(1)*if self.base==0{1}else{2};
+            let mut tree=vec![0;2*base];
+            if self.base>0{tree[base..base+self.len].copy_from_slice(&self.tree[self.base..self.base+self.len]);}
+            for i in (1..base).rev(){tree[i]=tree[2*i].max(tree[2*i+1]);}
+            self.base=base;self.tree=tree;
+        }
+        let i=self.len;self.len+=1;self.set(i,value);
+    }
+    fn set(&mut self,i:usize,value:u64){
+        let mut node=self.base+i;self.tree[node]=value;
+        while node>1{node/=2;self.tree[node]=self.tree[node*2].max(self.tree[node*2+1]);}
+    }
+    fn first(&self,size:u64)->Option<usize>{
+        if self.len==0||self.tree[1]<size{return None;}
+        let mut node=1;
+        while node<self.base{node=if self.tree[node*2]>=size{node*2}else{node*2+1};}
+        let i=node-self.base;if i<self.len{Some(i)}else{None}
+    }
 }
 
 // Ordered capacities. Unused smaller media remain available for later groups.
@@ -236,7 +270,7 @@ pub fn plan_mixed(files: &[Entry], capacities: &[u64], reserve: u64, strategy: S
         if f.archive.is_empty() || f.archive.split('/').any(|p|p.is_empty()||p=="."||p==".."||p.contains('\\')||p.contains(':')) {bail!("Invalid archive path: {}",f.archive);}
         if !paths.insert(f.archive.to_lowercase()) {bail!("Duplicate archive path: {}",f.archive);}
     }
-    sorted.sort_by(|a,b|natural_cmp(&a.archive,&b.archive));
+    sort_entries(&mut sorted);
     let mut eligible=vec![];
     for f in sorted {if cost(&f)>limit {result.oversized.push(f);} else {eligible.push(f);}}
     let mut units=vec![];
@@ -246,13 +280,14 @@ pub fn plan_mixed(files: &[Entry], capacities: &[u64], reserve: u64, strategy: S
     } else {units.extend(eligible.into_iter().map(|f|vec![f]));}
     if strategy==Strategy::Maximum {units.sort_by_key(|g|std::cmp::Reverse(g.iter().map(cost).sum::<u64>()));}
     let mut available=capacities.to_vec();
+    let mut free=FreeIndex::default();
     // If a group cannot fit remaining media, split it instead of silently omitting files.
     let mut pending: std::collections::VecDeque<_>=units.into();
     while let Some(g)=pending.pop_front() {
         let size=g.iter().map(cost).sum::<u64>();
         let fits=|d:&Disc|size<=d.capacity-reserve-d.estimated_used;
         let index=match strategy {
-            Strategy::Maximum|Strategy::Hybrid=>result.discs.iter().position(fits),
+            Strategy::Maximum|Strategy::Hybrid=>free.first(size),
             _=>result.discs.len().checked_sub(1).filter(|&i|fits(&result.discs[i])),
         };
         let i=if let Some(i)=index {i} else {
@@ -265,9 +300,11 @@ pub fn plan_mixed(files: &[Entry], capacities: &[u64], reserve: u64, strategy: S
             };
             let i=result.discs.len();
             result.discs.push(Disc{number:i+1,locked:false,label:format!("DISC_{:03}",i+1),capacity:cap,estimated_used:0,files:vec![]});
+            free.push(cap-reserve);
             i
         };
         result.discs[i].estimated_used+=size;
+        free.set(i,result.discs[i].capacity-reserve-result.discs[i].estimated_used);
         result.discs[i].files.extend(g);
     }
     Ok(result)
@@ -276,6 +313,26 @@ pub fn plan_mixed(files: &[Entry], capacities: &[u64], reserve: u64, strategy: S
 mod tests {
     use super::*;
     fn entry(name:&str, bytes:u64)->Entry { Entry {source:PathBuf::from(name),archive:name.into(),bytes,sha256:None} }
+    #[test] fn free_index_matches_linear_reference(){
+        let mut index=FreeIndex::default();let mut linear=vec![];
+        for i in 0..1000usize{
+            let value=(i*37%997) as u64;
+            index.push(value);linear.push(value);
+            let j=i/3;let changed=(i*13%1000) as u64;
+            index.set(j,changed);linear[j]=changed;
+            for size in [1,50,200,500,900,1000]{assert_eq!(index.first(size),linear.iter().position(|&v|v>=size));}
+        }
+    }
+    #[test] fn large_inventory_conservation(){
+        let files:Vec<_>=(0..50_000).map(|i|entry(&format!("Series {}/Season {}/Episode {}.mkv",i/1000,i/100,i),1_000_000+(i%1000) as u64*1024)).collect();
+        for strategy in [Strategy::Sequential,Strategy::Folder,Strategy::Maximum,Strategy::Hybrid]{
+            let p=plan(&files,700_000_000,1_000_000,strategy).unwrap();
+            crate::editing::validate(&p).unwrap();
+            assert!(p.oversized.is_empty());
+            let paths:HashSet<_>=p.discs.iter().flat_map(|d|&d.files).map(|f|f.archive.as_str()).collect();
+            assert_eq!(paths.len(),files.len());assert!(files.iter().all(|f|paths.contains(f.archive.as_str())));
+        }
+    }
     #[test] fn natural_order() {
         let mut names = ["Show S02E1", "Show S01E10", "Show S01E2", "Show S01E999999999999999999999"];
         names.sort_by(|a,b|natural_cmp(a,b));
