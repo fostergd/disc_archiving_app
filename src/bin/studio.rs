@@ -3,7 +3,7 @@ use disc_archive::{scan,plan_mixed,ScanOptions,Inventory,Plan,Strategy,MEDIA};
 use disc_archive::editing;
 use eframe::egui;
 use std::{path::PathBuf,sync::mpsc::{self,Receiver},fs::File,io::{BufReader,BufWriter,Write}};
-enum Work { Inventory(Inventory), Plan(Plan), Comparison(Vec<editing::Summary>), Duplicates(Vec<Vec<String>>), Saved(String), Project(disc_archive::project::Project), Error(String) }
+enum Work { Inventory(Inventory), Plan(Plan), Comparison(Vec<editing::Summary>), Duplicates(Vec<Vec<String>>), Saved(String), Project(disc_archive::project::Project), CatalogOpened(PathBuf,Vec<disc_archive::catalog::ProjectRow>), CatalogResults(Vec<disc_archive::catalog::Match>,usize), CatalogImported(i64,Vec<disc_archive::catalog::ProjectRow>), Error(String) }
 struct Studio {
     sources:Vec<PathBuf>, source_text:String, extensions:String, exclusions:String, hash:bool,
     capacities:String, reserve:String, strategy:Strategy, inventory:Option<Inventory>, plan:Option<Plan>,
@@ -11,11 +11,12 @@ struct Studio {
     pattern:String, move_path:String, destination:usize, search:String, tab:usize,
     inventory_search:String, duplicate_groups:Vec<Vec<String>>, dirty:bool, close_prompt:bool,
     project_name:String,
+    catalog_path:Option<PathBuf>, catalog_projects:Vec<disc_archive::catalog::ProjectRow>, catalog_rows:Vec<disc_archive::catalog::Match>, catalog_term:String, catalog_project:Option<i64>, catalog_offset:usize, catalog_has_next:bool, catalog_query:Option<(String,Option<i64>)>,
 }
 impl Default for Studio {
     fn default()->Self{Self{sources:vec![],source_text:String::new(),extensions:String::new(),exclusions:String::new(),hash:false,
         capacities:"50000000000".into(),reserve:"50000000".into(),strategy:Strategy::Hybrid,inventory:None,plan:None,comparison:vec![],
-        worker:None,status:"Add files or folders to begin.".into(),selected:None,pattern:"DISC_{n:03}".into(),move_path:String::new(),destination:1,search:String::new(),tab:0,inventory_search:String::new(),duplicate_groups:vec![],dirty:false,close_prompt:false,project_name:"Untitled archive".into()}}
+        worker:None,status:"Add files or folders to begin.".into(),selected:None,pattern:"DISC_{n:03}".into(),move_path:String::new(),destination:1,search:String::new(),tab:0,inventory_search:String::new(),duplicate_groups:vec![],dirty:false,close_prompt:false,project_name:"Untitled archive".into(),catalog_path:None,catalog_projects:vec![],catalog_rows:vec![],catalog_term:String::new(),catalog_project:None,catalog_offset:0,catalog_has_next:false,catalog_query:None}}
 }
 fn caps(text:&str)->anyhow::Result<Vec<u64>> {let v=text.split(',').map(|s|s.trim().parse::<u64>()).collect::<Result<Vec<_>,_>>()?;Ok(v)}
 fn save_new<T:serde::Serialize>(path:PathBuf,value:&T)->anyhow::Result<()>{
@@ -42,6 +43,9 @@ impl Studio{
                 Work::Duplicates(v)=>{self.status=format!("{} duplicate groups",v.len());self.duplicate_groups=v;self.tab=4;}
                 Work::Project(p)=>{self.project_name=p.name;self.sources=p.sources;self.extensions=p.extensions.join(",");self.exclusions=p.exclusions.join("\n");self.hash=p.hash;self.capacities=p.capacities.iter().map(u64::to_string).collect::<Vec<_>>().join(",");self.reserve=p.reserve.to_string();self.strategy=p.strategy;self.pattern=p.naming_pattern;self.inventory=p.inventory;self.plan=p.plan;self.selected=self.plan.as_ref().and_then(|p|p.discs.first()).map(|d|d.number);self.comparison.clear();self.duplicate_groups.clear();self.tab=if self.plan.is_some(){1}else{0};self.dirty=false;self.status="Project opened".into();}
                 Work::Saved(message)=>{self.status=message;self.dirty=false;}
+                Work::CatalogOpened(path,projects)=>{self.catalog_path=Some(path);self.catalog_projects=projects;self.catalog_rows.clear();self.catalog_project=None;self.catalog_offset=0;self.catalog_has_next=false;self.catalog_query=None;self.status="Catalog opened".into();self.tab=6;}
+                Work::CatalogResults(mut rows,offset)=>{self.catalog_has_next=rows.len()>100;rows.truncate(100);self.catalog_rows=rows;self.catalog_offset=offset;self.status=format!("Catalog page {}",offset/100+1);}
+                Work::CatalogImported(id,projects)=>{self.catalog_projects=projects;self.catalog_rows.clear();self.catalog_query=None;self.catalog_has_next=false;self.catalog_offset=0;self.catalog_project=Some(id);self.status=format!("Imported planned snapshot {}",id);}
                 Work::Error(e)=>self.status=e,
             }
         }
@@ -65,6 +69,73 @@ impl Studio{
             }
             Err(e)=>self.status=e.to_string(),
         }
+    }
+    fn catalog_search(&mut self,ctx:&egui::Context,offset:usize){
+        let Some(path)=self.catalog_path.clone() else{return;};
+        let term=self.catalog_term.clone();let project=self.catalog_project;
+        self.catalog_query=Some((term.clone(),project));
+        self.catalog_rows.clear();self.catalog_has_next=false;
+        self.spawn(ctx,move||{let db=disc_archive::catalog::Catalog::open(&path,false)?;Ok(Work::CatalogResults(db.search(&term,project,101,offset)?,offset))});
+    }
+    fn catalog_ui(&mut self,ui:&mut egui::Ui,ctx:&egui::Context){
+        use disc_archive::catalog::Catalog;
+        ui.heading("Archive catalog");
+        ui.label("Search saved assignments without connecting the source drives. Planned does not mean burned or verified.");
+        ui.horizontal_wrapped(|ui|{
+            if ui.button("Create catalog").clicked(){
+                if let Some(path)=rfd::FileDialog::new().set_file_name("archive.sqlite").save_file(){
+                    self.spawn(ctx,move||{let db=Catalog::create(&path)?;let rows=db.projects()?;Ok(Work::CatalogOpened(path,rows))});
+                }
+            }
+            if ui.button("Open catalog").clicked(){
+                if let Some(path)=rfd::FileDialog::new().add_filter("SQLite catalog",&["sqlite","db"]).pick_file(){
+                    self.spawn(ctx,move||{let db=Catalog::open(&path,false)?;let rows=db.projects()?;Ok(Work::CatalogOpened(path,rows))});
+                }
+            }
+            if ui.add_enabled(self.catalog_path.is_some(),egui::Button::new("Close catalog")).clicked(){
+                self.catalog_path=None;self.catalog_projects.clear();self.catalog_rows.clear();self.catalog_project=None;self.catalog_query=None;self.catalog_has_next=false;self.catalog_offset=0;
+            }
+        });
+        let Some(path)=self.catalog_path.clone() else{return;};
+        ui.label(path.display().to_string());
+        ui.horizontal_wrapped(|ui|{
+            if ui.button("Import saved project").clicked(){
+                if let Some(project)=rfd::FileDialog::new().add_filter("Archive project",&["json"]).pick_file(){
+                    let path=path.clone();
+                    self.spawn(ctx,move||{let p=disc_archive::project::load(&project)?;let mut db=Catalog::open(&path,true)?;let id=db.import(&p)?;Ok(Work::CatalogImported(id,db.projects()?))});
+                }
+            }
+            if ui.add_enabled(self.plan.is_some(),egui::Button::new("Import current plan snapshot")).clicked(){
+                match self.snapshot(){
+                    Ok(p)=>{let path=path.clone();self.spawn(ctx,move||{let mut db=Catalog::open(&path,true)?;let id=db.import(&p)?;Ok(Work::CatalogImported(id,db.projects()?))});}
+                    Err(e)=>self.status=e.to_string(),
+                }
+            }
+        });
+        ui.label("Each import adds a separate planned snapshot. It does not replace previous imports.");
+        let label=self.catalog_project.and_then(|id|self.catalog_projects.iter().find(|p|p.id==id)).map(|p|format!("{} (# {})",p.name,p.id)).unwrap_or_else(||"All projects".into());
+        egui::ComboBox::from_label("Project filter").selected_text(label).show_ui(ui,|ui|{
+            ui.selectable_value(&mut self.catalog_project,None,"All projects");
+            for p in &self.catalog_projects{ui.selectable_value(&mut self.catalog_project,Some(p.id),format!("{} (# {}) - {} files, {} discs",p.name,p.id,p.files,p.discs));}
+        });
+        ui.horizontal(|ui|{ui.label("Filename, path or hash");ui.text_edit_singleline(&mut self.catalog_term);if ui.button("Search").clicked(){self.catalog_search(ctx,0);}});
+        let current=self.catalog_query.as_ref().map(|(term,project)|term==&self.catalog_term&&project==&self.catalog_project).unwrap_or(false);
+        if !current{ui.label("Search to refresh results for the current filters.");return;}
+        ui.horizontal(|ui|{
+            if ui.add_enabled(self.catalog_offset>0,egui::Button::new("Previous")).clicked(){self.catalog_search(ctx,self.catalog_offset.saturating_sub(100));}
+            ui.label(format!("Page {} - {} results",self.catalog_offset/100+1,self.catalog_rows.len()));
+            if ui.add_enabled(self.catalog_has_next,egui::Button::new("Next")).clicked(){self.catalog_search(ctx,self.catalog_offset.saturating_add(100));}
+        });
+        egui::ScrollArea::vertical().id_salt("catalog_results").max_height(480.).show_rows(ui,70.,self.catalog_rows.len(),|ui,range|{
+            for j in range{
+                let f=&self.catalog_rows[j];
+                ui.group(|ui|{
+                    ui.label(&f.archive);
+                    ui.label(format!("{} (# {}) | {} | {} | {} bytes",f.project,f.project_id,f.disc_label.as_deref().unwrap_or("Unassigned"),f.status,f.bytes));
+                    ui.label(&f.source);
+                });
+            }
+        });
     }
     fn sources_ui(&mut self,ui:&mut egui::Ui,ctx:&egui::Context){
         ui.heading("Archive sources");
@@ -194,7 +265,7 @@ impl eframe::App for Studio{
                 });
             });
             ui.horizontal(|ui|{ui.label("Project name");if ui.text_edit_singleline(&mut self.project_name).changed(){self.dirty=true;}});
-            ui.horizontal(|ui|{ui.selectable_value(&mut self.tab,0,"Sources");ui.selectable_value(&mut self.tab,1,"Planner");ui.selectable_value(&mut self.tab,2,"Comparison");ui.selectable_value(&mut self.tab,4,"Duplicates");});
+            ui.horizontal(|ui|{ui.selectable_value(&mut self.tab,0,"Sources");ui.selectable_value(&mut self.tab,1,"Planner");ui.selectable_value(&mut self.tab,2,"Comparison");ui.selectable_value(&mut self.tab,4,"Duplicates");ui.selectable_value(&mut self.tab,6,"Catalog");});
         });
         egui::TopBottomPanel::bottom("status").show(ctx,|ui|{ui.horizontal(|ui|{if self.worker.is_some(){ui.spinner();}ui.label(&self.status);});});
         egui::CentralPanel::default().show(ctx,|ui|{
@@ -203,6 +274,7 @@ impl eframe::App for Studio{
                 1=>self.planner_ui(ui,ctx),
                 2=>{ui.heading("Distribution comparison");for s in &self.comparison{ui.label(format!("{:?}: {} discs | {} assigned | {} unassigned | {} split folders | {:.2} GB used / {:.2} GB capacity",s.strategy,s.discs,s.files,s.unassigned,s.split_folders,s.estimated_used_bytes as f64/1e9,s.capacity_bytes as f64/1e9));}},
                 4=>{ui.heading("Duplicate content");ui.label("Identical SHA-256 and file size. No files are removed.");for (i,group) in self.duplicate_groups.iter().enumerate(){ui.collapsing(format!("Group {} - {} files",i+1,group.len()),|ui|{for path in group{ui.label(path);}});}},
+                6=>self.catalog_ui(ui,ctx),
                 5=>{ui.label("Closing the project discards all unsaved project settings, inventory and plan. Save a new project revision first if needed.");if ui.button("Confirm close project").clicked(){*self=Self::default();}if ui.button("Cancel").clicked(){self.tab=0;}},
                 _=>{ui.label("Closing disc plan discards unsaved edits.");if ui.button("Confirm close plan").clicked(){self.plan=None;self.selected=None;self.dirty=false;self.tab=0;self.status="Plan closed".into();}if ui.button("Cancel").clicked(){self.tab=1;}}
             });});
