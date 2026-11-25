@@ -153,7 +153,7 @@ pub(crate) fn validate_authorization(id:&str,hash:&str,confirmation:&str)->Resul
     Ok(())
 }
 #[cfg(windows)]
-pub fn burn(manifest:&crate::image::PreparedDisc,image:&std::path::Path,id:&str,hash:&str,confirmation:&str)->Result<BurnReceipt>{
+fn burn(manifest:&crate::image::PreparedDisc,image:&std::path::Path,id:&str,hash:&str,confirmation:&str)->Result<BurnReceipt>{
     use anyhow::Context;
     use std::{os::windows::fs::OpenOptionsExt,process::Command};
     validate_authorization(id,hash,confirmation)?;
@@ -180,7 +180,7 @@ pub fn burn(manifest:&crate::image::PreparedDisc,image:&std::path::Path,id:&str,
     Ok(BurnReceipt{recorder_id:id.into(),image_sha256:verified.sha256,image_bytes:verified.image_bytes,status:"written_unverified".into()})
 }
 #[cfg(not(windows))]
-pub fn burn(_manifest:&crate::image::PreparedDisc,_image:&std::path::Path,id:&str,hash:&str,confirmation:&str)->Result<BurnReceipt>{
+fn burn(_manifest:&crate::image::PreparedDisc,_image:&std::path::Path,id:&str,hash:&str,confirmation:&str)->Result<BurnReceipt>{
     validate_authorization(id,hash,confirmation)?;
     bail!("Native physical writing requires Windows")
 }
@@ -208,6 +208,7 @@ mod burn_tests{
 pub fn burn_logged(journal:&crate::jobs::Journal,manifest:&crate::image::PreparedDisc,image:&std::path::Path,id:&str,hash:&str,confirmation:&str)->Result<BurnReceipt>{
     validate_authorization(id,hash,confirmation)?;
     let image=image.canonicalize()?;
+    let _guard=crate::jobs::RecorderGuard::acquire(id)?;
     let attempt=journal.begin(id,&image,hash,manifest.number,&manifest.label)?;
     match burn(manifest,&image,id,hash,confirmation){
         Ok(receipt)=>{journal.finish(attempt,true,"Native writer returned successfully; physical readback pending")?;Ok(receipt)}

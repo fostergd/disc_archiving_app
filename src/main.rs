@@ -25,6 +25,7 @@ enum Command {
     Burn { manifest:PathBuf, image:PathBuf, #[arg(long)] journal:PathBuf, #[arg(long)] recorder:String, #[arg(long)] sha256:String, #[arg(long)] confirm:String },
     JobsCreate { journal:PathBuf },
     JobsList { journal:PathBuf },
+    JobsReconcile { journal:PathBuf, attempt:i64, #[arg(long)] confirm:String, #[arg(long)] note:String },
     BurnPreview { manifest:PathBuf, image:PathBuf, #[arg(long)] recorder:String },
     ImageVerify { manifest:PathBuf, image:PathBuf },
     ImageCreate { plan:PathBuf, disc:usize, #[arg(short,long)] output:PathBuf },
@@ -99,6 +100,7 @@ fn run()->Result<()> {
             println!("{}",serde_json::to_string_pretty(&receipt)?);
         },
         Command::JobsCreate{journal}=>{disc_archive::jobs::Journal::create(&journal)?;println!("Burn journal created");},
+        Command::JobsReconcile{journal,attempt,confirm,note}=>{disc_archive::jobs::Journal::open(&journal)?.reconcile(attempt,&confirm,&note)?;println!("Operator reconciliation recorded; no verified outcome asserted");},
         Command::JobsList{journal}=>{println!("{}",serde_json::to_string_pretty(&disc_archive::jobs::Journal::open(&journal)?.list()?)?);},
         Command::BurnPreview{manifest,image,recorder}=>{
             let m:disc_archive::image::PreparedDisc=serde_json::from_reader(BufReader::new(File::open(manifest)?))?;
