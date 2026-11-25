@@ -1,6 +1,6 @@
 use anyhow::{bail, Result};
 use clap::{Parser, Subcommand, ValueEnum};
-use disc_archive::{scan, plan, duplicates, ScanOptions, Strategy, Inventory, MEDIA};
+use disc_archive::{scan, plan_mixed, duplicates, ScanOptions, Strategy, Inventory, MEDIA};
 use std::{fs::File, io::{BufReader, BufWriter, Write}, path::PathBuf};
 
 #[derive(Parser)]
@@ -15,7 +15,7 @@ impl From<Mode> for Strategy {
 enum Command {
     Media,
     Scan { #[arg(required=true)] sources: Vec<PathBuf>, #[arg(short,long)] output: PathBuf, #[arg(long)] extension: Vec<String>, #[arg(long)] exclude: Vec<String>, #[arg(long)] hash: bool },
-    Plan { inventory: PathBuf, #[arg(short,long)] output: PathBuf, #[arg(long,default_value_t=50_000_000_000)] capacity: u64, #[arg(long,default_value_t=50_000_000)] reserve: u64, #[arg(long,value_enum,default_value="hybrid")] mode: Mode },
+    Plan { inventory: PathBuf, #[arg(short,long)] output: PathBuf, #[arg(long,default_value_t=50_000_000_000)] capacity: u64, #[arg(long,value_delimiter=',')] capacities: Vec<u64>, #[arg(long,default_value_t=50_000_000)] reserve: u64, #[arg(long,value_enum,default_value="hybrid")] mode: Mode },
     Duplicates { inventory: PathBuf },
 }
 fn write_new<T:serde::Serialize>(path:PathBuf,value:&T)->Result<()> {
@@ -31,10 +31,11 @@ fn run()->Result<()> {
             let incomplete=!i.errors.is_empty(); write_new(output,&i)?;
             if incomplete {bail!("Inventory incomplete; inspect errors before planning");}
         },
-        Command::Plan{inventory,output,capacity,reserve,mode}=>{
+        Command::Plan{inventory,output,capacity,capacities,reserve,mode}=>{
             let i:Inventory=serde_json::from_reader(BufReader::new(File::open(inventory)?))?;
             if !i.errors.is_empty(){bail!("Inventory has unresolved scan errors");}
-            let p=plan(&i.files,capacity,reserve,mode.into())?;
+            let capacities=if capacities.is_empty(){vec![capacity]}else{capacities};
+            let p=plan_mixed(&i.files,&capacities,reserve,mode.into())?;
             eprintln!("{} discs, {} oversized files",p.discs.len(),p.oversized.len());
             let incomplete=!p.oversized.is_empty(); write_new(output,&p)?;
             if incomplete {bail!("Plan has oversized files requiring manual resolution");}

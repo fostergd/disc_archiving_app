@@ -118,44 +118,107 @@ pub struct Plan {
 }
 pub const MEDIA: &[(&str,u64)] = &[("CD",700_000_000),("DVD",4_700_000_000),("DVD-DL",8_500_000_000),("BD",25_000_000_000),("BD-DL",50_000_000_000),("BDXL-100",100_000_000_000),("BDXL-128",128_000_000_000)];
 // Provisional estimate only. Real filesystem image must be measured before writing.
-fn cost(f: &Entry) -> u64 { f.bytes.saturating_add(2047)/2048*2048 + 4096 }
+fn cost(f: &Entry) -> u64 { (f.bytes.saturating_add(2047)/2048*2048).saturating_add(4096) }
+// Recursively preserve the largest folder that fits a disc.
+fn folder_units(files: Vec<Entry>, depth: usize, limit: u64, out: &mut Vec<Vec<Entry>>) {
+    let total = files.iter().fold(0u64, |n,f| n.saturating_add(cost(f)));
+    if total <= limit { if !files.is_empty() { out.push(files); } return; }
+    let mut groups: Vec<(String,Vec<Entry>)> = Vec::new();
+    let mut indices = HashMap::new();
+    for f in files {
+        let parts: Vec<_> = f.archive.split('/').collect();
+        let key = if depth+1 < parts.len() { format!("D:{}",parts[depth]) } else { format!("F:{}",f.archive) };
+        let i = *indices.entry(key.clone()).or_insert_with(|| {let i=groups.len();groups.push((key,vec![]));i});
+        groups[i].1.push(f);
+    }
+    // Match sidecars to a unique audio/video stem, including language suffixes.
+    let media = ["mkv","mp4","avi","mov","m4v","webm","mpg","mpeg","ts","flac","mp3","wav","aac","m4a","ogg"];
+    let sidecars = ["srt","ass","ssa","vtt","sub","idx","nfo","jpg","jpeg","png","txt"];
+    let mut owners: HashMap<String,Vec<usize>> = HashMap::new();
+    for (i,(key,g)) in groups.iter().enumerate() {
+        if key.starts_with("F:") {
+            if let Some((stem,ext)) = g[0].archive.rsplit_once('.') {
+                if media.contains(&ext.to_ascii_lowercase().as_str()) { owners.entry(stem.to_lowercase()).or_default().push(i); }
+            }
+        }
+    }
+    for i in 0..groups.len() {
+        if !groups[i].0.starts_with("F:") || groups[i].1.is_empty() { continue; }
+        let name=groups[i].1[0].archive.to_lowercase();
+        if !name.rsplit_once('.').map(|(_,e)|sidecars.contains(&e)).unwrap_or(false) {continue;}
+        let mut stem=name.as_str();
+        let mut matches=vec![];
+        while let Some((prefix,_))=stem.rsplit_once('.') {
+            if let Some(found)=owners.get(prefix){matches.extend(found.iter().copied());}
+            stem=prefix;
+        }
+        if matches.len()==1 && matches[0]!=i {
+            let mut related=std::mem::take(&mut groups[i].1);
+            groups[matches[0]].1.append(&mut related);
+        }
+    }
+    for (key,mut g) in groups {
+        if key.starts_with("D:") { folder_units(g,depth+1,limit,out); }
+        else if !g.is_empty() {
+            g.sort_by(|a,b|natural_cmp(&a.archive,&b.archive));
+            if g.iter().fold(0u64,|n,f|n.saturating_add(cost(f)))<=limit {out.push(g);}
+            else {out.extend(g.into_iter().map(|f|vec![f]));}
+        }
+    }
+}
+
 pub fn plan(files: &[Entry], capacity: u64, reserve: u64, strategy: Strategy) -> Result<Plan> {
-    let usable = capacity.checked_sub(reserve).filter(|x| *x>0).context("Reserve must be smaller than capacity")?;
-    let mut result = Plan { strategy, discs: vec![], oversized: vec![] };
-    let mut sorted = files.to_vec();
-    sorted.sort_by(|a,b| natural_cmp(&a.archive,&b.archive));
-    let mut groups: Vec<Vec<Entry>> = vec![];
-    for f in sorted {
-        if cost(&f)>usable { result.oversized.push(f); continue; }
-        let parent = f.archive.rsplit_once('/').map(|v|v.0).unwrap_or("");
-        let same_parent = groups.last().and_then(|g|g.first()).map(|x|x.archive.rsplit_once('/').map(|v|v.0).unwrap_or("") == parent).unwrap_or(false);
-        if matches!(strategy, Strategy::Folder|Strategy::Hybrid) && same_parent {
-            groups.last_mut().unwrap().push(f);
-        } else { groups.push(vec![f]); }
+    plan_mixed(files, &[capacity], reserve, strategy)
+}
+
+// Ordered capacities. Unused smaller media remain available for later groups.
+// Once all listed media are used, the final capacity repeats.
+pub fn plan_mixed(files: &[Entry], capacities: &[u64], reserve: u64, strategy: Strategy) -> Result<Plan> {
+    if capacities.is_empty() || capacities.iter().any(|&c|c<=reserve) {bail!("Every capacity must exceed reserve");}
+    let limit=capacities.iter().copied().max().unwrap()-reserve;
+    let mut result=Plan {strategy,discs:vec![],oversized:vec![]};
+    let mut sorted=files.to_vec();
+    let mut paths=HashSet::new();
+    for f in &sorted {
+        if f.archive.is_empty() || f.archive.split('/').any(|p|p.is_empty()||p=="."||p==".."||p.contains('\\')||p.contains(':')) {bail!("Invalid archive path: {}",f.archive);}
+        if !paths.insert(f.archive.to_lowercase()) {bail!("Duplicate archive path: {}",f.archive);}
     }
-    let mut units = vec![];
-    for g in groups {
-        let size = g.iter().fold(0u64, |s,f|s.saturating_add(cost(f)));
-        if size<=usable { units.push(g); } else { units.extend(g.into_iter().map(|f|vec![f])); }
-    }
-    if strategy==Strategy::Maximum { units.sort_by_key(|g|std::cmp::Reverse(g.iter().map(cost).sum::<u64>())); }
-    for g in units {
-        let size = g.iter().map(cost).sum::<u64>();
-        let fits = |d: &Disc| size <= usable-d.estimated_used;
-        let index = match strategy {
-            Strategy::Maximum|Strategy::Hybrid => result.discs.iter().position(fits),
-            _ => result.discs.len().checked_sub(1).filter(|&i|fits(&result.discs[i])),
+    sorted.sort_by(|a,b|natural_cmp(&a.archive,&b.archive));
+    let mut eligible=vec![];
+    for f in sorted {if cost(&f)>limit {result.oversized.push(f);} else {eligible.push(f);}}
+    let mut units=vec![];
+    if matches!(strategy,Strategy::Folder|Strategy::Hybrid) {
+        // Partition recursively from the first path component.
+        folder_units(eligible,0,limit,&mut units);
+    } else {units.extend(eligible.into_iter().map(|f|vec![f]));}
+    if strategy==Strategy::Maximum {units.sort_by_key(|g|std::cmp::Reverse(g.iter().map(cost).sum::<u64>()));}
+    let mut available=capacities.to_vec();
+    // If a group cannot fit remaining media, split it instead of silently omitting files.
+    let mut pending: std::collections::VecDeque<_>=units.into();
+    while let Some(g)=pending.pop_front() {
+        let size=g.iter().map(cost).sum::<u64>();
+        let fits=|d:&Disc|size<=d.capacity-reserve-d.estimated_used;
+        let index=match strategy {
+            Strategy::Maximum|Strategy::Hybrid=>result.discs.iter().position(fits),
+            _=>result.discs.len().checked_sub(1).filter(|&i|fits(&result.discs[i])),
         };
-        let i = index.unwrap_or_else(|| {
-            let i = result.discs.len();
-            result.discs.push(Disc { number:i+1, capacity, estimated_used:0, files:vec![] }); i
-        });
-        result.discs[i].estimated_used += size;
+        let i=if let Some(i)=index {i} else {
+            let cap=if let Some(j)=available.iter().position(|&c|c-reserve>=size){available.remove(j)}
+            else if capacities.last().unwrap()-reserve>=size {*capacities.last().unwrap()}
+            else {
+                if g.len()>1 {for f in g.into_iter().rev(){pending.push_front(vec![f]);}}
+                else {result.oversized.extend(g);}
+                continue;
+            };
+            let i=result.discs.len();
+            result.discs.push(Disc{number:i+1,capacity:cap,estimated_used:0,files:vec![]});
+            i
+        };
+        result.discs[i].estimated_used+=size;
         result.discs[i].files.extend(g);
     }
     Ok(result)
 }
-
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -173,6 +236,25 @@ mod tests {
             assert_eq!(p.discs.iter().map(|d|d.files.len()).sum::<usize>(),3);
             assert!(p.discs.iter().all(|d|d.estimated_used<=65000));
         }
+    }
+    #[test] fn recursive_groups_and_mixed_media() {
+        let files=vec![entry("Shows/A/Season 1/E1.mkv",20000),entry("Shows/A/Season 2/E2.mkv",20000),entry("Shows/B/E1.mkv",40000)];
+        let p=plan_mixed(&files,&[60000,85000],0,Strategy::Folder).unwrap();
+        assert_eq!(p.discs.len(),2);
+        assert_eq!(p.discs[0].files.len(),2);
+        assert_eq!(p.discs[0].capacity,60000);
+        assert_eq!(p.discs[1].capacity,85000);
+        assert!(p.oversized.is_empty());
+    }
+    #[test] fn related_files_stay_together() {
+        let files=vec![entry("Movies/Film 1.mkv",30000),entry("Movies/Film 1.en.srt",100),entry("Movies/Film 2.mkv",30000)];
+        let p=plan(&files,50000,0,Strategy::Folder).unwrap();
+        assert_eq!(p.discs.len(),2);
+        assert!(p.discs.iter().any(|d|d.files.len()==2 && d.files.iter().all(|f|f.archive.contains("Film 1."))));
+    }
+    #[test] fn invalid_paths_rejected() {
+        assert!(plan(&[entry("../bad",1)],50000,0,Strategy::Hybrid).is_err());
+        assert!(plan(&[entry("A/x",1),entry("a/X",1)],50000,0,Strategy::Hybrid).is_err());
     }
     #[test] fn mixed_types_and_hashes() {
         let tmp=tempfile::tempdir().unwrap();
