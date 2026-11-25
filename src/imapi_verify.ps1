@@ -31,7 +31,18 @@ try {
         if (-not $expected.ContainsKey($relative)) { throw "Unexpected file: $relative" }
         $f = $expected[$relative]
         if ($item.Length -ne [long]$f.bytes) { throw "Size mismatch: $relative" }
-        $hash = (Get-FileHash -LiteralPath $item.FullName -Algorithm SHA256).Hash
+        # Stream through .NET cryptography instead of depending on Get-FileHash.
+        $hasher = [System.Security.Cryptography.SHA256]::Create()
+        try {
+            $inputStream = [System.IO.File]::OpenRead($item.FullName)
+            try {
+                $hash = [System.BitConverter]::ToString($hasher.ComputeHash($inputStream)).Replace('-', '')
+            } finally {
+                $inputStream.Dispose()
+            }
+        } finally {
+            $hasher.Dispose()
+        }
         if ($hash -ne $f.sha256) { throw "Checksum mismatch: $relative" }
         [void]$expected.Remove($relative)
         $seen++

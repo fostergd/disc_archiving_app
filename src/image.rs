@@ -173,7 +173,10 @@ mod native_tests{
         assert_eq!(receipt.verified_files,entries.len());
         let mut manifest=prepare(&p,1).unwrap();
         manifest.files[0].sha256="0".repeat(64);
-        assert!(verify_udf(&manifest,&output).is_err());
+        let error=verify_udf(&manifest,&output).expect_err("Incorrect manifest checksum must fail");
+        assert!(format!("{error:#}").contains("Checksum mismatch"),"Unexpected verification failure: {error:#}");
+        let original=prepare(&p,1).unwrap();
+        assert_eq!(verify_udf(&original,&output).unwrap().files,entries.len());
         assert_eq!(receipt.bytes,std::fs::metadata(&output).unwrap().len());
         assert_eq!(receipt.sha256,digest(&output).unwrap());
         assert_eq!(receipt.bytes%2048,0);
