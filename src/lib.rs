@@ -1,5 +1,5 @@
 use anyhow::{bail, Context, Result};
-use globset::{Glob, GlobSetBuilder};
+use globset::GlobSetBuilder;
 use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
 use std::{cmp::Ordering, collections::{HashMap, HashSet}, fs::File, io::Read, path::{Path, PathBuf}};
@@ -57,40 +57,87 @@ pub fn digest(path: &Path) -> Result<String> {
     Ok(format!("{:x}", h.finalize()))
 }
 
-pub fn scan(roots: &[PathBuf], options: &ScanOptions) -> Result<Inventory> {
-    let mut builder = GlobSetBuilder::new();
-    for pattern in &options.exclude { builder.add(Glob::new(pattern)?); }
-    let excludes = builder.build()?;
-    let extensions: HashSet<_> = options.extensions.iter().map(|e| e.trim_start_matches('.').to_lowercase()).collect();
-    let mut inventory = Inventory::default();
-    let mut paths = HashSet::new();
-    for input in roots {
-        let root = input.canonicalize().with_context(|| format!("Source unavailable: {}", input.display()))?;
-        let prefix = root.file_name().and_then(|s| s.to_str()).context("Select a named folder or file, not an unnamed volume root")?;
-        let base = root.parent().context("Source has no parent")?;
-        for item in WalkDir::new(&root).follow_links(false) {
-            let item = match item { Ok(v) => v, Err(e) => { inventory.errors.push(e.to_string()); continue; } };
-            if item.file_type().is_symlink() { inventory.excluded.push(format!("Link: {}", item.path().display())); continue; }
-            if !item.file_type().is_file() { continue; }
-            let relative = item.path().strip_prefix(base)?;
-            let mut parts = Vec::new();
-            for c in relative.components() { parts.push(c.as_os_str().to_str().context("Non-Unicode filename cannot be represented safely")?); }
-            let archive = parts.join("/");
-            debug_assert!(archive.starts_with(prefix));
-            if excludes.is_match(&archive) || (!extensions.is_empty() && !item.path().extension().and_then(|s| s.to_str()).map(|s| extensions.contains(&s.to_lowercase())).unwrap_or(false)) {
-                inventory.excluded.push(archive); continue;
+// Reparse points include junctions and other Windows filesystem redirects.
+fn redirected(metadata:&std::fs::Metadata)->bool {
+    if metadata.file_type().is_symlink(){return true;}
+    #[cfg(windows)]
+    { use std::os::windows::fs::MetadataExt; metadata.file_attributes() & 0x400 != 0 }
+    #[cfg(not(windows))]
+    { false }
+}
+fn archive_path(root:&Path,path:&Path)->Result<String> {
+    let relative=path.strip_prefix(root)?;
+    let prefix=if let Some(name)=root.file_name(){name.to_str().context("Non-Unicode source name")?.to_owned()}
+    else {
+        #[cfg(windows)]
+        {
+            use std::path::{Component,Prefix};
+            match root.components().next(){
+                Some(Component::Prefix(p))=>match p.kind(){
+                    Prefix::Disk(d)|Prefix::VerbatimDisk(d)=>format!("Drive_{}",d as char),
+                    Prefix::UNC(_,share)|Prefix::VerbatimUNC(_,share)=>share.to_str().context("Non-Unicode share name")?.to_owned(),
+                    _=>bail!("Unsupported volume root: {}",root.display()),
+                },
+                _=>bail!("Unsupported volume root: {}",root.display()),
             }
-            let key = archive.to_lowercase();
-            if !paths.insert(key) { bail!("Archive path collision: {archive}"); }
-            let result = (|| -> Result<Entry> {
-                let bytes = item.metadata()?.len();
-                let sha256 = if options.hash { Some(digest(item.path())?) } else { None };
-                Ok(Entry { source: item.path().to_owned(), archive: archive.clone(), bytes, sha256 })
+        }
+        #[cfg(not(windows))]
+        {"Root".to_owned()}
+    };
+    let mut parts=vec![prefix];
+    for c in relative.components(){parts.push(c.as_os_str().to_str().context("Non-Unicode filename cannot be represented safely")?.to_owned());}
+    Ok(parts.join("/"))
+}
+pub fn scan(roots:&[PathBuf], options:&ScanOptions)->Result<Inventory>{
+    let mut builder=GlobSetBuilder::new();
+    for pattern in &options.exclude{
+        builder.add(globset::GlobBuilder::new(&pattern.replace('\\',"/")).case_insensitive(true).literal_separator(true).build()?);
+    }
+    let excludes=builder.build()?;
+    let extensions:HashSet<_>=options.extensions.iter().map(|e|e.trim_start_matches('.').to_lowercase()).collect();
+    let mut inventory=Inventory::default();
+    let mut canonical=Vec::new();
+    for input in roots{
+        let metadata=std::fs::symlink_metadata(input).with_context(||format!("Source unavailable: {}",input.display()))?;
+        if redirected(&metadata){inventory.excluded.push(format!("Redirected source: {}",input.display()));continue;}
+        let root=input.canonicalize().with_context(||format!("Source unavailable: {}",input.display()))?;
+        canonical.push(root);
+    }
+    // Parent selections take precedence regardless of input order.
+    canonical.sort_by_key(|p|p.components().count());
+    let mut selected:Vec<PathBuf>=vec![];
+    for root in canonical{
+        if selected.iter().any(|p|root.starts_with(p)){
+            inventory.excluded.push(format!("Overlapping source: {}",root.display()));
+        }else{selected.push(root);}
+    }
+    let mut paths=HashSet::new();
+    for root in selected{
+        let mut walker=WalkDir::new(&root).follow_links(false).into_iter();
+        while let Some(item)=walker.next(){
+            let item=match item{Ok(v)=>v,Err(e)=>{inventory.errors.push(e.to_string());continue;}};
+            let archive=archive_path(&root,item.path())?;
+            let metadata=match std::fs::symlink_metadata(item.path()){
+                Ok(m)=>m,Err(e)=>{if item.file_type().is_dir(){walker.skip_current_dir();} inventory.errors.push(format!("{archive}: {e}"));continue;}
+            };
+            if redirected(&metadata)||excludes.is_match(&archive){
+                if item.file_type().is_dir(){walker.skip_current_dir();}
+                inventory.excluded.push(archive);continue;
+            }
+            if !metadata.is_file(){continue;}
+            if !extensions.is_empty()&&!item.path().extension().and_then(|s|s.to_str()).map(|s|extensions.contains(&s.to_lowercase())).unwrap_or(false){
+                inventory.excluded.push(archive);continue;
+            }
+            if !paths.insert(archive.to_lowercase()){bail!("Archive path collision: {archive}");}
+            let result=(||->Result<Entry>{
+                let sha256=if options.hash{Some(digest(item.path())?)}else{None};
+                Ok(Entry{source:item.path().to_owned(),archive:archive.clone(),bytes:metadata.len(),sha256})
             })();
-            match result { Ok(e) => inventory.files.push(e), Err(e) => inventory.errors.push(format!("{archive}: {e:#}")) }
+            match result{Ok(e)=>inventory.files.push(e),Err(e)=>inventory.errors.push(format!("{archive}: {e:#}"))}
         }
     }
-    inventory.files.sort_by(|a,b| natural_cmp(&a.archive,&b.archive));
+    inventory.files.sort_by(|a,b|natural_cmp(&a.archive,&b.archive));
+    inventory.excluded.sort();inventory.errors.sort();
     Ok(inventory)
 }
 
@@ -261,6 +308,39 @@ mod tests {
     #[test] fn invalid_paths_rejected() {
         assert!(plan(&[entry("../bad",1)],50000,0,Strategy::Hybrid).is_err());
         assert!(plan(&[entry("A/x",1),entry("a/X",1)],50000,0,Strategy::Hybrid).is_err());
+    }
+    #[test] fn overlapping_sources_and_directory_exclusions(){
+        let tmp=tempfile::tempdir().unwrap();
+        let root=tmp.path().join("Collection");let sub=root.join("Season");let skip=root.join("Cache");
+        std::fs::create_dir_all(&sub).unwrap();std::fs::create_dir_all(&skip).unwrap();
+        std::fs::write(sub.join("E1.mkv"),b"video").unwrap();std::fs::write(skip.join("hidden.txt"),b"cache").unwrap();
+        let i=scan(&[sub,root.clone(),root],&ScanOptions{exclude:vec!["collection/cache".into()],..Default::default()}).unwrap();
+        assert!(i.errors.is_empty());assert_eq!(i.files.len(),1);assert_eq!(i.files[0].archive,"Collection/Season/E1.mkv");
+        assert_eq!(i.excluded.len(),3);
+    }
+    #[test] fn long_unicode_path(){
+        let tmp=tempfile::tempdir().unwrap();
+        let root=tmp.path().join("Collection");std::fs::create_dir(&root).unwrap();
+        let mut deep=root.canonicalize().unwrap();
+        for _ in 0..8{deep.push("長いフォルダ_0123456789012345678901234567890123456789");}
+        std::fs::create_dir_all(&deep).unwrap();
+        std::fs::write(deep.join("音楽.flac"),b"test").unwrap();
+        let i=scan(&[root],&ScanOptions{hash:true,..Default::default()}).unwrap();
+        assert!(i.errors.is_empty());assert_eq!(i.files.len(),1);assert!(i.files[0].archive.ends_with("音楽.flac"));
+        assert!(i.files[0].archive.encode_utf16().count()>260);
+    }
+    #[cfg(windows)]
+    #[test] fn junction_is_not_traversed(){
+        let tmp=tempfile::tempdir().unwrap();
+        let root=tmp.path().join("Collection");let outside=tmp.path().join("Outside");
+        std::fs::create_dir(&root).unwrap();std::fs::create_dir(&outside).unwrap();
+        std::fs::write(outside.join("secret.txt"),b"outside").unwrap();
+        let link=root.join("Junction");
+        let status=std::process::Command::new("cmd").args(["/C","mklink","/J"]).arg(&link).arg(&outside).status().unwrap();
+        assert!(status.success());
+        let result=scan(&[root.clone(),link.clone()],&ScanOptions::default());
+        std::fs::remove_dir(&link).unwrap();
+        let i=result.unwrap();assert!(i.files.is_empty());assert!(i.errors.is_empty());assert_eq!(i.excluded.len(),2);
     }
     #[test] fn mixed_types_and_hashes() {
         let tmp=tempfile::tempdir().unwrap();
