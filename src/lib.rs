@@ -417,3 +417,5 @@ pub mod project;
 pub mod catalog;
 
 pub mod image;
+
+pub mod optical;
