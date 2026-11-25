@@ -146,7 +146,7 @@ pub struct BurnReceipt {
     pub recorder_id:String,pub image_sha256:String,pub image_bytes:u64,
     pub status:String,
 }
-fn validate_authorization(id:&str,hash:&str,confirmation:&str)->Result<()>{
+pub(crate) fn validate_authorization(id:&str,hash:&str,confirmation:&str)->Result<()>{
     if id.trim().is_empty(){bail!("Explicit recorder identity required");}
     if hash.len()!=64||!hash.bytes().all(|b|b.is_ascii_hexdigit()){bail!("Expected SHA-256 required");}
     if confirmation!="WRITE-ONCE"{bail!("Explicit WRITE-ONCE confirmation required");}
@@ -202,5 +202,15 @@ mod burn_tests{
             .env("DAS_BURN_CONFIRM","").output().unwrap();
         assert!(!result.status.success());
         assert!(String::from_utf8_lossy(&result.stderr).contains("Explicit WRITE-ONCE confirmation required"));
+    }
+}
+
+pub fn burn_logged(journal:&crate::jobs::Journal,manifest:&crate::image::PreparedDisc,image:&std::path::Path,id:&str,hash:&str,confirmation:&str)->Result<BurnReceipt>{
+    validate_authorization(id,hash,confirmation)?;
+    let image=image.canonicalize()?;
+    let attempt=journal.begin(id,&image,hash,manifest.number,&manifest.label)?;
+    match burn(manifest,&image,id,hash,confirmation){
+        Ok(receipt)=>{journal.finish(attempt,true,"Native writer returned successfully; physical readback pending")?;Ok(receipt)}
+        Err(e)=>{journal.finish(attempt,false,&format!("{e:#}"))?;Err(e)}
     }
 }

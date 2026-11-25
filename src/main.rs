@@ -22,7 +22,9 @@ enum Command {
     Validate { plan:PathBuf },
     Drives,
     /// Experimental physical write; requires manual hardware acceptance.
-    Burn { manifest:PathBuf, image:PathBuf, #[arg(long)] recorder:String, #[arg(long)] sha256:String, #[arg(long)] confirm:String },
+    Burn { manifest:PathBuf, image:PathBuf, #[arg(long)] journal:PathBuf, #[arg(long)] recorder:String, #[arg(long)] sha256:String, #[arg(long)] confirm:String },
+    JobsCreate { journal:PathBuf },
+    JobsList { journal:PathBuf },
     BurnPreview { manifest:PathBuf, image:PathBuf, #[arg(long)] recorder:String },
     ImageVerify { manifest:PathBuf, image:PathBuf },
     ImageCreate { plan:PathBuf, disc:usize, #[arg(short,long)] output:PathBuf },
@@ -90,11 +92,14 @@ fn run()->Result<()> {
             }
             write_new(output,&p)?;
         },
-        Command::Burn{manifest,image,recorder,sha256,confirm}=>{
+        Command::Burn{manifest,image,journal,recorder,sha256,confirm}=>{
             let m:disc_archive::image::PreparedDisc=serde_json::from_reader(BufReader::new(File::open(manifest)?))?;
-            let receipt=disc_archive::optical::burn(&m,&image,&recorder,&sha256,&confirm)?;
+            let j=disc_archive::jobs::Journal::open(&journal)?;
+            let receipt=disc_archive::optical::burn_logged(&j,&m,&image,&recorder,&sha256,&confirm)?;
             println!("{}",serde_json::to_string_pretty(&receipt)?);
         },
+        Command::JobsCreate{journal}=>{disc_archive::jobs::Journal::create(&journal)?;println!("Burn journal created");},
+        Command::JobsList{journal}=>{println!("{}",serde_json::to_string_pretty(&disc_archive::jobs::Journal::open(&journal)?.list()?)?);},
         Command::BurnPreview{manifest,image,recorder}=>{
             let m:disc_archive::image::PreparedDisc=serde_json::from_reader(BufReader::new(File::open(manifest)?))?;
             let preview=disc_archive::optical::burn_preview(&m,&image,&recorder)?;
