@@ -39,8 +39,10 @@ jobs:
           $rejected = $false
           try { ./scripts/package-windows.ps1 -Destination $dest } catch { $rejected = $true }
           if (-not $rejected) { throw 'Existing package destination was accepted' }
-          & (Join-Path $dest 'disc-archive.exe') --help
+          $helpText = & (Join-Path $dest 'disc-archive.exe') --help
           if ($LASTEXITCODE -ne 0) { throw 'Packaged CLI failed' }
+          if (($helpText -join "`n") -notmatch 'experimental write-once optical recording') { throw 'Packaged CLI help is outdated' }
+          $helpText
       - name: Publish requested preview
         if: ${{ github.event_name == 'workflow_dispatch' && inputs.publish_preview }}
         uses: actions/upload-artifact@v4

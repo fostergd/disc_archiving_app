@@ -1,20 +1,50 @@
 # Disc Archive Studio
 
-Phase 3A development preview: read-only inventory and estimated disc planning via CLI and desktop GUI. No optical writing yet. Windows 10/11 x64 target.
+Unsigned Windows 10/11 x64 portable preview for planning file archives, creating verified UDF images, and experimental single-session write-once optical recording. CLI and desktop GUI share the Rust engine. Automated Windows CI is not physical hardware or interactive desktop acceptance. Complete [WINDOWS_ACCEPTANCE.md](WINDOWS_ACCEPTANCE.md) with disposable fixtures and expendable media before trusting the writer with archive material.
 
-All regular file types are included by default. No source deletion, transcoding, recovery data, incremental archive, rewritable management, disc copying, label printing, periodic audits, multisession, audio CD or movie authoring.
+## Getting started
 
-CLI:
-- disc-archive media
-- disc-archive scan "D:\\Videos" --output inventory.json --hash
-- disc-archive plan inventory.json --output plan.json --mode hybrid
-- disc-archive duplicates inventory.json
+Extract the portable package into a new local folder and verify SHA256SUMS.txt. Run disc-archive-studio.exe for the GUI or disc-archive.exe --help for the CLI. Windows PowerShell 5.1 is required for native optical and image operations. No installer or separate SQLite server is required. Keep catalogs and journals on local storage and use an NTFS image destination with sufficient free space. Do not bypass security warnings without verifying provenance.
 
-Use --extension repeatedly for an allowlist and --exclude for archive-relative glob patterns. Hashing is optional and streams source files. Duplicate reports never remove files. Outputs must not already exist. Keep reports outside source trees. Reports contain local paths and should not be committed to Git.
+From a Windows source checkout, build with `cargo build --release --features gui` and assemble with `./scripts/package-windows.ps1 -Destination C:\Temp\das-preview` (destination must not exist). Windows CI builds and tests the package on each push. To request a downloadable preview, manually run the Windows build and tests workflow with publish_preview enabled, subject to available artifact quota; the artifact is retained for three days. Ordinary CI does not upload artifacts.
 
-Default 50 GB Blu-ray DL; --capacities accepts comma-separated capacities in bytes, with the final capacity repeating. Provisional overhead is stored in new plans. Actual image size and writable capacity must be validated later. Folder/hybrid modes group recursive folder trees and matching audio/video sidecars when possible. Numeric sorting covers digit runs anywhere in the path. No media-specific parsing yet. Unicode paths use native Rust filesystem APIs, but optical compatibility, UNC and long path acceptance remain pending. Symbolic links and Windows reparse points (including junctions) are excluded by default; overlapping canonical source paths are collapsed to their parent selection. Directory exclusion matches prune traversal. Exclusion globs are case-insensitive and use slash-separated archive paths; use ** for recursive matching. Drive and UNC share roots receive named archive prefixes. Long Unicode path and junction tests run in Windows CI. Real network shares and mapped drives still need acceptance testing. Empty folders are not represented. Archive path collisions fail rather than rename silently.
+## Workflow
 
-Next: filesystem edge-case validation, scalable project persistence, GUI with drag/drop, SQLite catalog, UDF image generation, verified single-session write-once burning, existing image burning and concurrent independent drives. CLI and GUI share the library.
+- Scan source folders or files, optionally hashing contents; review exclusions and errors before planning. Duplicate reports never delete or exclude files automatically.
+- Plan using sequential, folder, maximum or hybrid packing; compare strategies, lock discs, move files and save new project revisions. Default capacity is 50 GB with a 50 MB reserve; actual image and media capacity must be checked.
+- Prepare a disc manifest and create a UDF 2.01 image. Image creation stages and hashes source bytes, checks actual capacity and mounts the image read-only for exact file-by-file verification before publishing without replacement. Keep the manifest and image together.
+- Discover recorders and preview exact recorder/image assignments. Preview is not permission to write. Open a durable journal and explicitly authorize WRITE-ONCE only after reviewing the image checksum and target. The writer rechecks media under exclusive access. Batch jobs use independent recorders and distinct images.
+- A completed write is written_unverified, not verified. Use journal-bound physical readback to check paths, sizes and hashes. Explicitly link successful historical readback to a matching catalog snapshot; catalog status is not a live assertion about inserted media.
+
+## CLI examples
+
+```powershell
+disc-archive.exe scan "D:\Videos" --output inventory.json --hash
+disc-archive.exe plan inventory.json --output plan.json --mode hybrid
+disc-archive.exe validate plan.json
+disc-archive.exe project-pack inventory.json plan.json --output archive.das.json
+disc-archive.exe image-prepare plan.json 1 --output disc001.prepared.json
+disc-archive.exe image-create plan.json 1 --output DISC_001.iso
+disc-archive.exe image-verify disc001.prepared.json DISC_001.iso
+disc-archive.exe drives
+disc-archive.exe jobs-create jobs.sqlite
+disc-archive.exe catalog-create archive.sqlite
+disc-archive.exe catalog-import archive.sqlite archive.das.json
+```
+
+Use --help on individual subcommands for arguments. Physical operations are deliberately not included as runnable examples; follow the acceptance checklist first.
+
+## Safety and limitations
+
+Source files are never deleted or transcoded. Reports contain private local paths; keep them outside source trees and out of Git. Reparse points and symbolic links are excluded; overlapping canonical roots are collapsed. Empty directories are not represented. Path collisions fail rather than silently rename. Real mapped drives, UNC shares, long paths and desktop interactions still require acceptance. Inventory and plan metadata reside in RAM.
+
+Image publication requires same-volume hard-link support and sufficient storage for staged payload and generated image, plus native temporary storage. Mounting depends on Windows permissions and drive-letter availability. Physical recording is experimental and restricted to explicitly blank supported write-once media. No automatic retries: interrupted or uncertain attempts block subsequent jobs on that recorder until explicit operator reconciliation. Never bypass an unresolved attempt with a new journal. Confirm any orphaned helper has stopped and remove suspect media before reconciliation. Same-user application locks do not coordinate other users or external software. Sector progress may be unavailable; 100% data progress is not finalization. Readback checks content, not unique physical disc identity.
+
+Excluded scope: source deletion, recovery data, incremental archives, rewritable management, disc copying, label printing, periodic audits, multisession, audio CD and movie authoring.
+
+## Development history
+
+The following historical notes describe capabilities at the time of each increment; their former limitations and next steps are not current release status. See DEVELOPMENT_STATUS.md in the source repository for the durable checkpoint.
 
 Phase 2B: compare inventory.json, validate plan.json, edit plan.json --output revised.json lock 1, edit plan.json --output revised.json move "Videos/Movie.mkv" 2, edit plan.json --output revised.json rename "VIDEO_{n:03}", and edit plan.json --output revised.json add-disc 50000000000. Every edit creates a new file. Plans generated before Phase 2B should be regenerated to include the reserve and labels. Locked discs cannot receive or release files and retain labels. Replanning preserves locked disc assignments, identifiers, capacities and labels. Labels are conservative ASCII identifiers up to 32 characters, not validated optical volume names yet.
 

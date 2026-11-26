@@ -4,7 +4,7 @@ use disc_archive::{scan, plan_mixed, duplicates, ScanOptions, Strategy, Inventor
 use std::{fs::File, io::{BufReader, BufWriter, Write}, path::PathBuf};
 
 #[derive(Parser)]
-#[command(version, about="Read-only archive inventory and disc planning")]
+#[command(version, about="Archive planning, verified UDF images and experimental write-once optical recording")]
 struct Cli { #[command(subcommand)] command: Command }
 #[derive(Clone, Copy, ValueEnum)]
 enum Mode { Sequential, Folder, Maximum, Hybrid }
