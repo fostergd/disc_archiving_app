@@ -92,6 +92,35 @@ pub struct ImageReceipt {
     pub verified_files:usize,
 }
 
+// Reject Windows device names, alternate data streams and ambiguous trailing characters
+// before creating staging files or publishing an image.
+fn checked_output_path(parent:&Path,output:&Path)->Result<PathBuf>{
+    let filename=output.file_name().and_then(|n|n.to_str()).context("Invalid image filename")?;
+    if !safe_component(filename){bail!("Unsafe image output filename");}
+    let path=parent.join(filename);
+    match std::fs::symlink_metadata(&path){
+        Ok(_)=>bail!("Image output already exists"),
+        Err(e) if e.kind()==std::io::ErrorKind::NotFound=>Ok(path),
+        Err(e)=>Err(e).context("Inspecting image output path"),
+    }
+}
+
+#[cfg(test)]
+#[test]
+fn output_path_rejects_unsafe_names_and_existing_entries(){
+    let tmp=tempfile::tempdir().unwrap();
+    let parent=tmp.path();
+    for name in ["CON.iso","NUL.iso","bad:stream","trailing.","trailing "]{
+        assert!(checked_output_path(parent,Path::new(name)).is_err(),"{name}");
+    }
+    assert_eq!(checked_output_path(parent,Path::new("safe.iso")).unwrap(),parent.join("safe.iso"));
+    std::fs::write(parent.join("safe.iso"),b"original").unwrap();
+    assert!(checked_output_path(parent,Path::new("safe.iso")).is_err());
+    assert_eq!(std::fs::read(parent.join("safe.iso")).unwrap(),b"original");
+    std::fs::create_dir(parent.join("directory.iso")).unwrap();
+    assert!(checked_output_path(parent,Path::new("directory.iso")).is_err());
+}
+
 #[cfg(windows)]
 pub fn create_udf(p:&Plan,number:usize,output:&Path)->Result<ImageReceipt>{
     use std::io::Write;
@@ -100,8 +129,7 @@ pub fn create_udf(p:&Plan,number:usize,output:&Path)->Result<ImageReceipt>{
     let prepared=prepare(p,number)?;
     let parent=output.parent().filter(|p|!p.as_os_str().is_empty()).unwrap_or(Path::new("."));
     let parent=parent.canonicalize()?;
-    let filename=output.file_name().context("Invalid image filename")?;
-    let final_path=parent.join(filename);
+    let final_path=checked_output_path(&parent,output)?;
     let work=tempfile::Builder::new().prefix("das-image-").tempdir_in(&parent)?;
     let stage=work.path().join("stage");
     std::fs::create_dir(&stage)?;
