@@ -20,3 +20,5 @@ Current increment 6H.5: explicitly flush verified image before no-replace hard-l
 4. Stop for genuine hardware/user acceptance; never perform physical burns or modify source user files from automated development.
 
 The CI pass is not hardware acceptance. On a green current HEAD and unfinished GitHub-only work, implement and commit a meaningful tested increment; a status-only report is not continuation. If blocked, identify the exact attempted action and error. Use compare-and-swap main updates and avoid racing active CI or other sessions. No artifact deletion or billing changes. Never claim a commit or CI result without fresh evidence.
+
+Phase 7A: portable unsigned Windows x64 package assembly, SHA-256 manifest, CI package smoke and collision regression checks, and operator acceptance checklist. Parent 30d6e6788615ee0eb9d698da3bc42387d436ceaf passed Windows CI 45842442553. New CI pending; artifact upload remains opt-in. Next: validate package CI and review remaining release readiness before physical acceptance.
