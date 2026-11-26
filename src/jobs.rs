@@ -32,7 +32,8 @@ impl Journal{
     pub fn create(path:&Path)->Result<Self>{
         std::fs::OpenOptions::new().write(true).create_new(true).open(path)?;
         let db=Connection::open_with_flags(path,OpenFlags::SQLITE_OPEN_READ_WRITE)?;
-        db.execute_batch("PRAGMA synchronous=FULL; BEGIN IMMEDIATE;
+        db.busy_timeout(std::time::Duration::from_secs(5))?;
+        db.execute_batch("PRAGMA synchronous=FULL; PRAGMA foreign_keys=ON; BEGIN IMMEDIATE;
         PRAGMA application_id=1145131850; PRAGMA user_version=3;
         CREATE TABLE attempts(id INTEGER PRIMARY KEY, recorder TEXT NOT NULL,image TEXT NOT NULL,
           sha256 TEXT NOT NULL,disc_number INTEGER NOT NULL,label TEXT NOT NULL,state TEXT NOT NULL
@@ -119,6 +120,7 @@ mod tests{
         let j=Journal::create(&p).unwrap();
         let a=j.begin("A",Path::new("image.iso"),&h,1,"DISC_001").unwrap();drop(j);
         let j=Journal::open(&p).unwrap();assert_eq!(j.list().unwrap()[0].state,"in_progress");
+        assert!(j.begin("a",Path::new("image.iso"),&h,1,"DISC_001").is_err());
         assert!(j.begin("A",Path::new("image.iso"),&h,1,"DISC_001").is_err());
         let b=j.begin("B",Path::new("image.iso"),&h,1,"DISC_001").unwrap();
         j.finish(a,false,"interrupted").unwrap();j.finish(b,true,"writer returned").unwrap();
@@ -150,4 +152,25 @@ mod tests{
     j.record_readback(a,"B",true,"matched").unwrap();
     assert_eq!(j.list().unwrap()[0].verification_status.as_deref(),Some("content_verified"));
     assert!(j.record_readback(999,"B",true,"missing").is_err());
+}
+
+#[cfg(test)]
+#[test]fn legacy_journal_migration_preserves_unresolved_attempt(){
+    let t=tempfile::tempdir().unwrap();let p=t.path().join("legacy.sqlite");
+    let db=Connection::open(&p).unwrap();
+    db.execute_batch("PRAGMA application_id=1145131850; PRAGMA user_version=1;
+        CREATE TABLE attempts(id INTEGER PRIMARY KEY, recorder TEXT NOT NULL,image TEXT NOT NULL,sha256 TEXT NOT NULL,disc_number INTEGER NOT NULL,label TEXT NOT NULL,state TEXT NOT NULL,detail TEXT NOT NULL,started TEXT NOT NULL,finished TEXT);
+        CREATE UNIQUE INDEX one_active_recorder ON attempts(recorder) WHERE state='in_progress';").unwrap();
+    let h="a".repeat(64);
+    db.execute("INSERT INTO attempts VALUES (1,'Drive-A','image.iso',?1,1,'DISC_001','in_progress','interrupted','2026-01-01',NULL)",[&h]).unwrap();
+    drop(db);
+    let j=Journal::open(&p).unwrap();
+    assert_eq!(j.list().unwrap()[0].state,"in_progress");
+    assert!(j.begin("drive-a",Path::new("image.iso"),&h,1,"DISC_001").is_err());
+    assert!(j.verification_manifest(1).is_err());
+    j.reconcile_locked(1,"Inspected and removed media").unwrap();
+    drop(j);
+    let j=Journal::open(&p).unwrap();
+    assert_eq!(j.list().unwrap()[0].reconciliation.as_deref(),Some("Inspected and removed media"));
+    assert!(j.begin("DRIVE-A",Path::new("image.iso"),&h,1,"DISC_001").is_ok());
 }

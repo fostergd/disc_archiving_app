@@ -5,6 +5,8 @@ Current increment: 6F.2 GUI explicit catalog linkage and historical readback tim
 
 Current increment 6G.1: strict ordered native writer lifecycle protocol and non-writing regression tests for missing, duplicate, out-of-order and unexpected markers. Parent a58e76248339b7e19580c8b2c6c55e0f79840fa2 passed Windows CI 45737912807. New CI pending. Parent CI 45750494175 passed.
 
+Current increment 6H.2: journal creation uses the same foreign-key and busy-timeout settings as reopen; synthetic legacy migration and case-insensitive unresolved-attempt regression coverage. Parent 50170c3417aa9e0ee28880a633ed3fbfab8ff8dc passed Windows CI 45785400276. New CI pending.
+
 ## Remaining work, in priority order
 1. If current CI fails, inspect logs and fix. GUI and CLI linkage require exact pre-existing hashes and latest successful readback. Catalog status is historical, not a live media assertion.
 2. Phase 6G.2 adds optional native IMAPI sector progress and synthetic tests (CI 45769776994 passed). Phase 6H.1 binds GUI batch preview authorization to ordered recorder identities and checksums, with regression tests; new CI pending. Next: GUI state/authorization review, durable recovery, migration tests, image path and storage robustness. Real callback delivery requires hardware acceptance.
