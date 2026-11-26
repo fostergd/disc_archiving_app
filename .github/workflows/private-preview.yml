@@ -1,0 +1,31 @@
+name: Publish private Windows preview
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: private-windows-preview
+  cancel-in-progress: false
+jobs:
+  publish:
+    if: ${{ github.event.repository.private && github.ref == 'refs/heads/main' }}
+    runs-on: windows-2022
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - run: rustup default stable-x86_64-pc-windows-msvc
+      - run: cargo test --all-targets --features gui
+      - run: cargo build --release --features gui
+      - name: Assemble and validate portable preview
+        shell: powershell
+        run: |
+          ./scripts/build-and-test-portable.ps1 -Destination (Join-Path $env:RUNNER_TEMP 'das-portable')
+          ./scripts/new-preview-zip.ps1 -PackageDirectory (Join-Path $env:RUNNER_TEMP 'das-portable') -OutputDirectory (Join-Path $env:RUNNER_TEMP 'das-release')
+      - name: Publish verified ZIP to private GitHub Release
+        shell: powershell
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: ./scripts/publish-private-preview.ps1 -OutputDirectory (Join-Path $env:RUNNER_TEMP 'das-release')

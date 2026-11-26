@@ -24,25 +24,8 @@ jobs:
       - name: Assemble and validate portable preview
         shell: powershell
         run: |
-          $dest = Join-Path $env:RUNNER_TEMP 'das-portable'
-          ./scripts/package-windows.ps1 -Destination $dest
-          $expected = @('disc-archive.exe','disc-archive-studio.exe','README.md','WINDOWS_ACCEPTANCE.md','SHA256SUMS.txt')
-          foreach ($name in $expected) {
-            if (-not (Test-Path -LiteralPath (Join-Path $dest $name) -PathType Leaf)) { throw "Missing package file: $name" }
-          }
-          $lines = @(Get-Content -LiteralPath (Join-Path $dest 'SHA256SUMS.txt'))
-          if ($lines.Count -ne 4) { throw 'Unexpected checksum count' }
-          foreach ($name in $expected[0..3]) {
-            $hash = (Get-FileHash -LiteralPath (Join-Path $dest $name) -Algorithm SHA256).Hash.ToLowerInvariant()
-            if ($lines -cnotcontains "$hash  $name") { throw "Checksum mismatch: $name" }
-          }
-          $rejected = $false
-          try { ./scripts/package-windows.ps1 -Destination $dest } catch { $rejected = $true }
-          if (-not $rejected) { throw 'Existing package destination was accepted' }
-          $helpText = & (Join-Path $dest 'disc-archive.exe') --help
-          if ($LASTEXITCODE -ne 0) { throw 'Packaged CLI failed' }
-          if (($helpText -join "`n") -notmatch 'experimental write-once optical recording') { throw 'Packaged CLI help is outdated' }
-          $helpText
+          ./scripts/build-and-test-portable.ps1 -Destination (Join-Path $env:RUNNER_TEMP 'das-portable')
+          ./scripts/new-preview-zip.ps1 -PackageDirectory (Join-Path $env:RUNNER_TEMP 'das-portable') -OutputDirectory (Join-Path $env:RUNNER_TEMP 'das-zip-validation')
       - name: Publish requested preview
         if: ${{ github.event_name == 'workflow_dispatch' && inputs.publish_preview }}
         uses: actions/upload-artifact@v4
