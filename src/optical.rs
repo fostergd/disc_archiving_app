@@ -164,7 +164,7 @@ pub(crate) fn validate_authorization(id:&str,hash:&str,confirmation:&str)->Resul
 }
 #[derive(Debug,Clone,Copy,PartialEq,Eq,Serialize)]
 #[serde(rename_all="snake_case")]
-pub enum BurnStage{VerifyingImage,InspectingRecorder,CheckingMedia,WritingAndFinalizing,ReleasingRecorder,WrittenUnverified}
+pub enum BurnStage{VerifyingImage,InspectingRecorder,CheckingMedia,WritingAndFinalizing,WritingProgress{written_sectors:u64,total_sectors:u64},ReleasingRecorder,WrittenUnverified}
 fn parse_stage(line:&str)->Option<BurnStage>{
     match line.trim(){
         "DAS_STAGE CHECKING_MEDIA"=>Some(BurnStage::CheckingMedia),
@@ -176,11 +176,26 @@ fn parse_stage(line:&str)->Option<BurnStage>{
 // Accept only the ordered native protocol. A completion marker alone is not evidence
 // that the expected writer lifecycle ran.
 #[derive(Default)]
-struct WriterProtocol { next: usize, invalid: bool }
+struct WriterProtocol { next: usize, invalid: bool, last_progress:Option<(u64,u64)> }
 impl WriterProtocol {
     fn observe(&mut self,line:&str)->Option<BurnStage>{
         let line=line.trim();
         if line.is_empty(){return None;}
+        if let Some(data)=line.strip_prefix("DAS_PROGRESS "){
+            if self.next!=2{self.invalid=true;return None;}
+            let mut fields=data.split_ascii_whitespace();
+            let sample=fields.next().and_then(|s|s.parse::<u64>().ok()).zip(fields.next().and_then(|s|s.parse::<u64>().ok()));
+            if let Some((written,total))=sample{
+                if fields.next().is_none()&&total>0&&written<=total{
+                    if self.last_progress.is_none_or(|(last,count)|total==count&&written>=last){
+                        self.last_progress=Some((written,total));
+                        return Some(BurnStage::WritingProgress{written_sectors:written,total_sectors:total});
+                    }
+                }
+            }
+            // Optional numerical telemetry can be dropped without changing write outcome.
+            return None;
+        }
         let expected=["DAS_STAGE CHECKING_MEDIA","DAS_STAGE WRITING","DAS_STAGE RELEASING","WRITE_COMPLETED"];
         if expected.get(self.next).copied()!=Some(line){self.invalid=true;return None;}
         self.next+=1;
@@ -259,6 +274,26 @@ mod burn_tests{
             for line in lines {p.observe(line);}
             assert!(!p.completed());
         }
+    }
+    #[test]fn detailed_progress_does_not_replace_lifecycle(){
+        let mut p=WriterProtocol::default();
+        p.observe("DAS_STAGE CHECKING_MEDIA");p.observe("DAS_STAGE WRITING");
+        assert_eq!(p.observe("DAS_PROGRESS 25 100"),Some(BurnStage::WritingProgress{written_sectors:25,total_sectors:100}));
+        for line in ["DAS_PROGRESS 24 100","DAS_PROGRESS 101 100","DAS_PROGRESS 30 200","DAS_PROGRESS bad 100","DAS_PROGRESS 0 0"]{assert_eq!(p.observe(line),None);}
+        assert_eq!(p.observe("DAS_PROGRESS 100 100"),Some(BurnStage::WritingProgress{written_sectors:100,total_sectors:100}));
+        assert!(!p.completed());
+        p.observe("DAS_STAGE RELEASING");p.observe("WRITE_COMPLETED");assert!(p.completed());
+        let mut p=WriterProtocol::default();p.observe("DAS_PROGRESS 1 2");
+        for line in ["DAS_STAGE CHECKING_MEDIA","DAS_STAGE WRITING","DAS_STAGE RELEASING","WRITE_COMPLETED"]{p.observe(line);}
+        assert!(!p.completed());
+    }
+    #[cfg(windows)]
+    #[test]fn native_telemetry_compiles_without_hardware(){
+        let tmp=tempfile::tempdir().unwrap();let script=tmp.path().join("burn.ps1");
+        std::fs::write(&script,include_str!("imapi_burn.ps1")).unwrap();
+        let result=std::process::Command::new("powershell.exe").args(["-NoProfile","-NonInteractive","-ExecutionPolicy","Bypass","-File"]).arg(script).arg("-TelemetrySelfTest").output().unwrap();
+        assert!(result.status.success(),"{}",String::from_utf8_lossy(&result.stderr));
+        assert_eq!(String::from_utf8_lossy(&result.stdout).trim(),"TELEMETRY_SELFTEST_PASSED");
     }
     #[test]fn explicit_authorization(){
         let hash="a".repeat(64);

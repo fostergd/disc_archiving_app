@@ -504,7 +504,16 @@ impl eframe::App for Studio{
         });
         egui::TopBottomPanel::bottom("status").show(ctx,|ui|{ui.horizontal(|ui|{if self.worker.is_some(){ui.spinner();}ui.label(&self.status);});});
         egui::CentralPanel::default().show(ctx,|ui|{
-            if self.burn_progress.is_some(){ui.heading("Active burning jobs");for (id,stage) in &self.burn_stages{ui.label(format!("{id}: {stage:?}"));}}
+            if self.burn_progress.is_some(){ui.heading("Active burning jobs");for (id,stage) in &self.burn_stages{
+                ui.label(id);
+                match stage{
+                    disc_archive::optical::BurnStage::WritingProgress{written_sectors,total_sectors}=>{
+                        let fraction=(*written_sectors as f64 / *total_sectors as f64) as f32;
+                        ui.add(egui::ProgressBar::new(fraction).text(format!("Data written: {:.1}% (finalization and verification separate)",fraction*100.0)));
+                    }
+                    _=>{ui.label(format!("{stage:?}"));}
+                }
+            }}
             ui.add_enabled_ui(self.worker.is_none(),|ui|{egui::ScrollArea::vertical().show(ui,|ui|match self.tab{
                 0=>self.sources_ui(ui,ctx),
                 1=>self.planner_ui(ui,ctx),
