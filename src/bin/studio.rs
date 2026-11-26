@@ -20,7 +20,7 @@ struct Studio {
 impl Default for Studio {
     fn default()->Self{Self{burn_requests:vec![],burn_previews:vec![],burn_confirm:false,burn_progress:None,burn_stages:Default::default(),burn_outcomes:vec![],drives:None,journal_path:None,jobs:vec![],job_selection:None,job_recorder:String::new(),reconcile_note:String::new(),reconcile_confirm:false,verify_confirm:false,sources:vec![],source_text:String::new(),extensions:String::new(),exclusions:String::new(),hash:false,
         capacities:"50000000000".into(),reserve:"50000000".into(),strategy:Strategy::Hybrid,inventory:None,plan:None,comparison:vec![],
-        worker:None,status:"Add files or folders to begin.".into(),selected:None,pattern:"DISC_{n:03}".into(),move_path:String::new(),destination:1,search:String::new(),tab:0,inventory_search:String::new(),duplicate_groups:vec![],dirty:false,close_prompt:false,project_name:"Untitled archive".into(),image_disc:1,image_receipt:None,verify_receipt:None,image_path:None,manifest_path:None,catalog_path:None,catalog_projects:vec![],catalog_rows:vec![],catalog_term:String::new(),catalog_project:None,catalog_offset:0,catalog_has_next:false,catalog_query:None}}
+        worker:None,status:"Add files or folders to begin.".into(),selected:None,pattern:"DISC_{n:03}".into(),move_path:String::new(),destination:1,search:String::new(),tab:11,inventory_search:String::new(),duplicate_groups:vec![],dirty:false,close_prompt:false,project_name:"Untitled archive".into(),image_disc:1,image_receipt:None,verify_receipt:None,image_path:None,manifest_path:None,catalog_path:None,catalog_projects:vec![],catalog_rows:vec![],catalog_term:String::new(),catalog_project:None,catalog_offset:0,catalog_has_next:false,catalog_query:None}}
 }
 fn caps(text:&str)->anyhow::Result<Vec<u64>> {let v=text.split(',').map(|s|s.trim().parse::<u64>()).collect::<Result<Vec<_>,_>>()?;Ok(v)}
 fn save_new<T:serde::Serialize>(path:PathBuf,value:&T)->anyhow::Result<()>{
@@ -89,6 +89,52 @@ impl Studio{
         self.catalog_query=Some((term.clone(),project));
         self.catalog_rows.clear();self.catalog_has_next=false;
         self.spawn(ctx,move||{let db=disc_archive::catalog::Catalog::open(&path,false)?;Ok(Work::CatalogResults(db.search(&term,project,101,offset)?,offset))});
+    }
+    fn overview_ui(&mut self,ui:&mut egui::Ui,ctx:&egui::Context){
+        ui.add_space(12.0);
+        ui.label(egui::RichText::new("Your archive workspace").size(28.0).strong());
+        ui.label("Create an archive from files or folders, or resume a saved project.");
+        ui.add_space(12.0);
+        ui.horizontal_wrapped(|ui|{
+            if ui.add_sized([180.0,42.0],egui::Button::new("Start selecting files")).clicked(){self.tab=0;}
+            let can_open=!self.dirty&&self.plan.is_none()&&self.inventory.is_none();
+            if ui.add_enabled(can_open,egui::Button::new("Open saved project").min_size(egui::vec2(180.0,42.0))).clicked(){
+                if let Some(path)=rfd::FileDialog::new().add_filter("Archive project",&["json"]).pick_file(){
+                    self.spawn(ctx,move||Ok(Work::Project(disc_archive::project::load(&path)?)));
+                }
+            }
+        });
+        ui.add_space(14.0);
+        ui.group(|ui|{
+            ui.heading(&self.project_name);
+            ui.horizontal_wrapped(|ui|{
+                ui.label(format!("{} sources",self.sources.len()));
+                ui.separator();
+                ui.label(match &self.inventory{Some(i)=>format!("{} inventoried files",i.files.len()),None=>"Not scanned".into()});
+                ui.separator();
+                ui.label(match &self.plan{Some(p)=>format!("{} planned discs",p.discs.len()),None=>"Not planned".into()});
+            });
+        });
+        ui.add_space(14.0);
+        ui.heading("Archive workflow");
+        for (id,title,description) in [
+            (0,"1. Select and scan sources","Choose files, folders or network shares; inventory without changing original files."),
+            (1,"2. Plan disc distribution","Choose media capacity, compare allocation strategies and adjust assignments."),
+            (7,"3. Create and verify images","Generate UDF images and preparation manifests; validate contents before writing."),
+            (10,"4. Burn discs","Experimental physical writing. Explicit authorization and a burn journal are required."),
+            (9,"5. Verify and review jobs","Read back written discs and review persistent job history."),
+            (6,"6. Search your archive","Browse planned and historically verified catalog entries."),
+        ]{
+            ui.add_space(5.0);
+            ui.group(|ui|{
+                ui.horizontal(|ui|{
+                    ui.vertical(|ui|{ui.strong(title);ui.label(description);});
+                });
+                if ui.button("Open workspace").clicked(){self.tab=id;}
+            });
+        }
+        ui.add_space(12.0);
+        ui.label(egui::RichText::new("Preview notice: physical optical writing has not yet passed hardware acceptance.").weak());
     }
     fn catalog_ui(&mut self,ui:&mut egui::Ui,ctx:&egui::Context){
         use disc_archive::catalog::Catalog;
@@ -479,31 +525,65 @@ impl eframe::App for Studio{
         if self.close_prompt {egui::Window::new("Close application?").collapsible(false).show(ctx,|ui|{ui.label("Wait for running work to finish before exiting; unsaved plan changes may be lost.");if ui.button("Keep working").clicked(){self.close_prompt=false;}if ui.add_enabled(self.worker.is_none(),egui::Button::new("Discard and exit")).clicked(){self.close_prompt=false;self.dirty=false;self.worker=None;ctx.send_viewport_cmd(egui::ViewportCommand::Close);}});}
         if self.worker.is_none(){
             let dropped=ctx.input(|i|i.raw.dropped_files.clone());
-            for f in dropped{if let Some(p)=f.path{self.add(p);}}
+            for f in dropped{if let Some(p)=f.path{self.add(p);if self.tab==11{self.tab=0;}}}
         }
         egui::TopBottomPanel::top("top").show(ctx,|ui|{
-            ui.horizontal_wrapped(|ui|{
-                ui.heading("Disc Archive Studio");ui.label("Archive planning, verified images and experimental physical writing");if self.dirty{ui.label("Unsaved plan");}
-                if ui.button("Toggle theme").clicked(){let dark=ctx.style().visuals.dark_mode;ctx.set_visuals(if dark{egui::Visuals::light()}else{egui::Visuals::dark()});}
+            ui.add_space(8.0);
+            ui.horizontal(|ui|{
+                ui.vertical(|ui|{
+                    ui.label(egui::RichText::new("DISC ARCHIVE STUDIO").size(22.0).strong());
+                    ui.label(egui::RichText::new("Archive workspace  /  Windows preview").small().weak());
+                });
+                ui.with_layout(egui::Layout::right_to_left(egui::Align::Center),|ui|{
+                    let dark=ctx.style().visuals.dark_mode;
+                    if ui.button(if dark{"Light theme"}else{"Dark theme"}).clicked(){apply_theme(ctx,!dark);}
+                    if self.dirty{ui.label(egui::RichText::new("Unsaved changes").strong());}
+                });
             });
+            ui.add_space(5.0);
             ui.add_enabled_ui(self.worker.is_none(),|ui|{
                 ui.horizontal_wrapped(|ui|{
+                    ui.menu_button("Project",|ui|{
                     if ui.add_enabled(!self.dirty&&self.plan.is_none()&&self.inventory.is_none(),egui::Button::new("Open project")).clicked(){if let Some(path)=rfd::FileDialog::new().add_filter("Archive project",&["json"]).pick_file(){self.spawn(ctx,move||Ok(Work::Project(disc_archive::project::load(&path)?)));}}
                     if ui.button("Save project as").clicked(){match self.snapshot(){Ok(p)=>{if let Some(path)=rfd::FileDialog::new().set_file_name("archive.das.json").save_file(){self.spawn(ctx,move||{disc_archive::project::save(&path,&p)?;Ok(Work::Saved("Project saved".into()))});}},Err(e)=>self.status=e.to_string()}}
                     if ui.button("Close project").clicked(){self.tab=5;}
-                    if ui.button("Load inventory").clicked()&&self.plan.is_none(){if let Some(path)=rfd::FileDialog::new().add_filter("JSON",&["json"]).pick_file(){
+                    if ui.add_enabled(self.plan.is_none(),egui::Button::new("Load inventory")).clicked(){if let Some(path)=rfd::FileDialog::new().add_filter("JSON",&["json"]).pick_file(){
                         self.spawn(ctx,move||Ok(Work::Inventory(serde_json::from_reader(BufReader::new(File::open(path)?))?)));
                     }}
                     if ui.add_enabled(self.inventory.is_some(),egui::Button::new("Save inventory")).clicked(){if let Some(path)=rfd::FileDialog::new().set_file_name("inventory.json").save_file(){self.status=save_new(path,self.inventory.as_ref().unwrap()).map(|_|"Inventory saved".into()).unwrap_or_else(|e|e.to_string());}}
                     if ui.add_enabled(self.plan.is_none(),egui::Button::new("Load plan")).clicked(){if let Some(path)=rfd::FileDialog::new().add_filter("JSON",&["json"]).pick_file(){self.spawn(ctx,move||{let p:Plan=serde_json::from_reader(BufReader::new(File::open(path)?))?;editing::validate(&p)?;Ok(Work::Plan(p))});}}
                     if ui.add_enabled(self.plan.is_some(),egui::Button::new("Save plan as")).clicked(){if let Some(path)=rfd::FileDialog::new().set_file_name("plan.json").save_file(){let p=self.plan.as_ref().unwrap().clone();self.spawn(ctx,move||{save_new(path,&p)?;Ok(Work::Saved("Plan saved".into()))});}}
                     if ui.add_enabled(self.plan.is_some(),egui::Button::new("Close plan")).clicked(){self.status="Save the plan before closing; use the separate confirmation below.".into();self.tab=3;}
+                    });
+                    ui.separator();
+                    ui.label("Project name");
+                    if ui.text_edit_singleline(&mut self.project_name).changed(){self.dirty=true;}
                 });
             });
-            ui.horizontal(|ui|{ui.label("Project name");if ui.text_edit_singleline(&mut self.project_name).changed(){self.dirty=true;}});
-            ui.horizontal(|ui|{ui.selectable_value(&mut self.tab,0,"Sources");ui.selectable_value(&mut self.tab,1,"Planner");ui.selectable_value(&mut self.tab,2,"Comparison");ui.selectable_value(&mut self.tab,4,"Duplicates");ui.selectable_value(&mut self.tab,6,"Catalog");ui.selectable_value(&mut self.tab,7,"Images");ui.selectable_value(&mut self.tab,8,"Drives");ui.selectable_value(&mut self.tab,9,"Burn journal");ui.selectable_value(&mut self.tab,10,"Burn");});
+            ui.add_space(6.0);
         });
-        egui::TopBottomPanel::bottom("status").show(ctx,|ui|{ui.horizontal(|ui|{if self.worker.is_some(){ui.spinner();}ui.label(&self.status);});});
+        egui::TopBottomPanel::bottom("status").show(ctx,|ui|{
+            ui.add_space(4.0);
+            ui.horizontal_wrapped(|ui|{
+                if self.worker.is_some(){ui.spinner();ui.strong("Working");}else{ui.strong("Status");}
+                ui.label(&self.status);
+            });
+            ui.add_space(4.0);
+        });
+        egui::SidePanel::left("workspace_navigation").exact_width(208.0).resizable(false).show(ctx,|ui|{
+            ui.add_space(12.0);
+            egui::ScrollArea::vertical().id_salt("workspace_navigation_scroll").show(ui,|ui|{
+                ui.add_enabled_ui(self.worker.is_none(),|ui|{
+                    for (section,pages) in NAVIGATION{
+                        ui.add_space(9.0);
+                        ui.label(egui::RichText::new(*section).small().strong().weak());
+                        for &(id,label) in *pages{
+                            if ui.add_sized([ui.available_width(),32.0],egui::Button::new(label).selected(self.tab==id)).clicked(){self.tab=id;}
+                        }
+                    }
+                });
+            });
+        });
         egui::CentralPanel::default().show(ctx,|ui|{
             if self.burn_progress.is_some(){ui.heading("Active burning jobs");for (id,stage) in &self.burn_stages{
                 ui.label(id);
@@ -516,6 +596,7 @@ impl eframe::App for Studio{
                 }
             }}
             ui.add_enabled_ui(self.worker.is_none(),|ui|{egui::ScrollArea::vertical().show(ui,|ui|match self.tab{
+                11=>self.overview_ui(ui,ctx),
                 0=>self.sources_ui(ui,ctx),
                 1=>self.planner_ui(ui,ctx),
                 2=>{ui.heading("Distribution comparison");for s in &self.comparison{ui.label(format!("{:?}: {} discs | {} assigned | {} unassigned | {} split folders | {:.2} GB used / {:.2} GB capacity",s.strategy,s.discs,s.files,s.unassigned,s.split_folders,s.estimated_used_bytes as f64/1e9,s.capacity_bytes as f64/1e9));}},
@@ -531,8 +612,36 @@ impl eframe::App for Studio{
         });
     }
 }
+const NAVIGATION:&[(&str,&[(usize,&str)])]=&[
+    ("WORKSPACE",&[(11,"Overview"),(0,"Sources"),(1,"Disc planner"),(2,"Compare strategies"),(4,"Duplicate review")]),
+    ("OPTICAL MEDIA",&[(7,"Create images"),(8,"Optical drives"),(10,"Burn discs"),(9,"Burn journal & verify")]),
+    ("LIBRARY",&[(6,"Archive catalog")]),
+];
+fn apply_theme(ctx:&egui::Context,dark:bool){
+    let mut style=(*ctx.style()).clone();
+    let mut visuals=if dark{egui::Visuals::dark()}else{egui::Visuals::light()};
+    visuals.panel_fill=if dark{egui::Color32::from_rgb(24,31,43)}else{egui::Color32::from_rgb(246,248,252)};
+    visuals.window_fill=visuals.panel_fill;
+    visuals.selection.bg_fill=if dark{egui::Color32::from_rgb(44,80,125)}else{egui::Color32::from_rgb(210,229,255)};
+    style.visuals=visuals;
+    style.spacing.item_spacing=egui::vec2(10.0,8.0);
+    style.spacing.button_padding=egui::vec2(12.0,7.0);
+    style.spacing.interact_size=egui::vec2(40.0,28.0);
+    for (kind,size) in [(egui::TextStyle::Body,15.0),(egui::TextStyle::Button,15.0),(egui::TextStyle::Heading,21.0),(egui::TextStyle::Small,12.0)]{
+        style.text_styles.insert(kind,egui::FontId::proportional(size));
+    }
+    ctx.set_style(style);
+}
+#[cfg(test)]
+#[test]
+fn navigation_preserves_every_workspace(){
+    let mut ids:Vec<_>=NAVIGATION.iter().flat_map(|(_,pages)|pages.iter().map(|(id,_)|*id)).collect();
+    ids.sort_unstable();
+    assert_eq!(ids,vec![0,1,2,4,6,7,8,9,10,11]);
+    assert_eq!(Studio::default().tab,11);
+}
 fn main()->eframe::Result<()>{
-    eframe::run_native("Disc Archive Studio",eframe::NativeOptions{viewport:egui::ViewportBuilder::default().with_inner_size([1100.,800.]),..Default::default()},Box::new(|_|Ok(Box::<Studio>::default())))
+    eframe::run_native("Disc Archive Studio",eframe::NativeOptions{viewport:egui::ViewportBuilder::default().with_inner_size([1200.,850.]).with_min_inner_size([800.,600.]),..Default::default()},Box::new(|cc|{apply_theme(&cc.egui_ctx,false);Ok(Box::<Studio>::default())}))
 }
 
  // A count match alone is not authorization: bind every displayed preview to its target and checksum.

@@ -1,0 +1,15 @@
+# UI redesign and acceptance roadmap
+
+Phase 8A accepted by operator: all four package checksum entries PASS, CLI 0.1.0 version/help works, GUI launches. Original screenshot shows dense horizontal tabs, small controls and blank start screen. User requested visual and workflow usability redesign before functional acceptance.
+
+Constraints: preserve Rust/egui, all existing CLI and GUI capabilities, source safety, data schemas, write authorization, job recovery, private repository, tests and portable packaging. No real optical writes, deployment, artifact deletion, billing changes or scope expansion. No fabricated screenshots or claims of runtime acceptance.
+
+- R1 (current commit): sidebar navigation, overview/welcome workspace, consolidated project commands, typography, spacing, coordinated light/dark palette, retained workspace routing and regression test. Validate exact-head Windows CI.
+- R2: guided workflow and contextual next actions, source drag/drop target, selected sources list, intuitive scan settings and state transitions; preserve saved projects and protect unsaved changes; tests.
+- R3a: planner usability, media presets, capacity overview, expandable folder grouping and explicit safe assignment interaction (including drag/drop where practical), comparison and duplicate review; preserve all planning/editing rules and test.
+- R3b: image creation, drive discovery, burn/verify and journal workspace usability; clear separation of planned/image/written/verified states; never relax authorization or retry rules; tests.
+- R3c: catalog and project usability, consistent empty/loading/error states, small-window and theme review; regression coverage.
+- R4: final GUI review, Windows CI, portable ZIP validation, updated acceptance checklist and private preview readiness. Keep existing manual private release publishing path. If no supported dispatch action, stop at passing build and request operator to run the existing private release workflow. Verify publication when available, then pause task for Windows acceptance. Do not claim actual GUI appearance/interaction has passed until operator tests.
+- After updated preview: resume Phase 8B functional Windows acceptance with disposable fixture files before physical media.
+
+Use fresh main HEAD, exact CI SHA, expected-head commits, and meaningful increments. Stop on genuine intervention only. Update this file with completed stages and evidence.
