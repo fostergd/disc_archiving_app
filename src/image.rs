@@ -200,6 +200,8 @@ pub(crate) fn validate_manifest(p:&PreparedDisc)->Result<()>{
     if p.files.is_empty()||p.reserve>=p.capacity{bail!("Invalid prepared disc");}
     let entries:Vec<_>=p.files.iter().map(|f|Entry{source:f.source.clone(),archive:f.archive.clone(),bytes:f.bytes,sha256:Some(f.sha256.clone())}).collect();
     check_paths(&entries)?;
+    let payload = p.files.iter().try_fold(0u64, |sum, f| sum.checked_add(f.bytes).context("Manifest payload size overflow"))?;
+    if payload > p.capacity - p.reserve { bail!("Manifest payload exceeds usable capacity"); }
     if p.files.iter().any(|f|f.sha256.len()!=64||!f.sha256.bytes().all(|b|b.is_ascii_hexdigit())){bail!("Invalid manifest checksum");}
     Ok(())
 }
@@ -229,4 +231,23 @@ pub fn verify_udf(p:&PreparedDisc,image:&Path)->Result<VerificationReceipt>{
 #[cfg(not(windows))]
 pub fn verify_udf(_p:&PreparedDisc,_image:&Path)->Result<VerificationReceipt>{
     bail!("Mounted UDF verification requires Windows")
+}
+
+#[cfg(test)]
+#[test]
+fn manifest_payload_capacity_and_overflow() {
+    let file = |archive: &str, bytes| PreparedFile {
+        source: "unused".into(), archive: archive.into(), bytes, sha256: "a".repeat(64),
+    };
+    let mut p = PreparedDisc {
+        number: 1, label: "DISC_001".into(), capacity: 4096, estimated_used: 2048,
+        reserve: 2048, files: vec![file("a", 2048), file("b", 0)],
+    };
+    assert!(validate_manifest(&p).is_ok());
+    p.files[1].bytes = 1;
+    assert!(validate_manifest(&p).is_err());
+    p.capacity = u64::MAX;
+    p.reserve = 0;
+    p.files[0].bytes = u64::MAX;
+    assert!(validate_manifest(&p).is_err());
 }
