@@ -3,9 +3,10 @@ use disc_archive::{scan,plan_mixed,ScanOptions,Inventory,Plan,Strategy,MEDIA};
 use disc_archive::editing;
 use eframe::egui;
 use std::{path::PathBuf,sync::mpsc::{self,Receiver},fs::File,io::{BufReader,BufWriter,Write}};
-enum Work { Inventory(Inventory), Plan(Plan), Comparison(Vec<editing::Summary>), Duplicates(Vec<Vec<String>>), Saved(String), Project(disc_archive::project::Project), CatalogOpened(PathBuf,Vec<disc_archive::catalog::ProjectRow>), CatalogResults(Vec<disc_archive::catalog::Match>,usize), CatalogImported(i64,Vec<disc_archive::catalog::ProjectRow>), ImageCreated(disc_archive::image::ImageReceipt), ImageVerified(disc_archive::image::VerificationReceipt), ManifestSaved(PathBuf), Drives(disc_archive::optical::Discovery), Error(String) }
+enum Work { Inventory(Inventory), Plan(Plan), Comparison(Vec<editing::Summary>), Duplicates(Vec<Vec<String>>), Saved(String), Project(disc_archive::project::Project), CatalogOpened(PathBuf,Vec<disc_archive::catalog::ProjectRow>), CatalogResults(Vec<disc_archive::catalog::Match>,usize), CatalogImported(i64,Vec<disc_archive::catalog::ProjectRow>), ImageCreated(disc_archive::image::ImageReceipt), ImageVerified(disc_archive::image::VerificationReceipt), ManifestSaved(PathBuf), Drives(disc_archive::optical::Discovery), Jobs(PathBuf,Vec<disc_archive::jobs::Job>,String), Error(String) }
 struct Studio {
     drives:Option<disc_archive::optical::Discovery>,
+    journal_path:Option<PathBuf>, jobs:Vec<disc_archive::jobs::Job>, job_selection:Option<i64>, job_recorder:String, reconcile_note:String, reconcile_confirm:bool, verify_confirm:bool,
     sources:Vec<PathBuf>, source_text:String, extensions:String, exclusions:String, hash:bool,
     capacities:String, reserve:String, strategy:Strategy, inventory:Option<Inventory>, plan:Option<Plan>,
     comparison:Vec<editing::Summary>, worker:Option<Receiver<Work>>, status:String, selected:Option<usize>,
@@ -16,7 +17,7 @@ struct Studio {
     catalog_path:Option<PathBuf>, catalog_projects:Vec<disc_archive::catalog::ProjectRow>, catalog_rows:Vec<disc_archive::catalog::Match>, catalog_term:String, catalog_project:Option<i64>, catalog_offset:usize, catalog_has_next:bool, catalog_query:Option<(String,Option<i64>)>,
 }
 impl Default for Studio {
-    fn default()->Self{Self{drives:None,sources:vec![],source_text:String::new(),extensions:String::new(),exclusions:String::new(),hash:false,
+    fn default()->Self{Self{drives:None,journal_path:None,jobs:vec![],job_selection:None,job_recorder:String::new(),reconcile_note:String::new(),reconcile_confirm:false,verify_confirm:false,sources:vec![],source_text:String::new(),extensions:String::new(),exclusions:String::new(),hash:false,
         capacities:"50000000000".into(),reserve:"50000000".into(),strategy:Strategy::Hybrid,inventory:None,plan:None,comparison:vec![],
         worker:None,status:"Add files or folders to begin.".into(),selected:None,pattern:"DISC_{n:03}".into(),move_path:String::new(),destination:1,search:String::new(),tab:0,inventory_search:String::new(),duplicate_groups:vec![],dirty:false,close_prompt:false,project_name:"Untitled archive".into(),image_disc:1,image_receipt:None,verify_receipt:None,image_path:None,manifest_path:None,catalog_path:None,catalog_projects:vec![],catalog_rows:vec![],catalog_term:String::new(),catalog_project:None,catalog_offset:0,catalog_has_next:false,catalog_query:None}}
 }
@@ -52,7 +53,8 @@ impl Studio{
                 Work::ImageVerified(receipt)=>{self.status=format!("Image verified: {} files",receipt.files);self.verify_receipt=Some(receipt);}
                 Work::ManifestSaved(path)=>{self.status=format!("Preparation manifest saved: {}",path.display());self.manifest_path=Some(path);}
                 Work::Drives(d)=>{self.status=format!("{} recorders detected; {} discovery errors",d.recorders.len(),d.errors.len());self.drives=Some(d);}
-                Work::Error(e)=>self.status=e,
+                Work::Jobs(path,jobs,message)=>{self.journal_path=Some(path);self.jobs=jobs;self.status=message;self.reconcile_confirm=false;self.verify_confirm=false;}
+                Work::Error(e)=>{self.status=e;self.reconcile_confirm=false;self.verify_confirm=false;},
             }
         }
     }
@@ -142,6 +144,58 @@ impl Studio{
                 });
             }
         });
+    }
+    fn jobs_ui(&mut self,ui:&mut egui::Ui,ctx:&egui::Context){
+        use disc_archive::jobs::Journal;
+        ui.heading("Burn journal");
+        ui.label("Manage recorded attempts and read back an intended disc. This tab does not initiate burning.");
+        let mut open=None;
+        if ui.button("Create journal").clicked(){if let Some(p)=rfd::FileDialog::new().set_file_name("jobs.sqlite").save_file(){open=Some((p,true));}}
+        if ui.button("Open journal").clicked(){if let Some(p)=rfd::FileDialog::new().add_filter("Burn journal",&["sqlite","db"]).pick_file(){open=Some((p,false));}}
+        if let Some((path,create))=open{
+            self.journal_path=None;self.jobs.clear();self.job_selection=None;self.job_recorder.clear();self.reconcile_note.clear();self.reconcile_confirm=false;self.verify_confirm=false;
+            self.spawn(ctx,move||{let j=if create{Journal::create(&path)?}else{Journal::open(&path)?};Ok(Work::Jobs(path,j.list()?,"Journal opened".into()))});return;
+        }
+        let Some(path)=self.journal_path.clone() else{return;};
+        ui.label(path.display().to_string());
+        if ui.button("Refresh job history").clicked(){self.spawn(ctx,move||{let j=Journal::open(&path)?;Ok(Work::Jobs(path,j.list()?,"Journal refreshed".into()))});return;}
+        let previous=self.job_selection;
+        egui::ScrollArea::vertical().id_salt("job_history").max_height(240.).show_rows(ui,26.,self.jobs.len(),|ui,range|{
+            for i in range{let j=&self.jobs[i];ui.selectable_value(&mut self.job_selection,Some(j.id),format!("#{} {} | {} | {}",j.id,j.label,j.state,j.verification_status.as_deref().unwrap_or("no readback")));}
+        });
+        if previous!=self.job_selection{self.reconcile_confirm=false;self.verify_confirm=false;self.reconcile_note.clear();self.job_recorder.clear();}
+        let Some(j)=self.jobs.iter().find(|j|Some(j.id)==self.job_selection) else{return;};
+        let id=j.id;
+        let unresolved=(j.state=="in_progress"||j.state=="outcome_unknown")&&j.reconciliation.is_none();
+        let written=j.state=="written_unverified";
+        ui.separator();
+        ui.label(format!("Recorder: {}",j.recorder));ui.label(format!("Image: {}",j.image));ui.label(format!("SHA-256: {}",j.sha256));
+        ui.label(format!("Started: {} | Finished: {}",j.started,j.finished.as_deref().unwrap_or("not recorded")));
+        ui.label(&j.detail);
+        if let Some(note)=&j.reconciliation{ui.label(format!("Reconciliation: {} ({})",note,j.reconciled_at.as_deref().unwrap_or("unknown")));}
+        if unresolved{
+            ui.label("Stop any orphaned writer and remove suspect media before reconciling. This does not assert a successful burn.");
+            ui.text_edit_multiline(&mut self.reconcile_note);
+            ui.checkbox(&mut self.reconcile_confirm,"I confirmed the writer has stopped and suspect media was removed.");
+            if ui.add_enabled(self.reconcile_confirm&&!self.reconcile_note.trim().is_empty(),egui::Button::new("Record reconciliation")).clicked(){
+                let note=self.reconcile_note.clone();self.reconcile_confirm=false;
+                self.spawn(ctx,move||{let j=Journal::open(&path)?;j.reconcile(id,"INSPECTED-REMOVE-MEDIA",&note)?;Ok(Work::Jobs(path,j.list()?,"Reconciliation recorded".into()))});return;
+            }
+        }
+        if written{
+            ui.label("Readback uses the stored manifest. Insert the intended disc and leave it inserted throughout verification.");
+            let prior=self.job_recorder.clone();
+            egui::ComboBox::from_label("Readback recorder").selected_text(if self.job_recorder.is_empty(){"Select recorder"}else{&self.job_recorder}).show_ui(ui,|ui|{
+                if let Some(d)=&self.drives{for r in &d.recorders{ui.selectable_value(&mut self.job_recorder,r.id.clone(),format!("{} {} {}",r.vendor,r.product,r.paths.join(", ")));}}
+            });
+            if prior!=self.job_recorder{self.verify_confirm=false;}
+            if ui.button("Refresh recorder list").clicked(){self.job_recorder.clear();self.verify_confirm=false;self.drives=None;self.spawn(ctx,move||Ok(Work::Drives(disc_archive::optical::discover()?)));return;}
+            ui.checkbox(&mut self.verify_confirm,"The intended disc is inserted in the selected recorder.");
+            if ui.add_enabled(self.verify_confirm&&!self.job_recorder.is_empty(),egui::Button::new("Verify recorded disc")).clicked(){
+                let recorder=self.job_recorder.clone();self.verify_confirm=false;
+                self.spawn(ctx,move||{let j=Journal::open(&path)?;let message=match disc_archive::optical::verify_logged_disc(&j,id,&recorder){Ok(r)=>format!("Verified {} files",r.files),Err(e)=>format!("Verification failed: {e:#}")};Ok(Work::Jobs(path,j.list()?,message))});
+            }
+        }
     }
     fn drives_ui(&mut self,ui:&mut egui::Ui,ctx:&egui::Context){
         ui.heading("Optical recorders");
@@ -356,7 +410,7 @@ impl eframe::App for Studio{
                 });
             });
             ui.horizontal(|ui|{ui.label("Project name");if ui.text_edit_singleline(&mut self.project_name).changed(){self.dirty=true;}});
-            ui.horizontal(|ui|{ui.selectable_value(&mut self.tab,0,"Sources");ui.selectable_value(&mut self.tab,1,"Planner");ui.selectable_value(&mut self.tab,2,"Comparison");ui.selectable_value(&mut self.tab,4,"Duplicates");ui.selectable_value(&mut self.tab,6,"Catalog");ui.selectable_value(&mut self.tab,7,"Images");ui.selectable_value(&mut self.tab,8,"Drives");});
+            ui.horizontal(|ui|{ui.selectable_value(&mut self.tab,0,"Sources");ui.selectable_value(&mut self.tab,1,"Planner");ui.selectable_value(&mut self.tab,2,"Comparison");ui.selectable_value(&mut self.tab,4,"Duplicates");ui.selectable_value(&mut self.tab,6,"Catalog");ui.selectable_value(&mut self.tab,7,"Images");ui.selectable_value(&mut self.tab,8,"Drives");ui.selectable_value(&mut self.tab,9,"Burn journal");});
         });
         egui::TopBottomPanel::bottom("status").show(ctx,|ui|{ui.horizontal(|ui|{if self.worker.is_some(){ui.spinner();}ui.label(&self.status);});});
         egui::CentralPanel::default().show(ctx,|ui|{
@@ -368,6 +422,7 @@ impl eframe::App for Studio{
                 6=>self.catalog_ui(ui,ctx),
                 7=>self.image_ui(ui,ctx),
                 8=>self.drives_ui(ui,ctx),
+                9=>self.jobs_ui(ui,ctx),
                 5=>{ui.label("Closing the project discards all unsaved project settings, inventory and plan. Save a new project revision first if needed.");if ui.button("Confirm close project").clicked(){*self=Self::default();}if ui.button("Cancel").clicked(){self.tab=0;}},
                 _=>{ui.label("Closing disc plan discards unsaved edits.");if ui.button("Confirm close plan").clicked(){self.plan=None;self.selected=None;self.dirty=false;self.tab=0;self.status="Plan closed".into();}if ui.button("Cancel").clicked(){self.tab=1;}}
             });});
