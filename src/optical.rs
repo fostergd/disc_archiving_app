@@ -288,12 +288,14 @@ mod burn_tests{
         assert!(!p.completed());
     }
     #[cfg(windows)]
-    #[test]fn native_telemetry_compiles_without_hardware(){
+    #[test]fn native_telemetry_and_stream_without_hardware(){
         let tmp=tempfile::tempdir().unwrap();let script=tmp.path().join("burn.ps1");
         std::fs::write(&script,include_str!("imapi_burn.ps1")).unwrap();
-        let result=std::process::Command::new("powershell.exe").args(["-NoProfile","-NonInteractive","-ExecutionPolicy","Bypass","-File"]).arg(script).arg("-TelemetrySelfTest").output().unwrap();
+        let result=std::process::Command::new("powershell.exe").args(["-NoProfile","-NonInteractive","-ExecutionPolicy","Bypass","-File"]).arg(script).arg("-TelemetrySelfTest").env("DAS_STREAM_TEST_FIXTURE",tmp.path().join("native-stream.bin")).output().unwrap();
         assert!(result.status.success(),"{}",String::from_utf8_lossy(&result.stderr));
         assert_eq!(String::from_utf8_lossy(&result.stdout).trim(),"TELEMETRY_SELFTEST_PASSED");
+        let fixture=std::fs::read(tmp.path().join("native-stream.bin")).unwrap();
+        assert_eq!(fixture,(0..4096).map(|i|(i%251) as u8).collect::<Vec<_>>());
     }
     #[test]fn explicit_authorization(){
         let hash="a".repeat(64);

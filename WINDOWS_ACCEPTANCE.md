@@ -17,3 +17,5 @@ This is an experimental portable build, not a signed or hardware-accepted releas
 - If interrupted, do not retry automatically. Confirm the helper stopped, inspect and remove suspect media, then explicitly reconcile the journal. Never create a new journal to bypass an unresolved attempt.
 
 Record Windows version, drive models, media types, package hashes, results and errors. Do not claim hardware acceptance until these checks pass.
+
+The CI package assembly checks and native file-stream tests do not exercise a real optical write. Confirm the selected Windows installation can complete the guarded ISO verification and native burn/readback sequence using disposable media before trusting it with archive material.

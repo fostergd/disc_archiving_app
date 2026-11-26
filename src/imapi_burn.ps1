@@ -19,7 +19,7 @@ using System.Runtime.InteropServices.ComTypes;
 using System.Globalization;
 using System.Reflection;
 public static class DasBurnStream {
-    [DllImport("shlwapi.dll", CharSet=CharSet.Unicode, PreserveSig=true)]
+    [DllImport("shlwapi.dll", CharSet=CharSet.Unicode, ExactSpelling=true, PreserveSig=true)]
     private static extern int SHCreateStreamOnFileEx(string path, uint mode, uint attributes,
         [MarshalAs(UnmanagedType.Bool)] bool create, IStream template, out IStream stream);
     public static IStream Open(string path) {
@@ -27,6 +27,37 @@ public static class DasBurnStream {
         int hr=SHCreateStreamOnFileEx(path,0x20,0,false,null,out stream);
         Marshal.ThrowExceptionForHR(hr);
         return stream;
+    }
+    // Exercise the actual native stream with a caller-owned, disposable fixture.
+    public static void CheckFixture(string path) {
+        byte[] expected = new byte[4096];
+        for (int i = 0; i < expected.Length; i++) expected[i] = (byte)(i % 251);
+        using (var file = new System.IO.FileStream(path, System.IO.FileMode.CreateNew, System.IO.FileAccess.Write, System.IO.FileShare.None)) {
+            file.Write(expected, 0, expected.Length);
+        }
+        using (var guard = new System.IO.FileStream(path, System.IO.FileMode.Open, System.IO.FileAccess.Read, System.IO.FileShare.Read)) {
+            IStream stream = Open(path);
+            IntPtr count = Marshal.AllocHGlobal(4);
+            try {
+                System.Runtime.InteropServices.ComTypes.STATSTG info;
+                stream.Stat(out info, 1);
+                if (info.cbSize != expected.Length) throw new InvalidOperationException("Native stream length mismatch");
+                byte[] actual = new byte[expected.Length];
+                stream.Read(actual, actual.Length, count);
+                if (Marshal.ReadInt32(count) != actual.Length) throw new InvalidOperationException("Native stream short read");
+                for (int i = 0; i < actual.Length; i++) {
+                    if (actual[i] != expected[i]) throw new InvalidOperationException("Native stream byte mismatch");
+                }
+                stream.Read(new byte[1], 1, count);
+                if (Marshal.ReadInt32(count) != 0) throw new InvalidOperationException("Native stream EOF mismatch");
+                stream.Seek(0, 0, IntPtr.Zero);
+                stream.Read(actual, 1, count);
+                if (Marshal.ReadInt32(count) != 1 || actual[0] != expected[0]) throw new InvalidOperationException("Native stream seek mismatch");
+            } finally {
+                Marshal.FreeHGlobal(count);
+                Marshal.ReleaseComObject(stream);
+            }
+        }
     }
 }
 public static class DasBurnTelemetry {
@@ -64,6 +95,8 @@ if ($TelemetrySelfTest) {
     if ([DasBurnTelemetry]::FormatProgress(4,100,125,100) -cne 'DAS_PROGRESS 25 100') { throw 'Telemetry conversion failed' }
     if ($null -ne [DasBurnTelemetry]::FormatProgress(4,100,99,100)) { throw 'Invalid LBA accepted' }
     if ($null -ne [DasBurnTelemetry]::FormatProgress(5,100,125,100)) { throw 'Non-writing event accepted' }
+    if ([string]::IsNullOrWhiteSpace($env:DAS_STREAM_TEST_FIXTURE)) { throw 'Fixture path required for native self-test' }
+    [DasBurnStream]::CheckFixture($env:DAS_STREAM_TEST_FIXTURE)
     Write-Output 'TELEMETRY_SELFTEST_PASSED'
     return
 }
