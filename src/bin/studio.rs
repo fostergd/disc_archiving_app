@@ -3,8 +3,9 @@ use disc_archive::{scan,plan_mixed,ScanOptions,Inventory,Plan,Strategy,MEDIA};
 use disc_archive::editing;
 use eframe::egui;
 use std::{path::PathBuf,sync::mpsc::{self,Receiver},fs::File,io::{BufReader,BufWriter,Write}};
-enum Work { Inventory(Inventory), Plan(Plan), Comparison(Vec<editing::Summary>), Duplicates(Vec<Vec<String>>), Saved(String), Project(disc_archive::project::Project), CatalogOpened(PathBuf,Vec<disc_archive::catalog::ProjectRow>), CatalogResults(Vec<disc_archive::catalog::Match>,usize), CatalogImported(i64,Vec<disc_archive::catalog::ProjectRow>), ImageCreated(disc_archive::image::ImageReceipt), ImageVerified(disc_archive::image::VerificationReceipt), ManifestSaved(PathBuf), Drives(disc_archive::optical::Discovery), Jobs(PathBuf,Vec<disc_archive::jobs::Job>,String), Error(String) }
+enum Work { Inventory(Inventory), Plan(Plan), Comparison(Vec<editing::Summary>), Duplicates(Vec<Vec<String>>), Saved(String), Project(disc_archive::project::Project), CatalogOpened(PathBuf,Vec<disc_archive::catalog::ProjectRow>), CatalogResults(Vec<disc_archive::catalog::Match>,usize), CatalogImported(i64,Vec<disc_archive::catalog::ProjectRow>), ImageCreated(disc_archive::image::ImageReceipt), ImageVerified(disc_archive::image::VerificationReceipt), ManifestSaved(PathBuf), Drives(disc_archive::optical::Discovery), Jobs(PathBuf,Vec<disc_archive::jobs::Job>,String), BatchPreview(Vec<disc_archive::optical::BurnPreview>), BatchDone(Vec<disc_archive::batch::Outcome>,Vec<disc_archive::jobs::Job>), Error(String) }
 struct Studio {
+    burn_requests:Vec<disc_archive::batch::Request>, burn_previews:Vec<disc_archive::optical::BurnPreview>, burn_confirm:bool, burn_progress:Option<Receiver<(String,disc_archive::optical::BurnStage)>>, burn_stages:std::collections::BTreeMap<String,disc_archive::optical::BurnStage>, burn_outcomes:Vec<disc_archive::batch::Outcome>,
     drives:Option<disc_archive::optical::Discovery>,
     journal_path:Option<PathBuf>, jobs:Vec<disc_archive::jobs::Job>, job_selection:Option<i64>, job_recorder:String, reconcile_note:String, reconcile_confirm:bool, verify_confirm:bool,
     sources:Vec<PathBuf>, source_text:String, extensions:String, exclusions:String, hash:bool,
@@ -17,7 +18,7 @@ struct Studio {
     catalog_path:Option<PathBuf>, catalog_projects:Vec<disc_archive::catalog::ProjectRow>, catalog_rows:Vec<disc_archive::catalog::Match>, catalog_term:String, catalog_project:Option<i64>, catalog_offset:usize, catalog_has_next:bool, catalog_query:Option<(String,Option<i64>)>,
 }
 impl Default for Studio {
-    fn default()->Self{Self{drives:None,journal_path:None,jobs:vec![],job_selection:None,job_recorder:String::new(),reconcile_note:String::new(),reconcile_confirm:false,verify_confirm:false,sources:vec![],source_text:String::new(),extensions:String::new(),exclusions:String::new(),hash:false,
+    fn default()->Self{Self{burn_requests:vec![],burn_previews:vec![],burn_confirm:false,burn_progress:None,burn_stages:Default::default(),burn_outcomes:vec![],drives:None,journal_path:None,jobs:vec![],job_selection:None,job_recorder:String::new(),reconcile_note:String::new(),reconcile_confirm:false,verify_confirm:false,sources:vec![],source_text:String::new(),extensions:String::new(),exclusions:String::new(),hash:false,
         capacities:"50000000000".into(),reserve:"50000000".into(),strategy:Strategy::Hybrid,inventory:None,plan:None,comparison:vec![],
         worker:None,status:"Add files or folders to begin.".into(),selected:None,pattern:"DISC_{n:03}".into(),move_path:String::new(),destination:1,search:String::new(),tab:0,inventory_search:String::new(),duplicate_groups:vec![],dirty:false,close_prompt:false,project_name:"Untitled archive".into(),image_disc:1,image_receipt:None,verify_receipt:None,image_path:None,manifest_path:None,catalog_path:None,catalog_projects:vec![],catalog_rows:vec![],catalog_term:String::new(),catalog_project:None,catalog_offset:0,catalog_has_next:false,catalog_query:None}}
 }
@@ -35,6 +36,7 @@ impl Studio{
         self.worker=Some(rx);self.status="Working in background...".into();
     }
     fn poll(&mut self){
+        if let Some(rx)=&self.burn_progress{for (id,stage) in rx.try_iter(){self.burn_stages.insert(id,stage);}}
         let event=match self.worker.as_ref().map(|r|r.try_recv()){
             Some(Ok(v))=>Some(v),Some(Err(mpsc::TryRecvError::Disconnected))=>Some(Work::Error("Worker stopped unexpectedly".into())),_=>None};
         if let Some(event)=event{
@@ -54,7 +56,9 @@ impl Studio{
                 Work::ManifestSaved(path)=>{self.status=format!("Preparation manifest saved: {}",path.display());self.manifest_path=Some(path);}
                 Work::Drives(d)=>{self.status=format!("{} recorders detected; {} discovery errors",d.recorders.len(),d.errors.len());self.drives=Some(d);}
                 Work::Jobs(path,jobs,message)=>{self.journal_path=Some(path);self.jobs=jobs;self.status=message;self.reconcile_confirm=false;self.verify_confirm=false;}
-                Work::Error(e)=>{self.status=e;self.reconcile_confirm=false;self.verify_confirm=false;},
+                Work::BatchPreview(v)=>{self.burn_previews=v;self.burn_confirm=false;self.status="Batch preview complete; inspect each target before authorizing".into();}
+                Work::BatchDone(outcomes,jobs)=>{self.burn_progress=None;self.jobs=jobs;self.status=format!("Batch finished: {} written, {} errors; physical verification separate",outcomes.iter().filter(|o|o.receipt.is_some()).count(),outcomes.iter().filter(|o|o.error.is_some()).count());self.burn_outcomes=outcomes;}
+                Work::Error(e)=>{self.burn_progress=None;self.burn_confirm=false;self.status=e;self.reconcile_confirm=false;self.verify_confirm=false;},
             }
         }
     }
@@ -144,6 +148,78 @@ impl Studio{
                 });
             }
         });
+    }
+    fn burn_ui(&mut self,ui:&mut egui::Ui,ctx:&egui::Context){
+        use disc_archive::{batch,optical,jobs::Journal};
+        ui.heading("Experimental concurrent burning");
+        ui.label("Physical writing requires hardware acceptance. Use expendable blank write-once media only. No automatic retry.");
+        if let Some(p)=&self.journal_path{ui.label(format!("Journal: {}",p.display()));}else{ui.label("Open a burn journal in the Burn journal tab first.");}
+        let mut changed=false;
+        if ui.button("Load explicit batch assignments (JSON)").clicked(){
+            if let Some(path)=rfd::FileDialog::new().add_filter("Batch JSON",&["json"]).pick_file(){
+                self.burn_requests.clear();changed=true;
+                match File::open(path).map_err(anyhow::Error::from).and_then(|f|serde_json::from_reader::<_,Vec<batch::Request>>(BufReader::new(f)).map_err(anyhow::Error::from)).and_then(|v|{batch::validate(&v,"WRITE-ONCE")?;Ok(v)}){
+                    Ok(v)=>self.burn_requests=v,Err(e)=>self.status=format!("{e:#}"),
+                }
+            }
+        }
+        if ui.button("Add assignment").clicked()&&self.burn_requests.len()<16{
+            self.burn_requests.push(batch::Request{recorder:String::new(),image:PathBuf::new(),manifest:PathBuf::new(),sha256:String::new()});changed=true;
+        }
+        if ui.button("Refresh recorders").clicked(){self.burn_previews.clear();self.burn_confirm=false;self.spawn(ctx,move||Ok(Work::Drives(optical::discover()?)));return;}
+        let mut remove=None;
+        for (i,r) in self.burn_requests.iter_mut().enumerate(){
+            ui.push_id(i,|ui|ui.group(|ui|{
+                ui.label(format!("Assignment {}",i+1));
+                let prior=r.recorder.clone();
+                egui::ComboBox::from_label("Recorder").selected_text(if r.recorder.is_empty(){"Select recorder"}else{&r.recorder}).show_ui(ui,|ui|{
+                    if let Some(d)=&self.drives{for rec in &d.recorders{ui.selectable_value(&mut r.recorder,rec.id.clone(),format!("{} {} {}",rec.vendor,rec.product,rec.paths.join(", ")));}}
+                });
+                changed|=prior!=r.recorder;
+                if ui.button("Choose ISO").clicked(){if let Some(p)=rfd::FileDialog::new().add_filter("Image",&["iso"]).pick_file(){r.image=p;changed=true;}}
+                ui.label(r.image.display().to_string());
+                if ui.button("Choose manifest").clicked(){if let Some(p)=rfd::FileDialog::new().add_filter("Manifest",&["json"]).pick_file(){r.manifest=p;changed=true;}}
+                ui.label(r.manifest.display().to_string());
+                ui.label("Expected SHA-256 (from verified image receipt)");
+                changed|=ui.text_edit_singleline(&mut r.sha256).changed();
+                if ui.button("Remove assignment").clicked(){remove=Some(i);}
+            }));
+        }
+        if let Some(i)=remove{self.burn_requests.remove(i);changed=true;}
+        if changed{self.burn_previews.clear();self.burn_confirm=false;}
+        if ui.add_enabled(!self.burn_requests.is_empty(),egui::Button::new("Validate all assignments")).clicked(){
+            self.burn_previews.clear();self.burn_confirm=false;
+            let requests=self.burn_requests.clone();
+            self.spawn(ctx,move||{
+                batch::validate(&requests,"WRITE-ONCE")?;
+                let mut previews=Vec::new();
+                let mut paths=std::collections::HashSet::new();
+                for r in requests{
+                    let image=r.image.canonicalize()?;
+                    if !paths.insert(image.to_string_lossy().to_lowercase()){anyhow::bail!("Duplicate image path");}
+                    let manifest=serde_json::from_reader(BufReader::new(File::open(r.manifest)?))?;
+                    let p=optical::burn_preview(&manifest,&image,&r.recorder)?;
+                    if !p.image_sha256.eq_ignore_ascii_case(&r.sha256){anyhow::bail!("Approved SHA-256 mismatch");}
+                    previews.push(p);
+                }
+                Ok(Work::BatchPreview(previews))
+            });return;
+        }
+        for p in &self.burn_previews{ui.label(format!("{} | {} | {} bytes / {} free | SHA-256 {}",p.recorder_id,p.media_type,p.image_bytes,p.free_bytes,p.image_sha256));}
+        let ready=!self.burn_requests.is_empty()&&self.burn_previews.len()==self.burn_requests.len()&&self.journal_path.is_some();
+        ui.add_enabled_ui(ready,|ui|{ui.checkbox(&mut self.burn_confirm,"I authorize irreversible writing to every listed recorder and confirm the intended blank media are inserted.");});
+        if ui.add_enabled(ready&&self.burn_confirm,egui::Button::new("Start authorized batch")).clicked(){
+            let path=self.journal_path.clone().unwrap();let requests=self.burn_requests.clone();
+            self.burn_confirm=false;self.burn_previews.clear();self.burn_outcomes.clear();self.burn_stages.clear();
+            let (tx,rx)=mpsc::channel();self.burn_progress=Some(rx);
+            let repaint=ctx.clone();
+            self.spawn(ctx,move||{
+                let outcomes=batch::execute(requests,&path,"WRITE-ONCE",|id,stage|{let _=tx.send((id.to_owned(),stage));repaint.request_repaint();})?;
+                let jobs=Journal::open(&path)?.list()?;
+                Ok(Work::BatchDone(outcomes,jobs))
+            });
+        }
+        for o in &self.burn_outcomes{ui.label(format!("{}: {}",o.recorder,o.error.as_deref().unwrap_or("Written, unverified")));}
     }
     fn jobs_ui(&mut self,ui:&mut egui::Ui,ctx:&egui::Context){
         use disc_archive::jobs::Journal;
@@ -392,7 +468,7 @@ impl eframe::App for Studio{
         }
         egui::TopBottomPanel::top("top").show(ctx,|ui|{
             ui.horizontal_wrapped(|ui|{
-                ui.heading("Disc Archive Studio");ui.label("Archive planning and verified images - no physical writing");if self.dirty{ui.label("Unsaved plan");}
+                ui.heading("Disc Archive Studio");ui.label("Archive planning, verified images and experimental physical writing");if self.dirty{ui.label("Unsaved plan");}
                 if ui.button("Toggle theme").clicked(){let dark=ctx.style().visuals.dark_mode;ctx.set_visuals(if dark{egui::Visuals::light()}else{egui::Visuals::dark()});}
             });
             ui.add_enabled_ui(self.worker.is_none(),|ui|{
@@ -410,10 +486,11 @@ impl eframe::App for Studio{
                 });
             });
             ui.horizontal(|ui|{ui.label("Project name");if ui.text_edit_singleline(&mut self.project_name).changed(){self.dirty=true;}});
-            ui.horizontal(|ui|{ui.selectable_value(&mut self.tab,0,"Sources");ui.selectable_value(&mut self.tab,1,"Planner");ui.selectable_value(&mut self.tab,2,"Comparison");ui.selectable_value(&mut self.tab,4,"Duplicates");ui.selectable_value(&mut self.tab,6,"Catalog");ui.selectable_value(&mut self.tab,7,"Images");ui.selectable_value(&mut self.tab,8,"Drives");ui.selectable_value(&mut self.tab,9,"Burn journal");});
+            ui.horizontal(|ui|{ui.selectable_value(&mut self.tab,0,"Sources");ui.selectable_value(&mut self.tab,1,"Planner");ui.selectable_value(&mut self.tab,2,"Comparison");ui.selectable_value(&mut self.tab,4,"Duplicates");ui.selectable_value(&mut self.tab,6,"Catalog");ui.selectable_value(&mut self.tab,7,"Images");ui.selectable_value(&mut self.tab,8,"Drives");ui.selectable_value(&mut self.tab,9,"Burn journal");ui.selectable_value(&mut self.tab,10,"Burn");});
         });
         egui::TopBottomPanel::bottom("status").show(ctx,|ui|{ui.horizontal(|ui|{if self.worker.is_some(){ui.spinner();}ui.label(&self.status);});});
         egui::CentralPanel::default().show(ctx,|ui|{
+            if self.burn_progress.is_some(){ui.heading("Active burning jobs");for (id,stage) in &self.burn_stages{ui.label(format!("{id}: {stage:?}"));}}
             ui.add_enabled_ui(self.worker.is_none(),|ui|{egui::ScrollArea::vertical().show(ui,|ui|match self.tab{
                 0=>self.sources_ui(ui,ctx),
                 1=>self.planner_ui(ui,ctx),
@@ -423,6 +500,7 @@ impl eframe::App for Studio{
                 7=>self.image_ui(ui,ctx),
                 8=>self.drives_ui(ui,ctx),
                 9=>self.jobs_ui(ui,ctx),
+                10=>self.burn_ui(ui,ctx),
                 5=>{ui.label("Closing the project discards all unsaved project settings, inventory and plan. Save a new project revision first if needed.");if ui.button("Confirm close project").clicked(){*self=Self::default();}if ui.button("Cancel").clicked(){self.tab=0;}},
                 _=>{ui.label("Closing disc plan discards unsaved edits.");if ui.button("Confirm close plan").clicked(){self.plan=None;self.selected=None;self.dirty=false;self.tab=0;self.status="Plan closed".into();}if ui.button("Cancel").clicked(){self.tab=1;}}
             });});

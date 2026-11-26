@@ -3,12 +3,12 @@ use anyhow::{bail,Result};
 use serde::{Deserialize,Serialize};
 use std::{path::{Path,PathBuf},collections::HashSet};
 use crate::optical::{BurnReceipt,BurnStage};
-#[derive(Debug,Deserialize)]
+#[derive(Debug,Clone,Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct Request{pub recorder:String,pub image:PathBuf,pub manifest:PathBuf,pub sha256:String}
 #[derive(Debug,Serialize)]
 pub struct Outcome{pub recorder:String,pub receipt:Option<BurnReceipt>,pub error:Option<String>}
-fn validate(requests:&[Request],confirmation:&str)->Result<()>{
+pub fn validate(requests:&[Request],confirmation:&str)->Result<()>{
     if requests.is_empty()||requests.len()>16{bail!("Batch must contain 1 to 16 explicitly selected recorders");}
     let mut ids=HashSet::new();
     for r in requests{
