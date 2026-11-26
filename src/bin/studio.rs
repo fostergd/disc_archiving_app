@@ -3,7 +3,7 @@ use disc_archive::{scan,plan_mixed,ScanOptions,Inventory,Plan,Strategy,MEDIA};
 use disc_archive::editing;
 use eframe::egui;
 use std::{path::PathBuf,sync::mpsc::{self,Receiver},fs::File,io::{BufReader,BufWriter,Write}};
-enum Work { Inventory(Inventory), Plan(Plan), Comparison(Vec<editing::Summary>), Duplicates(Vec<Vec<String>>), Saved(String), Project(disc_archive::project::Project), CatalogOpened(PathBuf,Vec<disc_archive::catalog::ProjectRow>), CatalogResults(Vec<disc_archive::catalog::Match>,usize), CatalogImported(i64,Vec<disc_archive::catalog::ProjectRow>), ImageCreated(disc_archive::image::ImageReceipt), ImageVerified(disc_archive::image::VerificationReceipt), ManifestSaved(PathBuf), Drives(disc_archive::optical::Discovery), Jobs(PathBuf,Vec<disc_archive::jobs::Job>,String), BatchPreview(Vec<disc_archive::optical::BurnPreview>), BatchDone(Vec<disc_archive::batch::Outcome>,Vec<disc_archive::jobs::Job>), Error(String) }
+enum Work { Inventory(Inventory), Plan(Plan), Comparison(Vec<editing::Summary>), Duplicates(Vec<Vec<String>>), Saved(String), Project(disc_archive::project::Project), CatalogOpened(PathBuf,Vec<disc_archive::catalog::ProjectRow>), CatalogResults(Vec<disc_archive::catalog::Match>,usize), CatalogImported(i64,Vec<disc_archive::catalog::ProjectRow>), CatalogLinked, ImageCreated(disc_archive::image::ImageReceipt), ImageVerified(disc_archive::image::VerificationReceipt), ManifestSaved(PathBuf), Drives(disc_archive::optical::Discovery), Jobs(PathBuf,Vec<disc_archive::jobs::Job>,String), BatchPreview(Vec<disc_archive::optical::BurnPreview>), BatchDone(Vec<disc_archive::batch::Outcome>,Vec<disc_archive::jobs::Job>), Error(String) }
 struct Studio {
     burn_requests:Vec<disc_archive::batch::Request>, burn_previews:Vec<disc_archive::optical::BurnPreview>, burn_confirm:bool, burn_progress:Option<Receiver<(String,disc_archive::optical::BurnStage)>>, burn_stages:std::collections::BTreeMap<String,disc_archive::optical::BurnStage>, burn_outcomes:Vec<disc_archive::batch::Outcome>,
     drives:Option<disc_archive::optical::Discovery>,
@@ -51,6 +51,7 @@ impl Studio{
                 Work::CatalogOpened(path,projects)=>{self.catalog_path=Some(path);self.catalog_projects=projects;self.catalog_rows.clear();self.catalog_project=None;self.catalog_offset=0;self.catalog_has_next=false;self.catalog_query=None;self.status="Catalog opened".into();self.tab=6;}
                 Work::CatalogResults(mut rows,offset)=>{self.catalog_has_next=rows.len()>100;rows.truncate(100);self.catalog_rows=rows;self.catalog_offset=offset;self.status=format!("Catalog page {}",offset/100+1);}
                 Work::CatalogImported(id,projects)=>{self.catalog_projects=projects;self.catalog_rows.clear();self.catalog_query=None;self.catalog_has_next=false;self.catalog_offset=0;self.catalog_project=Some(id);self.status=format!("Imported planned snapshot {}",id);}
+                Work::CatalogLinked=>{self.catalog_rows.clear();self.catalog_query=None;self.catalog_has_next=false;self.catalog_offset=0;self.status="Historical verification linked. Search to refresh.".into();}
                 Work::ImageCreated(receipt)=>{self.status=format!("Image created and {} files verified",receipt.verified_files);self.image_path=Some(receipt.output.clone());self.image_receipt=Some(receipt);}
                 Work::ImageVerified(receipt)=>{self.status=format!("Image verified: {} files",receipt.files);self.verify_receipt=Some(receipt);}
                 Work::ManifestSaved(path)=>{self.status=format!("Preparation manifest saved: {}",path.display());self.manifest_path=Some(path);}
@@ -130,6 +131,18 @@ impl Studio{
             ui.selectable_value(&mut self.catalog_project,None,"All projects");
             for p in &self.catalog_projects{ui.selectable_value(&mut self.catalog_project,Some(p.id),format!("{} (# {}) - {} files, {} discs",p.name,p.id,p.files,p.discs));}
         });
+        ui.separator();
+        ui.label("Link historical readback evidence from the selected Burn journal attempt. This does not assert current media condition.");
+        let target=self.catalog_project.zip(self.journal_path.clone()).zip(self.job_selection).and_then(|((project,journal),attempt)|{
+            self.jobs.iter().find(|j|j.id==attempt).map(|j|(project,journal,attempt,j.disc_number))
+        });
+        if let Some((project,journal,attempt,disc))=target {
+            ui.label(format!("Project #{} | disc #{} | attempt #{} | {}",project,disc,attempt,journal.display()));
+            if ui.button("Link selected attempt to selected project").clicked(){
+                let path=path.clone();
+                self.spawn(ctx,move||{let mut db=Catalog::open(&path,true)?;db.link_verified(project,disc,&journal,attempt)?;Ok(Work::CatalogLinked)});
+            }
+        }else{ui.label("Select a project and open a burn journal with an attempt selected.");}
         ui.horizontal(|ui|{ui.label("Filename, path or hash");ui.text_edit_singleline(&mut self.catalog_term);if ui.button("Search").clicked(){self.catalog_search(ctx,0);}});
         let current=self.catalog_query.as_ref().map(|(term,project)|term==&self.catalog_term&&project==&self.catalog_project).unwrap_or(false);
         if !current{ui.label("Search to refresh results for the current filters.");return;}
@@ -144,6 +157,7 @@ impl Studio{
                 ui.group(|ui|{
                     ui.label(&f.archive);
                     ui.label(format!("{} (# {}) | {} | {} | {} bytes",f.project,f.project_id,f.disc_label.as_deref().unwrap_or("Unassigned"),f.status,f.bytes));
+                    if let Some(at)=&f.verified_at{ui.label(format!("Historical readback: {}",at));}
                     ui.label(&f.source);
                 });
             }

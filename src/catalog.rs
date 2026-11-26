@@ -1,6 +1,6 @@
 //! Local catalog of planned assignments. Import is not evidence of a physical burn.
 use anyhow::{bail,Context,Result};
-use rusqlite::{Connection,OpenFlags,params};
+use rusqlite::{Connection,OpenFlags,OptionalExtension,params};
 use serde::Serialize;
 use std::path::Path;
 use crate::project::Project;
@@ -26,7 +26,7 @@ pub struct Catalog {conn:Connection}
 pub struct Match {
     pub project_id:i64,pub project:String,pub archive:String,pub source:String,pub bytes:i64,
     pub sha256:Option<String>,pub disc_number:Option<i64>,pub disc_label:Option<String>,
-    pub status:String,
+    pub status:String,pub verified_at:Option<String>,
 }
 #[derive(Debug,Serialize)]
 pub struct ProjectRow{pub id:i64,pub name:String,pub files:i64,pub discs:i64}
@@ -120,8 +120,8 @@ impl Catalog{
             if !archive.to_lowercase().contains(&needle)&&!hash.as_ref().map(|h|h.to_lowercase().contains(&needle)).unwrap_or(false){continue;}
             if skipped<offset{skipped+=1;continue;}
             let number:Option<i64>=r.get(6)?;
-            let verified=if version>=2 && number.is_some(){self.conn.query_row("SELECT EXISTS(SELECT 1 FROM verified_discs WHERE project_id=?1 AND disc_number=?2)",params![r.get::<_,i64>(0)?,number],|r|r.get::<_,bool>(0))?}else{false};
-            result.push(Match{project_id:r.get(0)?,project:r.get(1)?,archive,source:r.get(3)?,bytes:r.get(4)?,sha256:hash,disc_number:number,disc_label:r.get(7)?,status:if verified{"content_verified_at_import"}else if number.is_some(){"planned"}else{"unassigned"}.into()});
+            let verified_at:Option<String>=if version>=2 && number.is_some(){self.conn.query_row("SELECT verified_at FROM verified_discs WHERE project_id=?1 AND disc_number=?2",params![r.get::<_,i64>(0)?,number],|r|r.get(0)).optional()?}else{None};
+            result.push(Match{project_id:r.get(0)?,project:r.get(1)?,archive,source:r.get(3)?,bytes:r.get(4)?,sha256:hash,disc_number:number,disc_label:r.get(7)?,status:if verified_at.is_some(){"content_verified_at_import"}else if number.is_some(){"planned"}else{"unassigned"}.into(),verified_at});
             if result.len()==limit{break;}
         }
         Ok(result)
@@ -139,7 +139,7 @@ mod tests{
         let mut db=Catalog::create(&path).unwrap();let id=db.import(&p).unwrap();drop(db);
         assert!(Catalog::create(&path).is_err());
         let db=Catalog::open(&path,false).unwrap();
-        let rows=db.search("épisode",Some(id),10,0).unwrap();assert_eq!(rows.len(),1);assert_eq!(rows[0].status,"planned");
+        let rows=db.search("épisode",Some(id),10,0).unwrap();assert_eq!(rows.len(),1);assert_eq!(rows[0].status,"planned");assert!(rows[0].verified_at.is_none());
         assert_eq!(db.search("%_",None,10,0).unwrap().len(),1);
         assert_eq!(db.search("Large",None,10,0).unwrap()[0].status,"unassigned");
         assert_eq!(db.search("",None,1,1).unwrap().len(),1);
@@ -176,7 +176,7 @@ fn explicit_verified_link_requires_exact_hashed_snapshot(){
     j.record_readback(a,"B",true,"synthetic").unwrap();
     assert!(db.link_verified(id,n+1,&jp,a).is_err());
     db.link_verified(id,n,&jp,a).unwrap();
-    assert_eq!(db.search("",Some(id),10,0).unwrap()[0].status,"content_verified_at_import");
+    let rows=db.search("",Some(id),10,0).unwrap();assert_eq!(rows[0].status,"content_verified_at_import");assert!(rows[0].verified_at.as_ref().is_some_and(|s|!s.is_empty()));
     assert!(db.link_verified(id,n,&jp,a).is_err());
     let mut wrong=p.clone();wrong.plan.as_mut().unwrap().discs[0].files[0].sha256=Some("b".repeat(64));
     let other=db.import(&wrong).unwrap();assert!(db.link_verified(other,n,&jp,a).is_err());
