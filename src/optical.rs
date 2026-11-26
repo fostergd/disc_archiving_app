@@ -173,6 +173,21 @@ fn parse_stage(line:&str)->Option<BurnStage>{
         _=>None,
     }
 }
+// Accept only the ordered native protocol. A completion marker alone is not evidence
+// that the expected writer lifecycle ran.
+#[derive(Default)]
+struct WriterProtocol { next: usize, invalid: bool }
+impl WriterProtocol {
+    fn observe(&mut self,line:&str)->Option<BurnStage>{
+        let line=line.trim();
+        if line.is_empty(){return None;}
+        let expected=["DAS_STAGE CHECKING_MEDIA","DAS_STAGE WRITING","DAS_STAGE RELEASING","WRITE_COMPLETED"];
+        if expected.get(self.next).copied()!=Some(line){self.invalid=true;return None;}
+        self.next+=1;
+        parse_stage(line)
+    }
+    fn completed(&self)->bool{!self.invalid&&self.next==4}
+}
 #[cfg(windows)]
 fn burn(manifest:&crate::image::PreparedDisc,image:&std::path::Path,id:&str,hash:&str,confirmation:&str,progress:&mut dyn FnMut(BurnStage))->Result<BurnReceipt>{
     use anyhow::Context;
@@ -203,14 +218,11 @@ fn burn(manifest:&crate::image::PreparedDisc,image:&std::path::Path,id:&str,hash
     // Drain stderr concurrently to prevent pipe deadlock during the physical write.
     let drain=std::thread::spawn(move||{let mut data=Vec::new();let mut reader=stderr;let result=reader.read_to_end(&mut data);(result,data)});
     let stdout=child.stdout.take().context("Missing writer stdout")?;
-    let mut completed=false;
-    let mut unexpected=false;
+    let mut protocol=WriterProtocol::default();
     let mut read_error=None;
     for line in BufReader::new(stdout).lines(){
         match line{
-            Ok(line)=>{if let Some(stage)=parse_stage(&line){progress(stage);}
-                else if line.trim()=="WRITE_COMPLETED"&&!completed{completed=true;}
-                else if !line.trim().is_empty(){unexpected=true;}}
+            Ok(line)=>{if let Some(stage)=protocol.observe(&line){progress(stage);}}
             Err(e)=>{read_error=Some(e);break;}
         }
     }
@@ -219,7 +231,7 @@ fn burn(manifest:&crate::image::PreparedDisc,image:&std::path::Path,id:&str,hash
     drop(guard);
     stderr_result?;
     if !status.success(){bail!("Writer failed; media may be partially written. Do not retry automatically: {}",String::from_utf8_lossy(&stderr));}
-    if !completed||unexpected||read_error.is_some(){bail!("Unknown write outcome; inspect media before retrying");}
+    if !protocol.completed()||read_error.is_some(){bail!("Unknown write outcome; inspect media before retrying");}
     Ok(BurnReceipt{recorder_id:id.into(),image_sha256:verified.sha256,image_bytes:verified.image_bytes,status:"written_unverified".into()})
 }
 #[cfg(not(windows))]
@@ -230,6 +242,24 @@ fn burn(_manifest:&crate::image::PreparedDisc,_image:&std::path::Path,id:&str,ha
 #[cfg(test)]
 mod burn_tests{
     use super::*;
+    #[test]fn writer_protocol_requires_ordered_lifecycle(){
+        let valid=["DAS_STAGE CHECKING_MEDIA","DAS_STAGE WRITING","DAS_STAGE RELEASING","WRITE_COMPLETED"];
+        let mut p=WriterProtocol::default();
+        for line in valid {p.observe(line);}
+        assert!(p.completed());
+        for lines in [
+            vec!["WRITE_COMPLETED"],
+            vec![valid[0],valid[2],valid[1],valid[3]],
+            vec![valid[0],valid[1],valid[1],valid[2],valid[3]],
+            vec![valid[0],valid[1],valid[2]],
+            vec![valid[0],valid[1],valid[2],valid[3],"unexpected"],
+            vec![valid[0],valid[1],valid[2],valid[3],valid[3]],
+        ] {
+            let mut p=WriterProtocol::default();
+            for line in lines {p.observe(line);}
+            assert!(!p.completed());
+        }
+    }
     #[test]fn explicit_authorization(){
         let hash="a".repeat(64);
         assert!(validate_authorization("drive",&hash,"WRITE-ONCE").is_ok());
