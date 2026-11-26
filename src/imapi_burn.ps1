@@ -48,9 +48,9 @@ try {
     $format.ClientName = 'Disc Archive Studio'
     if (-not $format.IsCurrentMediaSupported($rec)) { throw 'Unsupported current medium' }
     $kind = [int]$format.CurrentPhysicalMediaType
-    if ($kind -ne [int]$env:DAS_BURN_MEDIA -or $kind -notin @(2,5,8,9,10,18)) { throw 'Media type changed or is not supported write-once media' }
+    if ($kind -ne [int]$env:DAS_BURN_MEDIA -or $kind -notin @(2,6,8,9,11,18)) { throw 'Media type changed or is not supported write-once media' }
     if (-not $format.MediaPhysicallyBlank -or -not $format.MediaHeuristicallyBlank) { throw 'Medium is not blank' }
-    if ([int]$format.CurrentMediaStatus -notin @(0,2)) { throw 'Unsafe media status' }
+    if ([int]$format.CurrentMediaStatus -ne 2) { throw 'Unsafe media status' }
     $free = [long]$format.FreeSectorsOnMedia
     if ($free -le 0 -or $free -gt [long]$format.TotalSectorsOnMedia -or ($bytes / 2048) -gt $free) { throw 'Insufficient writable capacity' }
     $format.ForceMediaToBeClosed = $true

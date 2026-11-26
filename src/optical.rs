@@ -1,4 +1,4 @@
-//! Read-only recorder discovery. No exclusive access, eject, erase or write.
+//! Recorder discovery, explicitly authorized writing and read-only verification.
 use anyhow::{bail,Result};
 use serde::{Serialize,Deserialize};
 
@@ -24,16 +24,16 @@ pub struct Media{
     pub total_sectors:i64,
 }
 impl Media{
-    // IMAPI physical media enum: CD-R=2, DVD+R=5, DVD+R DL=8,
-    // DVD-R=9, DVD-R DL=10, BD-R=18. Unknown/rewriteable media fail closed.
+    // IMAPI physical media enum: CD-R=2, DVD+R=6, DVD+R DL=8,
+    // DVD-R=9, DVD-R DL=11, BD-R=18. Unknown/rewriteable media fail closed.
     pub fn type_name(&self)->&'static str{
-        match self.physical_type{2=>"CD-R",5=>"DVD+R",8=>"DVD+R DL",9=>"DVD-R",10=>"DVD-R DL",18=>"BD-R",_=>"Other / unsupported"}
+        match self.physical_type{2=>"CD-R",6=>"DVD+R",8=>"DVD+R DL",9=>"DVD-R",11=>"DVD-R DL",18=>"BD-R",_=>"Other / unsupported"}
     }
-    pub fn write_once(&self)->bool{matches!(self.physical_type,2|5|8|9|10|18)}
+    pub fn write_once(&self)->bool{matches!(self.physical_type,2|6|8|9|11|18)}
     pub fn blank_candidate(&self)->bool{
         self.supported&&self.write_once()&&self.physically_blank&&self.heuristically_blank
         &&self.free_sectors>0&&self.total_sectors>=self.free_sectors
-        &&matches!(self.status,0|2) // unknown or blank only; preliminary inspection
+        &&self.status==2 // require explicit IMAPI blank state
     }
     pub fn fits_image(&self,bytes:u64)->bool{
         self.blank_candidate()&&bytes>0&&bytes%2048==0&&self.free_bytes().is_some_and(|free|bytes<=free)
@@ -77,16 +77,26 @@ pub fn discover()->Result<Discovery>{bail!("Optical discovery requires Windows")
 #[cfg(test)]
 mod tests{
     use super::*;
-    fn media(kind:i32)->Media{Media{physical_type:kind,supported:true,physically_blank:true,heuristically_blank:true,status:0,free_sectors:100,total_sectors:100}}
+    fn media(kind:i32)->Media{Media{physical_type:kind,supported:true,physically_blank:true,heuristically_blank:true,status:2,free_sectors:100,total_sectors:100}}
     #[test]fn media_policy(){
-        for n in [2,5,8,9,10,18]{assert!(media(n).blank_candidate());}
-        for n in [0,1,3,4,6,7,11,12,13,14,15,16,17,19,20,21,22]{assert!(!media(n).blank_candidate());}
+        for n in [2,6,8,9,11,18]{assert!(media(n).blank_candidate());}
+        for n in [0,1,3,4,5,7,10,12,13,14,15,16,17,19,20,21,22]{assert!(!media(n).blank_candidate());}
         let mut m=media(18);m.physically_blank=false;assert!(!m.blank_candidate());
         let mut m=media(18);m.free_sectors=-1;assert_eq!(m.free_bytes(),None);assert!(!m.blank_candidate());
         let mut m=media(18);m.status=0x8000;assert!(!m.blank_candidate());
         let m=media(18);assert_eq!(m.free_bytes(),Some(204800));
         assert!(m.fits_image(204800));assert!(!m.fits_image(206848));assert!(!m.fits_image(1));assert!(!m.fits_image(0));
-        for status in [1,4,8,16,0x4000,0x8000,-1]{let mut m=media(18);m.status=status;assert!(!m.fits_image(2048));}
+        for status in [0,1,3,4,8,16,0x400,0x800,0x1000,0x2000,0x4000,0x8000,-1]{let mut m=media(18);m.status=status;assert!(!m.fits_image(2048));}
+    }
+    #[test]fn native_media_policy_matches_documented_enum(){
+        for (kind,name) in [(2,"CD-R"),(6,"DVD+R"),(8,"DVD+R DL"),(9,"DVD-R"),(11,"DVD-R DL"),(18,"BD-R")]{
+            assert_eq!(media(kind).type_name(),name);
+            assert!(media(kind).write_once());
+        }
+        for kind in [5,7,10,13,19]{assert!(!media(kind).write_once());}
+        let script=include_str!("imapi_burn.ps1");
+        assert!(script.contains("@(2,6,8,9,11,18)"));
+        assert!(script.contains("CurrentMediaStatus -ne 2"));
     }
     #[test]fn empty_discovery_and_duplicate_ids(){
         let d:Discovery=serde_json::from_str(r#"{"recorders":[],"errors":[]}"#).unwrap();d.validate().unwrap();

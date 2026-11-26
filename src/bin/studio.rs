@@ -55,7 +55,7 @@ impl Studio{
                 Work::ImageVerified(receipt)=>{self.status=format!("Image verified: {} files",receipt.files);self.verify_receipt=Some(receipt);}
                 Work::ManifestSaved(path)=>{self.status=format!("Preparation manifest saved: {}",path.display());self.manifest_path=Some(path);}
                 Work::Drives(d)=>{self.status=format!("{} recorders detected; {} discovery errors",d.recorders.len(),d.errors.len());self.drives=Some(d);}
-                Work::Jobs(path,jobs,message)=>{self.journal_path=Some(path);self.jobs=jobs;self.status=message;self.reconcile_confirm=false;self.verify_confirm=false;}
+                Work::Jobs(path,jobs,message)=>{if self.journal_path.as_ref()!=Some(&path){self.burn_previews.clear();self.burn_confirm=false;}self.journal_path=Some(path);self.jobs=jobs;self.status=message;self.reconcile_confirm=false;self.verify_confirm=false;}
                 Work::BatchPreview(v)=>{self.burn_previews=v;self.burn_confirm=false;self.status="Batch preview complete; inspect each target before authorizing".into();}
                 Work::BatchDone(outcomes,jobs)=>{self.burn_progress=None;self.jobs=jobs;self.status=format!("Batch finished: {} written, {} errors; physical verification separate",outcomes.iter().filter(|o|o.receipt.is_some()).count(),outcomes.iter().filter(|o|o.error.is_some()).count());self.burn_outcomes=outcomes;}
                 Work::Error(e)=>{self.burn_progress=None;self.burn_confirm=false;self.status=e;self.reconcile_confirm=false;self.verify_confirm=false;},
@@ -166,7 +166,7 @@ impl Studio{
         if ui.button("Add assignment").clicked()&&self.burn_requests.len()<16{
             self.burn_requests.push(batch::Request{recorder:String::new(),image:PathBuf::new(),manifest:PathBuf::new(),sha256:String::new()});changed=true;
         }
-        if ui.button("Refresh recorders").clicked(){self.burn_previews.clear();self.burn_confirm=false;self.spawn(ctx,move||Ok(Work::Drives(optical::discover()?)));return;}
+        if ui.button("Refresh recorders").clicked(){self.drives=None;self.burn_previews.clear();self.burn_confirm=false;self.spawn(ctx,move||Ok(Work::Drives(optical::discover()?)));return;}
         let mut remove=None;
         for (i,r) in self.burn_requests.iter_mut().enumerate(){
             ui.push_id(i,|ui|ui.group(|ui|{
@@ -229,7 +229,7 @@ impl Studio{
         if ui.button("Create journal").clicked(){if let Some(p)=rfd::FileDialog::new().set_file_name("jobs.sqlite").save_file(){open=Some((p,true));}}
         if ui.button("Open journal").clicked(){if let Some(p)=rfd::FileDialog::new().add_filter("Burn journal",&["sqlite","db"]).pick_file(){open=Some((p,false));}}
         if let Some((path,create))=open{
-            self.journal_path=None;self.jobs.clear();self.job_selection=None;self.job_recorder.clear();self.reconcile_note.clear();self.reconcile_confirm=false;self.verify_confirm=false;
+            self.burn_previews.clear();self.burn_confirm=false;self.journal_path=None;self.jobs.clear();self.job_selection=None;self.job_recorder.clear();self.reconcile_note.clear();self.reconcile_confirm=false;self.verify_confirm=false;
             self.spawn(ctx,move||{let j=if create{Journal::create(&path)?}else{Journal::open(&path)?};Ok(Work::Jobs(path,j.list()?,"Journal opened".into()))});return;
         }
         let Some(path)=self.journal_path.clone() else{return;};
