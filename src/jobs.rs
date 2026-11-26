@@ -90,6 +90,15 @@ impl Journal{
         if self.db.execute("INSERT INTO reconciliations SELECT id,?2,strftime('%Y-%m-%dT%H:%M:%fZ','now') FROM attempts WHERE id=?1 AND state IN ('in_progress','outcome_unknown')",params![id,note])?!=1{bail!("Attempt is not unresolved");}
         Ok(())
     }
+    // Read a consistent evidence snapshot; only the latest successful readback qualifies.
+    pub(crate) fn verified_evidence(&self,id:i64)->Result<(crate::image::PreparedDisc,String,String,String)>{
+        let (json,hash,recorder,at):(String,String,String,String)=self.db.query_row(
+            "SELECT m.json,a.sha256,r.recorder,r.at FROM attempts a JOIN manifests m ON m.attempt_id=a.id JOIN readbacks r ON r.id=(SELECT max(id) FROM readbacks WHERE attempt_id=a.id) WHERE a.id=?1 AND a.state='written_unverified' AND r.passed=1",
+            [id],|r|Ok((r.get(0)?,r.get(1)?,r.get(2)?,r.get(3)?))).context("No current successful readback evidence")?;
+        let manifest=serde_json::from_str(&json)?;
+        crate::image::validate_manifest(&manifest)?;
+        Ok((manifest,hash,recorder,at))
+    }
     pub fn list(&self)->Result<Vec<Job>>{
         let mut q=self.db.prepare("SELECT a.id,a.recorder,a.image,a.sha256,a.disc_number,a.label,a.state,a.detail,a.started,a.finished,r.note,r.at,(SELECT CASE passed WHEN 1 THEN 'content_verified' ELSE 'verification_failed' END FROM readbacks WHERE attempt_id=a.id ORDER BY id DESC LIMIT 1) FROM attempts a LEFT JOIN reconciliations r ON r.attempt_id=a.id ORDER BY a.id")?;
         let rows=q.query_map([],|r|Ok(Job{id:r.get(0)?,recorder:r.get(1)?,image:r.get(2)?,sha256:r.get(3)?,disc_number:r.get(4)?,label:r.get(5)?,state:r.get(6)?,detail:r.get(7)?,started:r.get(8)?,finished:r.get(9)?,reconciliation:r.get(10)?,reconciled_at:r.get(11)?,verification_status:r.get(12)?}))?;

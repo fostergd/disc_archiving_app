@@ -35,6 +35,7 @@ enum Command {
     ImagePrepare { plan:PathBuf, disc:usize, #[arg(short,long)] output:PathBuf },
     CatalogCreate { database:PathBuf },
     CatalogImport { database:PathBuf, project:PathBuf },
+    CatalogLinkVerified { database:PathBuf, journal:PathBuf, #[arg(long)] project_id:i64, #[arg(long)] disc:i64, #[arg(long)] attempt:i64 },
     CatalogProjects { database:PathBuf },
     CatalogSearch { database:PathBuf, term:String, #[arg(long)] project_id:Option<i64>, #[arg(long,default_value_t=100)] limit:usize, #[arg(long,default_value_t=0)] offset:usize },
     ProjectCheck { project:PathBuf },
@@ -142,6 +143,7 @@ fn run()->Result<()> {
         },
         Command::CatalogCreate{database}=>{disc_archive::catalog::Catalog::create(&database)?;println!("Catalog created");},
         Command::CatalogImport{database,project}=>{let p=disc_archive::project::load(&project)?;let id=disc_archive::catalog::Catalog::open(&database,true)?.import(&p)?;println!("Imported planned snapshot {id}");},
+        Command::CatalogLinkVerified{database,journal,project_id,disc,attempt}=>{disc_archive::catalog::Catalog::open(&database,true)?.link_verified(project_id,disc,&journal,attempt)?;println!("Historical verified readback linked to catalog snapshot");},
         Command::CatalogProjects{database}=>{println!("{}",serde_json::to_string_pretty(&disc_archive::catalog::Catalog::open(&database,false)?.projects()?)?);},
         Command::CatalogSearch{database,term,project_id,limit,offset}=>{println!("{}",serde_json::to_string_pretty(&disc_archive::catalog::Catalog::open(&database,false)?.search(&term,project_id,limit,offset)?)?);},
         Command::ProjectCheck{project}=>{
