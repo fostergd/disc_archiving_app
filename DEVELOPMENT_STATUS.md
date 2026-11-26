@@ -7,7 +7,7 @@ Current increment 6G.1: strict ordered native writer lifecycle protocol and non-
 
 ## Remaining work, in priority order
 1. If current CI fails, inspect logs and fix. GUI and CLI linkage require exact pre-existing hashes and latest successful readback. Catalog status is historical, not a live media assertion.
-2. Phase 6G.2 adds optional native IMAPI sector progress and synthetic tests (current CI pending). Next: GUI state/authorization review, durable recovery, migration tests, image path and storage robustness. Real callback delivery requires hardware acceptance.
+2. Phase 6G.2 adds optional native IMAPI sector progress and synthetic tests (CI 45769776994 passed). Phase 6H.1 binds GUI batch preview authorization to ordered recorder identities and checksums, with regression tests; new CI pending. Next: GUI state/authorization review, durable recovery, migration tests, image path and storage robustness. Real callback delivery requires hardware acceptance.
 3. Portable unsigned Windows release packaging, documentation and safe manual acceptance checklist (including GUI, mapped shares, real optical media and concurrent drives).
 4. Stop for genuine hardware/user acceptance; never perform physical burns or modify source user files from automated development.
 

@@ -220,7 +220,8 @@ impl Studio{
             });return;
         }
         for p in &self.burn_previews{ui.label(format!("{} | {} | {} bytes / {} free | SHA-256 {}",p.recorder_id,p.media_type,p.image_bytes,p.free_bytes,p.image_sha256));}
-        let ready=!self.burn_requests.is_empty()&&self.burn_previews.len()==self.burn_requests.len()&&self.journal_path.is_some();
+        let ready=batch_preview_matches(&self.burn_requests,&self.burn_previews)&&self.journal_path.is_some();
+        if !ready {self.burn_confirm=false;}
         ui.add_enabled_ui(ready,|ui|{ui.checkbox(&mut self.burn_confirm,"I authorize irreversible writing to every listed recorder and confirm the intended blank media are inserted.");});
         if ui.add_enabled(ready&&self.burn_confirm,egui::Button::new("Start authorized batch")).clicked(){
             let path=self.journal_path.clone().unwrap();let requests=self.burn_requests.clone();
@@ -532,4 +533,26 @@ impl eframe::App for Studio{
 }
 fn main()->eframe::Result<()>{
     eframe::run_native("Disc Archive Studio",eframe::NativeOptions{viewport:egui::ViewportBuilder::default().with_inner_size([1100.,800.]),..Default::default()},Box::new(|_|Ok(Box::<Studio>::default())))
+}
+
+ // A count match alone is not authorization: bind every displayed preview to its target and checksum.
+fn batch_preview_matches(requests:&[disc_archive::batch::Request],previews:&[disc_archive::optical::BurnPreview])->bool{
+    !requests.is_empty() && requests.len()==previews.len() &&
+    requests.iter().zip(previews).all(|(r,p)|r.recorder==p.recorder_id && r.sha256.eq_ignore_ascii_case(&p.image_sha256))
+}
+#[cfg(test)]
+mod authorization_tests {
+    use super::*;
+    #[test]
+    fn preview_must_match_target_and_checksum(){
+        let mut r=disc_archive::batch::Request{recorder:"A".into(),image:PathBuf::new(),manifest:PathBuf::new(),sha256:"a".repeat(64)};
+        let p=disc_archive::optical::BurnPreview{recorder_id:"A".into(),image_bytes:2048,image_sha256:"A".repeat(64),media_type:"BD-R".into(),free_bytes:4096,verified_files:1};
+        assert!(batch_preview_matches(std::slice::from_ref(&r),std::slice::from_ref(&p)));
+        r.recorder="B".into();
+        assert!(!batch_preview_matches(std::slice::from_ref(&r),std::slice::from_ref(&p)));
+        r.recorder="A".into();r.sha256="b".repeat(64);
+        assert!(!batch_preview_matches(std::slice::from_ref(&r),std::slice::from_ref(&p)));
+        assert!(!batch_preview_matches(&[],&[]));
+        assert!(!batch_preview_matches(std::slice::from_ref(&r),&[]));
+    }
 }
