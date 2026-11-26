@@ -173,7 +173,7 @@ pub fn create_udf(p:&Plan,number:usize,output:&Path)->Result<ImageReceipt>{
     let sha256=digest(&image)?;
     verify_udf(&prepared,&image)?;
     if digest(&image)?!=sha256{bail!("Image changed during verification");}
-    std::fs::hard_link(&image,&final_path).context("Publishing image requires hard-link support on the destination filesystem (NTFS recommended)")?;
+    publish_image(&image,&final_path)?;
     Ok(ImageReceipt{number,label:prepared.label,bytes,sha256,filesystem:"UDF 2.01".into(),output:final_path,verified_files:prepared.files.len()})
 }
 #[cfg(not(windows))]
@@ -278,4 +278,28 @@ fn manifest_payload_capacity_and_overflow() {
     p.reserve = 0;
     p.files[0].bytes = u64::MAX;
     assert!(validate_manifest(&p).is_err());
+}
+
+// Flush the verified image before publication; never fall back to an overwriting copy.
+#[cfg(any(windows,test))]
+fn publish_image(image:&Path, destination:&Path)->Result<()> {
+    File::options().read(true).write(true).open(image)?.sync_all()?;
+    std::fs::hard_link(image,destination).context("Publishing image requires hard-link support on the destination filesystem (NTFS recommended)")?;
+    Ok(())
+}
+#[cfg(test)]
+#[test]
+fn publication_preserves_existing_destination_and_staged_bytes(){
+    let tmp=tempfile::tempdir().unwrap();
+    let staged=tmp.path().join("staged.iso");
+    let dest=tmp.path().join("published.iso");
+    std::fs::write(&staged,b"verified").unwrap();
+    std::fs::write(&dest,b"existing").unwrap();
+    assert!(publish_image(&staged,&dest).is_err());
+    assert_eq!(std::fs::read(&dest).unwrap(),b"existing");
+    assert_eq!(std::fs::read(&staged).unwrap(),b"verified");
+    let fresh=tmp.path().join("fresh.iso");
+    publish_image(&staged,&fresh).unwrap();
+    std::fs::remove_file(&staged).unwrap();
+    assert_eq!(std::fs::read(&fresh).unwrap(),b"verified");
 }

@@ -11,6 +11,8 @@ Current increment 6H.3: reject prepared manifests whose aggregate payload overfl
 
 Current increment 6H.4: validate output filenames and reject existing filesystem entries before staging; retain atomic no-replace hard-link publication. Synthetic output path regression tests added. Parent 3b00acd4114ddbdd88e3c295b150771b663d4e1f passed Windows CI 45813309486. New CI pending. Next: storage review and portable release preparation.
 
+Current increment 6H.5: explicitly flush verified image before no-replace hard-link publication; synthetic regression covers destination collision and survival after staging cleanup. Parent 54cf1c59cba268cb5cb8f2dcc5e73729cd74a740 passed Windows CI 45831506197. New CI pending. Next: portable release preparation and acceptance checklist.
+
 ## Remaining work, in priority order
 1. If current CI fails, inspect logs and fix. GUI and CLI linkage require exact pre-existing hashes and latest successful readback. Catalog status is historical, not a live media assertion.
 2. Phase 6G.2 adds optional native IMAPI sector progress and synthetic tests (CI 45769776994 passed). Phase 6H.1 binds GUI batch preview authorization to ordered recorder identities and checksums, with regression tests; new CI pending. Next: GUI state/authorization review, durable recovery, migration tests, image path and storage robustness. Real callback delivery requires hardware acceptance.
