@@ -8,6 +8,7 @@ import struct
 import subprocess
 import tempfile
 import unittest
+import xml.etree.ElementTree as ET
 
 ROOT = Path(__file__).resolve().parents[1]
 FONT_BLOBS = {
@@ -103,6 +104,26 @@ def sqlite_dedication_comments(data):
     return [m.group(0) for m in re.finditer(r"/\*.*?\*/", text, re.S)
             if re.search(r"public\s+domain|the author disclaims copyright to this source code",
                          re.sub(r"\r?\n[ \t]*\*+[ \t]*", " ", m.group(0)), re.I)]
+
+
+def registry_legal_elements(raw):
+    # Khronos registry notices may occur in <comment> elements or XML
+    # comments inside the root, rather than before it. Keep the complete
+    # matching element text; never treat an empty result as clearance.
+    # Inputs are pinned registry files, not arbitrary user XML.
+    if re.search(rb"<!\s*(?:DOCTYPE|ENTITY)\b", raw, re.I):
+        raise ValueError("unexpected XML DTD or entity declaration")
+    parser = ET.XMLParser(target=ET.TreeBuilder(insert_comments=True))
+    root = ET.fromstring(raw, parser=parser)
+    notices = []
+    for item in root.iter():
+        tag = "xml-comment" if item.tag is ET.Comment else item.tag.rsplit("}", 1)[-1]
+        if tag not in ("comment", "xml-comment", "copyright", "license", "licence", "notice"):
+            continue
+        text = "".join(item.itertext())
+        if LEGAL.search(text) or tag in ("copyright", "license", "licence"):
+            notices.append({"kind": tag, "text": text})
+    return notices
 
 
 def file_evidence(path, base):
@@ -220,6 +241,10 @@ def inspect(out, messages):
                 if path.is_file() and path.suffix.lower() in (".xml", ".idl")]
     if not registry:
         raise ValueError("Khronos registry inputs not found")
+    for row in registry:
+        path = khronos / row["path"]
+        if path.suffix.lower() == ".xml":
+            row["registry_legal_elements"] = registry_legal_elements(path.read_bytes())
     generator, _ = crate("gl_generator", "0.14.0")
     generator_headers = [file_evidence(path, generator) for path in sorted((generator / "src").rglob("*.rs"))]
     generator_headers = [f for f in generator_headers if f["leading_legal_comments"]]
@@ -319,6 +344,21 @@ class EvidenceTests(unittest.TestCase):
             (wgl / "wgl.rs").unlink()
             with self.assertRaisesRegex(ValueError, "no generated Rust"):
                 read_build_outputs(messages, ids)
+
+    def test_registry_legal_elements(self):
+        raw = (b'<?xml version="1.0"?><registry>'
+               b'<comment>Copyright fixture.\nPermission granted.</comment>'
+               b'<!-- License fixture -->'
+               b'<comment>API description</comment></registry>')
+        self.assertEqual(registry_legal_elements(raw), [
+            {"kind": "comment", "text": "Copyright fixture.\nPermission granted."},
+            {"kind": "xml-comment", "text": " License fixture "},
+        ])
+        self.assertEqual(registry_legal_elements(b"<registry/>"), [])
+        with self.assertRaises(ValueError):
+            registry_legal_elements(b'<!DOCTYPE a [<!ENTITY x "test">]><a>&x;</a>')
+        with self.assertRaises(ET.ParseError):
+            registry_legal_elements(b"<registry>")
 
     def test_comments(self):
         self.assertEqual(leading_comments(b'<?xml version="1.0"?>\n<!-- Copyright X -->\n<registry/>'),

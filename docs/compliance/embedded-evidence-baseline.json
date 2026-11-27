@@ -1,0 +1,722 @@
+{
+  "source_commit": "9232d34f6d9a343c304b4d4a7e4864b3c5399525",
+  "run_id": 46064755192,
+  "job_id": 140727258682,
+  "evidence": {
+    "lock_sha256": "60862ef1ad2cfab8812323835ad07f16294ccd4b09b6a2b32b7ea5dc5cccc567",
+    "scope": "review evidence, not distribution approval",
+    "fonts": [
+      {
+        "file": "Hack-Regular.ttf",
+        "sha256": "15f55cc0c85a2988d2b4b3a8cdb5d77fdfbaf319e1bb5309d725db9818fb7125",
+        "upstream_git_blob_sha1": "92a90cb06e0535afa79f6cba26ceece15a7f7959",
+        "names": [
+          {
+            "platform": 3,
+            "encoding": 1,
+            "language": 1033,
+            "name_id": 0,
+            "text": "Copyright (c) 2018 Source Foundry Authors / Copyright (c) 2003 by Bitstream, Inc. All Rights Reserved."
+          },
+          {
+            "platform": 3,
+            "encoding": 1,
+            "language": 1033,
+            "name_id": 1,
+            "text": "Hack"
+          },
+          {
+            "platform": 3,
+            "encoding": 1,
+            "language": 1033,
+            "name_id": 5,
+            "text": "Version 3.003;[3114f1256]-release; ttfautohint (v1.7) -l 6 -r 50 -G 200 -x 10 -H 181 -D latn -f latn -m \"Hack-Regular-TA.txt\" -w G -W -t -X \"\""
+          },
+          {
+            "platform": 3,
+            "encoding": 1,
+            "language": 1033,
+            "name_id": 8,
+            "text": "Source Foundry"
+          },
+          {
+            "platform": 3,
+            "encoding": 1,
+            "language": 1033,
+            "name_id": 9,
+            "text": "Source Foundry Authors"
+          },
+          {
+            "platform": 3,
+            "encoding": 1,
+            "language": 1033,
+            "name_id": 11,
+            "text": "https://github.com/source-foundry"
+          },
+          {
+            "platform": 3,
+            "encoding": 1,
+            "language": 1033,
+            "name_id": 12,
+            "text": "https://github.com/source-foundry/Hack"
+          },
+          {
+            "platform": 3,
+            "encoding": 1,
+            "language": 1033,
+            "name_id": 13,
+            "text": "The work in the Hack project is Copyright 2018 Source Foundry Authors and licensed under the MIT License\n\nThe work in the DejaVu project was committed to the public domain.\n\nBitstream Vera Sans Mono Copyright 2003 Bitstream Inc. and licensed under the Bitstream Vera License with Reserved Font Names \"Bitstream\" and \"Vera\"\n\nMIT License\n\nCopyright (c) 2018 Source Foundry Authors\n\nPermission is hereby granted, free of charge, to any person obtaining a copy\nof this software and associated documentation files (the \"Software\"), to deal\nin the Software without restriction, including without limitation the rights\nto use, copy, modify, merge, publish, distribute, sublicense, and/or sell\ncopies of the Software, and to permit persons to whom the Software is\nfurnished to do so, subject to the following conditions:\n\nThe above copyright notice and this permission notice shall be included in all\ncopies or substantial portions of the Software.\n\nTHE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR\nIMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,\nFITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE\nAUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER\nLIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,\nOUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE\nSOFTWARE.\n\nBITSTREAM VERA LICENSE\n\nCopyright (c) 2003 by Bitstream, Inc. All Rights Reserved. Bitstream Vera is a trademark of Bitstream, Inc.\n\nPermission is hereby granted, free of charge, to any person obtaining a copy of the fonts accompanying this license (\"Fonts\") and associated documentation files (the \"Font Software\"), to reproduce and distribute the Font Software, including without limitation the rights to use, copy, merge, publish, distribute, and/or sell copies of the Font Software, and to permit persons to whom the Font Software is furnished to do so, subject to the following conditions:\n\nThe above copyright and trademark notices and this permission notice shall be included in all copies of one or more of the Font Software typefaces.\n\nThe Font Software may be modified, altered, or added to, and in particular the designs of glyphs or characters in the Fonts may be modified and additional glyphs or characters may be added to the Fonts, only if the fonts are renamed to names not containing either the words \"Bitstream\" or the word \"Vera\".\n\nThis License becomes null and void to the extent applicable to Fonts or Font Software that has been modified and is distributed under the \"Bitstream Vera\" names.\n\nThe Font Software may be sold as part of a larger software package but no copy of one or more of the Font Software typefaces may be sold by itself.\n\nTHE FONT SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO ANY WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT OF COPYRIGHT, PATENT, TRADEMARK, OR OTHER RIGHT. IN NO EVENT SHALL BITSTREAM OR THE GNOME FOUNDATION BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, INCLUDING ANY GENERAL, SPECIAL, INDIRECT, INCIDENTAL, OR CONSEQUENTIAL DAMAGES, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF THE USE OR INABILITY TO USE THE FONT SOFTWARE OR FROM OTHER DEALINGS IN THE FONT SOFTWARE.\n\nExcept as contained in this notice, the names of Gnome, the Gnome Foundation, and Bitstream Inc., shall not be used in advertising or otherwise to promote the sale, use or other dealings in this Font Software without prior written authorization from the Gnome Foundation or Bitstream Inc., respectively. For further information, contact: fonts at gnome dot org."
+          },
+          {
+            "platform": 3,
+            "encoding": 1,
+            "language": 1033,
+            "name_id": 14,
+            "text": "https://github.com/source-foundry/Hack/blob/master/LICENSE.md"
+          }
+        ],
+        "copyright_record_status": "decoded"
+      },
+      {
+        "file": "NotoEmoji-Regular.ttf",
+        "sha256": "415dc6290378574135b64c808dc640c1df7531973290c4970c51fdeb849cb0c5",
+        "upstream_git_blob_sha1": "19b7badf4afe64dae28cd64fc506b95291bb8b03",
+        "names": [
+          {
+            "platform": 3,
+            "encoding": 1,
+            "language": 1033,
+            "name_id": 0,
+            "text": "Copyright 2013 Google Inc. All Rights Reserved."
+          },
+          {
+            "platform": 3,
+            "encoding": 1,
+            "language": 1033,
+            "name_id": 1,
+            "text": "Noto Emoji"
+          },
+          {
+            "platform": 3,
+            "encoding": 1,
+            "language": 1033,
+            "name_id": 5,
+            "text": "Version 1.05 uh"
+          },
+          {
+            "platform": 3,
+            "encoding": 1,
+            "language": 1033,
+            "name_id": 7,
+            "text": "Noto is a trademark of Google Inc."
+          },
+          {
+            "platform": 3,
+            "encoding": 1,
+            "language": 1033,
+            "name_id": 8,
+            "text": "Monotype Imaging Inc."
+          },
+          {
+            "platform": 3,
+            "encoding": 1,
+            "language": 1033,
+            "name_id": 9,
+            "text": "Monotype Design Team"
+          },
+          {
+            "platform": 3,
+            "encoding": 1,
+            "language": 1033,
+            "name_id": 11,
+            "text": "http://www.google.com/get/noto/"
+          },
+          {
+            "platform": 3,
+            "encoding": 1,
+            "language": 1033,
+            "name_id": 12,
+            "text": "http://www.monotype.com/studio"
+          },
+          {
+            "platform": 3,
+            "encoding": 1,
+            "language": 1033,
+            "name_id": 13,
+            "text": "This Font Software is licensed under the SIL Open Font License, Version 1.1. This Font Software is distributed on an \"AS IS\" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the SIL Open Font License for the specific language, permissions and limitations governing your use of this Font Software."
+          },
+          {
+            "platform": 3,
+            "encoding": 1,
+            "language": 1033,
+            "name_id": 14,
+            "text": "http://scripts.sil.org/OFL"
+          }
+        ],
+        "copyright_record_status": "decoded"
+      },
+      {
+        "file": "Ubuntu-Light.ttf",
+        "sha256": "80307b8da7649aa4ee4d484b232140e3ce1ec0ca093073d3c53c8f5a5ced7a70",
+        "upstream_git_blob_sha1": "0e9f90d7cb13b3c816150ceae52bce1c91375e11",
+        "names": [
+          {
+            "platform": 3,
+            "encoding": 1,
+            "language": 1033,
+            "name_id": 0,
+            "text": "Copyright 2011 Canonical Ltd.  Licensed under the Ubuntu Font Licence 1.0"
+          },
+          {
+            "platform": 3,
+            "encoding": 1,
+            "language": 1033,
+            "name_id": 1,
+            "text": "Ubuntu Light"
+          },
+          {
+            "platform": 3,
+            "encoding": 1,
+            "language": 1033,
+            "name_id": 5,
+            "text": "0.83"
+          },
+          {
+            "platform": 3,
+            "encoding": 1,
+            "language": 1033,
+            "name_id": 7,
+            "text": "Ubuntu and Canonical are registered trademarks of Canonical Ltd."
+          },
+          {
+            "platform": 3,
+            "encoding": 1,
+            "language": 1033,
+            "name_id": 8,
+            "text": "Dalton Maag Ltd"
+          },
+          {
+            "platform": 3,
+            "encoding": 1,
+            "language": 1033,
+            "name_id": 9,
+            "text": "Dalton Maag Ltd"
+          },
+          {
+            "platform": 3,
+            "encoding": 1,
+            "language": 1033,
+            "name_id": 11,
+            "text": "http://www.daltonmaag.com/"
+          },
+          {
+            "platform": 3,
+            "encoding": 1,
+            "language": 1033,
+            "name_id": 12,
+            "text": "http://www.daltonmaag.com"
+          }
+        ],
+        "copyright_record_status": "decoded"
+      },
+      {
+        "file": "emoji-icon-font.ttf",
+        "sha256": "3a706840d2f888b83c184f7d41900dbaa0151a806c4d130cc88539d53fedef0a",
+        "upstream_git_blob_sha1": "806408328a74c59c8e728eeb0d4fa9ed4c84bd2f",
+        "names": [
+          {
+            "platform": 1,
+            "encoding": 0,
+            "language": 0,
+            "name_id": 1,
+            "text": "\u0000e\u0000m\u0000o\u0000j\u0000i"
+          },
+          {
+            "platform": 1,
+            "encoding": 0,
+            "language": 0,
+            "name_id": 5,
+            "text": "\u0000V\u0000e\u0000r\u0000s\u0000i\u0000o\u0000n\u0000 \u00001\u0000.\u00001"
+          },
+          {
+            "platform": 3,
+            "encoding": 1,
+            "language": 1033,
+            "name_id": 1,
+            "text": "emoji"
+          },
+          {
+            "platform": 3,
+            "encoding": 1,
+            "language": 1033,
+            "name_id": 5,
+            "text": "Version 1.1"
+          }
+        ],
+        "copyright_record_status": "absent"
+      }
+    ],
+    "sqlite": {
+      "features": [
+        "bundled",
+        "bundled_bindings",
+        "cc",
+        "default",
+        "min_sqlite_version_3_14_0",
+        "pkg-config",
+        "vcpkg"
+      ],
+      "files": [
+        {
+          "path": "sqlite3/sqlite3.c",
+          "sha256": "c01235302fe80da901fb70c7622c39147e29d9f29b7f6eb746b23517f320c90d",
+          "size": 9089040,
+          "leading_legal_comments": [],
+          "sqlite_dedication_comments": [
+            "/*\n** 2001 September 15\n**\n** The author disclaims copyright to this source code.  In place of\n** a legal notice, here is a blessing:\n**\n**    May you do good and not evil.\n**    May you find forgiveness for yourself and forgive others.\n**    May you share freely, never taking more than you give.\n**\n*************************************************************************\n** Internal interface definitions for SQLite.\n**\n*/",
+            "/*\n** 2015 January 12\n**\n** The author disclaims copyright to this source code.  In place of\n** a legal notice, here is a blessing:\n**\n**    May you do good and not evil.\n**    May you find forgiveness for yourself and forgive others.\n**    May you share freely, never taking more than you give.\n**\n******************************************************************************\n**\n** This file contains code that is specific to MSVC.\n*/",
+            "/*\n** 2015-03-02\n**\n** The author disclaims copyright to this source code.  In place of\n** a legal notice, here is a blessing:\n**\n**    May you do good and not evil.\n**    May you find forgiveness for yourself and forgive others.\n**    May you share freely, never taking more than you give.\n**\n******************************************************************************\n**\n** This file contains code that is specific to Wind River's VxWorks\n*/",
+            "/*\n** 2001-09-15\n**\n** The author disclaims copyright to this source code.  In place of\n** a legal notice, here is a blessing:\n**\n**    May you do good and not evil.\n**    May you find forgiveness for yourself and forgive others.\n**    May you share freely, never taking more than you give.\n**\n*************************************************************************\n** This header file defines the interface that the SQLite library\n** presents to client programs.  If a C-function, structure, datatype,\n** or constant definition does not appear in this file, then it is\n** not a published API of SQLite, is subject to change without\n** notice, and should not be referenced by programs that use SQLite.\n**\n** Some of the definitions that are in this file are marked as\n** \"experimental\".  Experimental interfaces are normally new\n** features recently added to SQLite.  We do not anticipate changes\n** to experimental interfaces but reserve the right to make minor changes\n** if experience from use \"in the wild\" suggest such changes are prudent.\n**\n** The official C-language API documentation for SQLite is derived\n** from comments in this file.  This file is the authoritative source\n** on how SQLite interfaces are supposed to operate.\n**\n** The name of this file under configuration management is \"sqlite.h.in\".\n** The makefile makes some minor changes to this file (such as inserting\n** the version number) and changes its name to \"sqlite3.h\" as\n** part of the build process.\n*/"
+          ]
+        },
+        {
+          "path": "sqlite3/sqlite3.h",
+          "sha256": "d088aa96aa70db50f02acc5c86eca61a5d17556e4c363b9c06079239bf7f87b1",
+          "size": 644069,
+          "leading_legal_comments": [
+            "/*\n** 2001-09-15\n**\n** The author disclaims copyright to this source code.  In place of\n** a legal notice, here is a blessing:\n**\n**    May you do good and not evil.\n**    May you find forgiveness for yourself and forgive others.\n**    May you share freely, never taking more than you give.\n**\n*************************************************************************\n** This header file defines the interface that the SQLite library\n** presents to client programs.  If a C-function, structure, datatype,\n** or constant definition does not appear in this file, then it is\n** not a published API of SQLite, is subject to change without\n** notice, and should not be referenced by programs that use SQLite.\n**\n** Some of the definitions that are in this file are marked as\n** \"experimental\".  Experimental interfaces are normally new\n** features recently added to SQLite.  We do not anticipate changes\n** to experimental interfaces but reserve the right to make minor changes\n** if experience from use \"in the wild\" suggest such changes are prudent.\n**\n** The official C-language API documentation for SQLite is derived\n** from comments in this file.  This file is the authoritative source\n** on how SQLite interfaces are supposed to operate.\n**\n** The name of this file under configuration management is \"sqlite.h.in\".\n** The makefile makes some minor changes to this file (such as inserting\n** the version number) and changes its name to \"sqlite3.h\" as\n** part of the build process.\n*/"
+          ],
+          "sqlite_dedication_comments": [
+            "/*\n** 2001-09-15\n**\n** The author disclaims copyright to this source code.  In place of\n** a legal notice, here is a blessing:\n**\n**    May you do good and not evil.\n**    May you find forgiveness for yourself and forgive others.\n**    May you share freely, never taking more than you give.\n**\n*************************************************************************\n** This header file defines the interface that the SQLite library\n** presents to client programs.  If a C-function, structure, datatype,\n** or constant definition does not appear in this file, then it is\n** not a published API of SQLite, is subject to change without\n** notice, and should not be referenced by programs that use SQLite.\n**\n** Some of the definitions that are in this file are marked as\n** \"experimental\".  Experimental interfaces are normally new\n** features recently added to SQLite.  We do not anticipate changes\n** to experimental interfaces but reserve the right to make minor changes\n** if experience from use \"in the wild\" suggest such changes are prudent.\n**\n** The official C-language API documentation for SQLite is derived\n** from comments in this file.  This file is the authoritative source\n** on how SQLite interfaces are supposed to operate.\n**\n** The name of this file under configuration management is \"sqlite.h.in\".\n** The makefile makes some minor changes to this file (such as inserting\n** the version number) and changes its name to \"sqlite3.h\" as\n** part of the build process.\n*/"
+          ]
+        }
+      ]
+    },
+    "khronos_registry_inputs": [
+      {
+        "path": "api/xml/gl.xml",
+        "sha256": "7dae830ddacefd2af92aef2b438ff89f90fb5496f596dec8282b212eb4fc51e3",
+        "size": 2745540,
+        "leading_legal_comments": []
+      },
+      {
+        "path": "api/xml/glx.xml",
+        "sha256": "338cee03c97e78aa167dd667407ab973f4bc656c58cf9002aa54fa78b2f9ff32",
+        "size": 113895,
+        "leading_legal_comments": []
+      },
+      {
+        "path": "api/xml/wgl.xml",
+        "sha256": "41e0a2182217b099b1628757956cb103cea9660e830f4d2f9fa07bf3a3679feb",
+        "size": 104058,
+        "leading_legal_comments": []
+      },
+      {
+        "path": "api_angle/scripts/egl.xml",
+        "sha256": "523fc17745545daca85c5b107b4a4c1a23dd3de39f70e499c77249e3dd6569ec",
+        "size": 167957,
+        "leading_legal_comments": []
+      },
+      {
+        "path": "api_angle/scripts/egl_angle_ext.xml",
+        "sha256": "98c60fa9fe46f50dd4e101c2262b4293adeeae48a18c39ad63dc085e639b6096",
+        "size": 5004,
+        "leading_legal_comments": []
+      },
+      {
+        "path": "api_angle/scripts/gl.xml",
+        "sha256": "baac3f2e27b4949773f4ee2e6ed8e43a2ae96a428b9d73ae9d1e9c0c404cae1f",
+        "size": 2708708,
+        "leading_legal_comments": []
+      },
+      {
+        "path": "api_angle/scripts/gl_angle_ext.xml",
+        "sha256": "dcf1ca2ce9536bd2ea6cab6e93ce0a37821793a9ed12f280f005a3459e2905e8",
+        "size": 66409,
+        "leading_legal_comments": []
+      },
+      {
+        "path": "api_angle/scripts/wgl.xml",
+        "sha256": "41e0a2182217b099b1628757956cb103cea9660e830f4d2f9fa07bf3a3679feb",
+        "size": 104058,
+        "leading_legal_comments": []
+      },
+      {
+        "path": "api_egl/api/egl.xml",
+        "sha256": "523fc17745545daca85c5b107b4a4c1a23dd3de39f70e499c77249e3dd6569ec",
+        "size": 167957,
+        "leading_legal_comments": []
+      },
+      {
+        "path": "api_webgl/extensions/ANGLE_instanced_arrays/extension.xml",
+        "sha256": "213f7e7636e8df0c390a18ad1339618335d7744970837998a191c275f7d1a95c",
+        "size": 3181,
+        "leading_legal_comments": []
+      },
+      {
+        "path": "api_webgl/extensions/EXT_blend_minmax/extension.xml",
+        "sha256": "d1798c0faf13dfa7930032994f5a47c07b6f2f44b45d033059bfcffb7c1d579c",
+        "size": 2110,
+        "leading_legal_comments": []
+      },
+      {
+        "path": "api_webgl/extensions/EXT_color_buffer_float/extension.xml",
+        "sha256": "48dacbcce0e0e96c206fc6dd2050266680ba24c2f6b254c3a6871c8715639d36",
+        "size": 4077,
+        "leading_legal_comments": []
+      },
+      {
+        "path": "api_webgl/extensions/EXT_color_buffer_half_float/extension.xml",
+        "sha256": "1900351880046b495af97e6d38e9f3213538b133f74625a4dd73165d43e7710c",
+        "size": 5063,
+        "leading_legal_comments": []
+      },
+      {
+        "path": "api_webgl/extensions/EXT_disjoint_timer_query/extension.xml",
+        "sha256": "5f3502d9359932bb19cb866ad01a35f774851e7290ef7cbafcaa0d67175a29d5",
+        "size": 14422,
+        "leading_legal_comments": []
+      },
+      {
+        "path": "api_webgl/extensions/EXT_disjoint_timer_query_webgl2/extension.xml",
+        "sha256": "81f643d90164e86c2a98b4053d7f8db233dc3c3339422f3f575df7da9ba8a518",
+        "size": 9103,
+        "leading_legal_comments": []
+      },
+      {
+        "path": "api_webgl/extensions/EXT_float_blend/extension.xml",
+        "sha256": "5a298482adee7bb1fcc8f613a8aa9b61bb71bf5523fac56da45bb68136e451b8",
+        "size": 1566,
+        "leading_legal_comments": []
+      },
+      {
+        "path": "api_webgl/extensions/EXT_frag_depth/extension.xml",
+        "sha256": "d19cf823811272352972ac4cb1d37405dcf63a91c48c1dd046e475487fecf9ea",
+        "size": 1923,
+        "leading_legal_comments": []
+      },
+      {
+        "path": "api_webgl/extensions/EXT_shader_texture_lod/extension.xml",
+        "sha256": "f1e5741d5d12d6e9a6bbc95049da2ec62ee55a4d1b6ec7b03e87e9f91282c6cb",
+        "size": 4341,
+        "leading_legal_comments": []
+      },
+      {
+        "path": "api_webgl/extensions/EXT_sRGB/extension.xml",
+        "sha256": "7688ba25fa05558fbae72b21661e5bece2c36e899fe78da83bc8a172db9622fd",
+        "size": 2970,
+        "leading_legal_comments": []
+      },
+      {
+        "path": "api_webgl/extensions/EXT_texture_compression_bptc/extension.xml",
+        "sha256": "823b0280845da20a584b3ad6e85052bb158c4e69add38c3f80899facdf9fda90",
+        "size": 4518,
+        "leading_legal_comments": []
+      },
+      {
+        "path": "api_webgl/extensions/EXT_texture_compression_rgtc/extension.xml",
+        "sha256": "6b95c30aa46b81a4bcde2a07df0c89cded028387ee1cc3a7e5d0aabf5f0d219e",
+        "size": 5338,
+        "leading_legal_comments": []
+      },
+      {
+        "path": "api_webgl/extensions/EXT_texture_filter_anisotropic/extension.xml",
+        "sha256": "131ed0429a9951c05ae5c30859179f47c99b9bd6f47ca2825bdecf791f0188b6",
+        "size": 2015,
+        "leading_legal_comments": []
+      },
+      {
+        "path": "api_webgl/extensions/KHR_parallel_shader_compile/extension.xml",
+        "sha256": "6e13b581cae0c8a6f41a484d98e55bb805b599081f54cfe737253238fe797395",
+        "size": 3412,
+        "leading_legal_comments": []
+      },
+      {
+        "path": "api_webgl/extensions/OES_element_index_uint/extension.xml",
+        "sha256": "734f7a90af440ea559fa0fe777144aaef8acc7de94a8c3ce153a75ff85cb1f6b",
+        "size": 1809,
+        "leading_legal_comments": []
+      },
+      {
+        "path": "api_webgl/extensions/OES_fbo_render_mipmap/extension.xml",
+        "sha256": "43bede667b814b80e15b5af463620c53f6fa9e1a610c2e9756ad2fa55b9f7589",
+        "size": 2335,
+        "leading_legal_comments": []
+      },
+      {
+        "path": "api_webgl/extensions/OES_standard_derivatives/extension.xml",
+        "sha256": "2fa53259457d9f6042194bfb13c0db4b3c63d2d99d9e44f057d8fe4d5b28fe69",
+        "size": 2102,
+        "leading_legal_comments": []
+      },
+      {
+        "path": "api_webgl/extensions/OES_texture_float/extension.xml",
+        "sha256": "42a782fcc2cafd3df9ea33c9259343c66b3fbd2ebfc216dc20ee6be53481f042",
+        "size": 3095,
+        "leading_legal_comments": []
+      },
+      {
+        "path": "api_webgl/extensions/OES_texture_float_linear/extension.xml",
+        "sha256": "98041c4427f5abf741eb2c34e23f9b8c84090d4d5b4e2e0f1b04f9b53c73259a",
+        "size": 1565,
+        "leading_legal_comments": []
+      },
+      {
+        "path": "api_webgl/extensions/OES_texture_half_float/extension.xml",
+        "sha256": "14cb4ce4e6f259fcb6ce0d988c4e81880299f28343cdcba4f7abbf8956207529",
+        "size": 3236,
+        "leading_legal_comments": []
+      },
+      {
+        "path": "api_webgl/extensions/OES_texture_half_float_linear/extension.xml",
+        "sha256": "d2f29c9a9bf31e757fc8c6da277cdb813350a1504be773c3bd105bfa92e45502",
+        "size": 1620,
+        "leading_legal_comments": []
+      },
+      {
+        "path": "api_webgl/extensions/OES_vertex_array_object/extension.xml",
+        "sha256": "8262ec860c2af3b23daacc27a17bcf29054bcc03baf59f90779c4e53fc469f41",
+        "size": 5596,
+        "leading_legal_comments": []
+      },
+      {
+        "path": "api_webgl/extensions/proposals/EXT_clip_cull_distance/extension.xml",
+        "sha256": "a4f9b465b1e1efa0367a8fbbada7a6156ffb3e4ee1c677a0d220a7ea1402a260",
+        "size": 2783,
+        "leading_legal_comments": []
+      },
+      {
+        "path": "api_webgl/extensions/proposals/EXT_multi_draw_arrays/extension.xml",
+        "sha256": "47f3ab7d17e28152b7873db5da9afbee058a61caacebba6b7fd9df4a569683a3",
+        "size": 3550,
+        "leading_legal_comments": []
+      },
+      {
+        "path": "api_webgl/extensions/proposals/WEBGL_blend_equation_advanced_coherent/extension.xml",
+        "sha256": "4c8d195e8cc21207e372ef596cfb58ada985289c6b1212fad912d8f0ad0563a8",
+        "size": 4261,
+        "leading_legal_comments": []
+      },
+      {
+        "path": "api_webgl/extensions/proposals/WEBGL_debug/extension.xml",
+        "sha256": "c8cdbb65c17dfe4851e7a56094c492b835f76f06a9cdb1b3fd273584357864b1",
+        "size": 12102,
+        "leading_legal_comments": []
+      },
+      {
+        "path": "api_webgl/extensions/proposals/WEBGL_dynamic_texture/extension.xml",
+        "sha256": "7f5bc906ba61037befd4acd9fc39209d2e4bd8eea20ba01f34ebe4700bfd1806",
+        "size": 56649,
+        "leading_legal_comments": []
+      },
+      {
+        "path": "api_webgl/extensions/proposals/WEBGL_subarray_uploads/extension.xml",
+        "sha256": "87cde732f220d4b54faaef1e6d5efc6174849c1b54983908084659f525c7f40f",
+        "size": 3544,
+        "leading_legal_comments": []
+      },
+      {
+        "path": "api_webgl/extensions/proposals/WEBGL_texture_multisample/extension.xml",
+        "sha256": "338f0fc6f62bf875a0f7b19e4c284ed48e5a76e791e55414843659cf402636da",
+        "size": 1384,
+        "leading_legal_comments": []
+      },
+      {
+        "path": "api_webgl/extensions/proposals/WEBGL_texture_source_iframe/extension.xml",
+        "sha256": "378beada6abe201a0ebdb68a3935e8bf27f620ae2653d696a38df9e499808eda",
+        "size": 5780,
+        "leading_legal_comments": []
+      },
+      {
+        "path": "api_webgl/extensions/proposals/WEBGL_video_texture/extension.xml",
+        "sha256": "b9e0ffa1cf37c827b9be82d71adcd40ce44d05e434a87d174b289c7a5b9d30b0",
+        "size": 4532,
+        "leading_legal_comments": []
+      },
+      {
+        "path": "api_webgl/extensions/rejected/EXT_texture_storage/extension.xml",
+        "sha256": "9fb3883d1b6d73e09b03129a30845031e0b27c9003b9fb0e2f2b2b2d5a9dbb1e",
+        "size": 2392,
+        "leading_legal_comments": []
+      },
+      {
+        "path": "api_webgl/extensions/rejected/OES_depth24/extension.xml",
+        "sha256": "159c541fc025c3d454887cdedd1ff5c19ed17e9356c63d95510d70c586502af7",
+        "size": 2214,
+        "leading_legal_comments": []
+      },
+      {
+        "path": "api_webgl/extensions/rejected/WEBGL_compressed_texture_atc/extension.xml",
+        "sha256": "43eab8d74ffb5799f2410a884d79bd4574531070a53947c334d71910c5a9bdee",
+        "size": 4539,
+        "leading_legal_comments": []
+      },
+      {
+        "path": "api_webgl/extensions/rejected/WEBGL_debug_shader_precision/extension.xml",
+        "sha256": "f618d6f82e21cf78146e86c396a3d7b3dd51cf778ab2dc7a504834d835abc5c8",
+        "size": 5597,
+        "leading_legal_comments": []
+      },
+      {
+        "path": "api_webgl/extensions/rejected/WEBGL_draw_elements_no_range_check/extension.xml",
+        "sha256": "a3a616760a9cca44ecca27e8a8afd49679974f1bf0dfd4624231bcffaf4aec54",
+        "size": 3447,
+        "leading_legal_comments": []
+      },
+      {
+        "path": "api_webgl/extensions/rejected/WEBGL_get_buffer_sub_data_async/extension.xml",
+        "sha256": "188b33f4972e400550bbd1be58f29d9a0bc24a8da09203edc2f3e6f1a595679b",
+        "size": 6643,
+        "leading_legal_comments": []
+      },
+      {
+        "path": "api_webgl/extensions/rejected/WEBGL_shared_resources/extension.xml",
+        "sha256": "cab1d86d6c853c11acf42044c4caea97103c70440c87688979c9f1cc18d622a6",
+        "size": 14535,
+        "leading_legal_comments": []
+      },
+      {
+        "path": "api_webgl/extensions/rejected/WEBGL_subscribe_uniform/extension.xml",
+        "sha256": "7ec77103308177cdfa0efbc995f62151622c30bab46a4ee191e04520c51965ae",
+        "size": 8366,
+        "leading_legal_comments": []
+      },
+      {
+        "path": "api_webgl/extensions/rejected/WEBGL_texture_from_depth_video/extension.xml",
+        "sha256": "eabf2a9003050f8ef5ceb4d5cc0fafc98977aef407fb4060d08d704884a3d462",
+        "size": 3130,
+        "leading_legal_comments": []
+      },
+      {
+        "path": "api_webgl/extensions/template/extension.xml",
+        "sha256": "8da65e0a5d053bf36373c6fcfdf7d8fa2738c48345671cf61b62e30ba9cce117",
+        "size": 6894,
+        "leading_legal_comments": []
+      },
+      {
+        "path": "api_webgl/extensions/WEBGL_color_buffer_float/extension.xml",
+        "sha256": "d68800fe416384a951fe45fdbcb324494d848cbecdecbdcacf7bbafe8a2aae93",
+        "size": 5343,
+        "leading_legal_comments": []
+      },
+      {
+        "path": "api_webgl/extensions/WEBGL_compressed_texture_astc/extension.xml",
+        "sha256": "9ba9c29e7e09aa8ec950ec70c79eae42c6f844d354b49fc88d9f048318a9c400",
+        "size": 27827,
+        "leading_legal_comments": []
+      },
+      {
+        "path": "api_webgl/extensions/WEBGL_compressed_texture_etc/extension.xml",
+        "sha256": "d926f0a7f533ea6ce43215a7e90f35064e1a51df539e04c49a2e918f69943aad",
+        "size": 8512,
+        "leading_legal_comments": []
+      },
+      {
+        "path": "api_webgl/extensions/WEBGL_compressed_texture_etc1/extension.xml",
+        "sha256": "02a008b04a5b40e274023defe3a2fb94f06a2150c059ae703c282faa6b6b4b0e",
+        "size": 3409,
+        "leading_legal_comments": []
+      },
+      {
+        "path": "api_webgl/extensions/WEBGL_compressed_texture_pvrtc/extension.xml",
+        "sha256": "1570f8ebb56480908e46706683182a097928e8e0a2e992e3eab8f1a2c16124c9",
+        "size": 4245,
+        "leading_legal_comments": []
+      },
+      {
+        "path": "api_webgl/extensions/WEBGL_compressed_texture_s3tc/extension.xml",
+        "sha256": "87585ba713ad1a8dd5c04fd24a7068a0cf88799ea697e940752c68698de0c707",
+        "size": 5300,
+        "leading_legal_comments": []
+      },
+      {
+        "path": "api_webgl/extensions/WEBGL_compressed_texture_s3tc_srgb/extension.xml",
+        "sha256": "e22e01bd35b437adabfc7592f5eb6d750fdaabac61b0f79561fe58e860843993",
+        "size": 5147,
+        "leading_legal_comments": []
+      },
+      {
+        "path": "api_webgl/extensions/WEBGL_debug_renderer_info/extension.xml",
+        "sha256": "af71073e0031b0296b7e5b609cdd272458cbae434a7fa31649054be0969a72e0",
+        "size": 4559,
+        "leading_legal_comments": []
+      },
+      {
+        "path": "api_webgl/extensions/WEBGL_debug_shaders/extension.xml",
+        "sha256": "fc8c59747ee8cc289aa269c6ac5b6a45f7dc036d509209ace8db7062481a1abe",
+        "size": 3330,
+        "leading_legal_comments": []
+      },
+      {
+        "path": "api_webgl/extensions/WEBGL_depth_texture/extension.xml",
+        "sha256": "5d91c9b8252b9f3a19f3f6a2f861a660d200446cfcaf09fa2a337e6f6b2dd5bd",
+        "size": 11272,
+        "leading_legal_comments": []
+      },
+      {
+        "path": "api_webgl/extensions/WEBGL_draw_buffers/extension.xml",
+        "sha256": "9b465aa066d86ba044ad1604f6a3ce9f9e9a3afe3b4d36750a60870a67697fa1",
+        "size": 9791,
+        "leading_legal_comments": []
+      },
+      {
+        "path": "api_webgl/extensions/WEBGL_lose_context/extension.xml",
+        "sha256": "71defc6045fefdf7b14cd2d1fe4a432d504b2567e7acb1e77b8737aea7ba1bb0",
+        "size": 5408,
+        "leading_legal_comments": []
+      },
+      {
+        "path": "api_webgl/extensions/WEBGL_multiview/extension.xml",
+        "sha256": "474fa0ccaa7150e32060fa9ff5357b43d08cfe34930118525a2e4bee698fda0a",
+        "size": 16084,
+        "leading_legal_comments": []
+      },
+      {
+        "path": "api_webgl/extensions/WEBGL_security_sensitive_resources/extension.xml",
+        "sha256": "99634c2e0117d7abb9b44bbd64d8c4e8c8ebbcfe6342222dfc624b05e8532249",
+        "size": 12125,
+        "leading_legal_comments": []
+      },
+      {
+        "path": "api_webgl/specs/latest/1.0/webgl.idl",
+        "sha256": "9bd8707845fb68ff349f95b320582160423ee4cdf47294cbd980933b3b25dae9",
+        "size": 33828,
+        "leading_legal_comments": [
+          "// Copyright (c) 2018 The Khronos Group Inc.\n//\n// Permission is hereby granted, free of charge, to any person obtaining a\n// copy of this software and/or associated documentation files (the\n// \"Materials\"), to deal in the Materials without restriction, including\n// without limitation the rights to use, copy, modify, merge, publish,\n// distribute, sublicense, and/or sell copies of the Materials, and to\n// permit persons to whom the Materials are furnished to do so, subject to\n// the following conditions:\n//\n// The above copyright notice and this permission notice shall be included\n// in all copies or substantial portions of the Materials.\n//\n// THE MATERIALS ARE PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND,\n// EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF\n// MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.\n// IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY\n// CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,\n// TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE\n// MATERIALS OR THE USE OR OTHER DEALINGS IN THE MATERIALS.\n"
+        ]
+      },
+      {
+        "path": "api_webgl/specs/latest/2.0/webgl2.idl",
+        "sha256": "4e9ba68c298e76e85f312f86d474975da4ce656e35c2ad4a8c706437d50253a1",
+        "size": 38280,
+        "leading_legal_comments": [
+          "// Copyright (c) 2018 The Khronos Group Inc.\n//\n// Permission is hereby granted, free of charge, to any person obtaining a\n// copy of this software and/or associated documentation files (the\n// \"Materials\"), to deal in the Materials without restriction, including\n// without limitation the rights to use, copy, modify, merge, publish,\n// distribute, sublicense, and/or sell copies of the Materials, and to\n// permit persons to whom the Materials are furnished to do so, subject to\n// the following conditions:\n//\n// The above copyright notice and this permission notice shall be included\n// in all copies or substantial portions of the Materials.\n//\n// THE MATERIALS ARE PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND,\n// EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF\n// MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.\n// IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY\n// CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,\n// TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE\n// MATERIALS OR THE USE OR OTHER DEALINGS IN THE MATERIALS.\n"
+        ]
+      }
+    ],
+    "generator_source_headers": [],
+    "generated_binding_outputs": [
+      {
+        "path": "egl_bindings.rs",
+        "sha256": "74effcafd13437ca44c50eb40dcdb440b19a29e247b9de39db9e25bdf902b1d2",
+        "size": 58650,
+        "leading_legal_comments": [],
+        "package": "glutin_egl_sys@0.7.1"
+      },
+      {
+        "path": "wgl_bindings.rs",
+        "sha256": "828eb90e300e5d958be235d7bdad04c76de3df645659715a708a19bfa062bc67",
+        "size": 15446,
+        "leading_legal_comments": [],
+        "package": "glutin_wgl_sys@0.6.1"
+      },
+      {
+        "path": "wgl_extra_bindings.rs",
+        "sha256": "c4333adc755b782390746479db01bc9113167fca905a39473dc934e54d3bcf2a",
+        "size": 39658,
+        "leading_legal_comments": [],
+        "package": "glutin_wgl_sys@0.6.1"
+      }
+    ]
+  }
+}
