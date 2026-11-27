@@ -10,3 +10,6 @@ A separate review is required for historical exposure findings and legacy releas
 
 ## Verified pinned toolchain bundle
 CI 46078156707 passed: 348 review-bundle payload files (21 additional toolchain files), all 54 Rust tests and the portable ZIP round-trip. Exact toolchain identity check and installed distribution documents passed. Added per-file toolchain notice identity output (relative names, SHA-256 and sizes only) to support exact subsequent review. The generated copyright documents themselves remain to be reviewed for any additional redistribution obligations; no final approval implied.
+
+## Verified toolchain identity checkpoint
+CI 46082221895 at 4687f658eaadd22b941e65a36e6b7044cf4f6240 passed all 54 application tests, 348 bundle payload files and the portable ZIP round-trip. The 21 toolchain notice paths, original SHA-256 digests and byte counts are retained in toolchain-notice-baseline.json. Added strict comparison against that independent successful CI baseline, including missing/extra/tampered-file regression cases. The official distribution copyright HTML files are included unchanged; their presence and hashes alone do not resolve every source or redistribution obligation. Full distribution report content review remains outstanding. No approval to publish.

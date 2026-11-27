@@ -83,6 +83,15 @@ def toolchain_notices():
     return out
 
 
+def verify_toolchain_baseline(items, expected):
+    # Compare independently recorded CI identities, not just two reads of
+    # the same installed toolchain. Reject missing, extra or changed bytes.
+    observed = [{"path": name, "sha256": digest(raw), "bytes": len(raw)}
+                for name, raw in sorted(items.items())]
+    if observed != sorted(expected, key=lambda row: row["path"]):
+        raise ValueError("toolchain notice baseline differs from reviewed CI")
+
+
 def expected_notices():
     inventory = load(ROOT / "docs/compliance/windows-license-inventory.json")
     if inventory["lock_sha256"] != LOCK_HASH:
@@ -110,6 +119,10 @@ def expected_notices():
 
 def verify_bytes(items, expected):
     toolchain = toolchain_notices()
+    baseline = load(ROOT / "docs/compliance/toolchain-notice-baseline.json")
+    if baseline["toolchain_commit"] != "0ef1bc386059596dada8fb65b50425aab2ea637a":
+        raise ValueError("unexpected toolchain baseline commit")
+    verify_toolchain_baseline(toolchain, baseline["files"])
     if set(items) != set(expected) | EXTRA | set(toolchain):
         raise ValueError("notice bundle entry set mismatch")
     for name, (algorithm, value) in expected.items():
@@ -217,6 +230,17 @@ class BundleTests(unittest.TestCase):
                 out.writestr("notice.txt", b"modified")
             with self.assertRaisesRegex(ValueError, "manifest mismatch"):
                 read_bundle(bad)
+
+    def test_toolchain_baseline(self):
+        items = {"toolchain/a.txt": b"notice", "toolchain/b.txt": b"other"}
+        expected = [{"path": name, "sha256": digest(raw), "bytes": len(raw)}
+                    for name, raw in items.items()]
+        verify_toolchain_baseline(items, expected)
+        for changed in ({"toolchain/a.txt": b"notice"},
+                        {**items, "toolchain/c.txt": b"extra"},
+                        {**items, "toolchain/a.txt": b"tamper"}):
+            with self.assertRaisesRegex(ValueError, "baseline differs"):
+                verify_toolchain_baseline(changed, expected)
 
     def test_path_validation(self):
         for name in ("../bad", "/bad", "a//b", "a\\b", "C:/bad", "a/./b"):
