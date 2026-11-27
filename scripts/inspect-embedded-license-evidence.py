@@ -96,6 +96,15 @@ def leading_comments(data):
     return out
 
 
+def sqlite_dedication_comments(data):
+    # Amalgamation banners can precede the original header and preprocessor
+    # directives can separate them. Preserve intact bounded comment blocks.
+    text = data[:65536].decode("utf-8-sig", errors="replace")
+    return [m.group(0) for m in re.finditer(r"/\*.*?\*/", text, re.S)
+            if re.search(r"public\s+domain|the author disclaims copyright to this source code",
+                         re.sub(r"\n\s*\*\s?", " ", m.group(0)), re.I)]
+
+
 def file_evidence(path, base):
     raw = path.read_bytes()
     return {"path": path.relative_to(base).as_posix(), "sha256": sha256(raw),
@@ -143,8 +152,11 @@ def inspect(out):
     if "bundled" not in features or any("sqlcipher" in f for f in features):
         raise ValueError("unexpected SQLite native feature set")
     sqlite_files = [file_evidence(sqlite / "sqlite3" / name, sqlite) for name in ("sqlite3.c", "sqlite3.h")]
-    if not all(any("public domain" in c.lower() for c in f["leading_legal_comments"]) for f in sqlite_files):
-        raise ValueError("SQLite public-domain header not found")
+    for f in sqlite_files:
+        raw = (sqlite / f["path"]).read_bytes()
+        f["sqlite_dedication_comments"] = sqlite_dedication_comments(raw)
+        if not f["sqlite_dedication_comments"]:
+            raise ValueError("SQLite dedication evidence not found: " + f["path"])
 
     khronos, _ = crate("khronos_api", "3.1.0")
     registry = [file_evidence(path, khronos) for path in sorted(khronos.rglob("*"))
@@ -202,6 +214,14 @@ class EvidenceTests(unittest.TestCase):
         sfnt = b"\x00\x01\x00\x00" + struct.pack(">HHHH", 1, 0, 0, 0)
         sfnt += struct.pack(">4sIII", b"name", 0, 28, len(table)) + table
         self.assertEqual(copyright_status(font_names(sfnt)), "absent")
+
+    def test_sqlite_dedication(self):
+        blessing = b"/* The author disclaims copyright to this source code. */"
+        self.assertEqual(sqlite_dedication_comments(b"/* banner */\n#define X 1\n" + blessing),
+                         [blessing.decode()])
+        self.assertEqual(sqlite_dedication_comments(b'const char *x = "public domain";'), [])
+        self.assertEqual(sqlite_dedication_comments(b"/* unrelated */"), [])
+        self.assertEqual(sqlite_dedication_comments(b"/* Public\n** domain */"), ["/* Public\n** domain */"])
 
     def test_comments(self):
         self.assertEqual(leading_comments(b'<?xml version="1.0"?>\n<!-- Copyright X -->\n<registry/>'),
