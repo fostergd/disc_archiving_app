@@ -118,7 +118,64 @@ def metadata():
         cwd=ROOT, encoding="utf-8"))
 
 
-def inspect(out):
+def capture_release_build(messages):
+    # Capture Cargo's authoritative build-script-executed events, not guessed
+    # target/release/build directory names. Keep compiler progress on stderr.
+    if messages.exists():
+        raise ValueError("build message destination exists")
+    with messages.open("xb") as stream:
+        result = subprocess.run(
+            ["cargo", "build", "--locked", "--release", "--features", "gui",
+             "--message-format=json-render-diagnostics"],
+            cwd=ROOT, stdout=stream)
+    if result.returncode:
+        raise SystemExit(result.returncode)
+
+
+def read_build_outputs(messages, expected_ids):
+    outputs = {}
+    finished = []
+    with messages.open(encoding="utf-8-sig") as stream:
+        for line in stream:
+            if not line.strip():
+                continue
+            event = json.loads(line)
+            reason = event.get("reason")
+            if reason == "build-finished":
+                finished.append(event.get("success"))
+            if reason != "build-script-executed":
+                continue
+            package_id = event.get("package_id")
+            if package_id not in expected_ids:
+                continue
+            directory = Path(event["out_dir"])
+            if not directory.is_absolute() or not directory.is_dir():
+                raise ValueError("invalid Cargo build output for " + expected_ids[package_id])
+            directory = directory.resolve()
+            if package_id in outputs and outputs[package_id] != directory:
+                raise ValueError("ambiguous Cargo build output for " + expected_ids[package_id])
+            outputs[package_id] = directory
+    if finished != [True]:
+        raise ValueError("Cargo messages do not describe one successful release build")
+    if set(outputs) != set(expected_ids):
+        raise ValueError("missing Cargo build-script event: " +
+                         ", ".join(sorted(expected_ids[k] for k in expected_ids.keys() - outputs.keys())))
+    generated = []
+    for package_id, name in sorted(expected_ids.items(), key=lambda item: item[1]):
+        directory = outputs[package_id]
+        paths = sorted(directory.rglob("*.rs"))
+        if not paths:
+            raise ValueError("no generated Rust bindings for " + name)
+        for path in paths:
+            if not path.is_file() or not path.resolve().is_relative_to(directory):
+                raise ValueError("invalid generated binding path")
+            row = file_evidence(path, directory)
+            row["package"] = name
+            generated.append(row)
+    return generated
+
+
+def inspect(out, messages):
     if out.exists():
         raise ValueError("evidence destination exists")
     expected = json.loads((ROOT / "docs/compliance/windows-license-inventory.json").read_text(encoding="utf-8"))
@@ -166,13 +223,10 @@ def inspect(out):
     generator, _ = crate("gl_generator", "0.14.0")
     generator_headers = [file_evidence(path, generator) for path in sorted((generator / "src").rglob("*.rs"))]
     generator_headers = [f for f in generator_headers if f["leading_legal_comments"]]
-    target = Path(meta["target_directory"]) / "release" / "build"
-    generated = []
-    for name in ("glutin_egl_sys", "glutin_wgl_sys"):
-        paths = sorted(target.glob(name + "-*/out/*.rs"))
-        if not paths:
-            raise ValueError("generated binding output not found: " + name)
-        generated.extend(file_evidence(path, target) for path in paths)
+    expected_ids = {packages[(name, version)]["id"]: name + "@" + version
+                    for name, version in (("glutin_egl_sys", "0.7.1"),
+                                          ("glutin_wgl_sys", "0.6.1"))}
+    generated = read_build_outputs(messages, expected_ids)
     report = {
         "lock_sha256": lock, "scope": "review evidence, not distribution approval",
         "fonts": fonts, "sqlite": {"features": sorted(features), "files": sqlite_files},
@@ -225,6 +279,42 @@ class EvidenceTests(unittest.TestCase):
         wrapped = b"/* The author disclaims\r\n *** copyright to this source code. */"
         self.assertEqual(sqlite_dedication_comments(wrapped), [wrapped.decode()])
 
+    def test_build_outputs(self):
+        with tempfile.TemporaryDirectory() as temp:
+            base = Path(temp).resolve()
+            # Deliberately use paths unrelated to target/release/build and
+            # include a space to exercise Cargo's actual reported out_dir.
+            egl = base / "alternate build" / "egl"
+            wgl = base / "different" / "wgl"
+            egl.mkdir(parents=True)
+            wgl.mkdir(parents=True)
+            (egl / "egl.rs").write_text("// Copyright fixture\n", encoding="utf-8")
+            (wgl / "wgl.rs").write_text("// binding fixture\n", encoding="utf-8")
+            messages = base / "messages.jsonl"
+            events = [
+                {"reason": "build-script-executed", "package_id": "egl-id", "out_dir": str(egl)},
+                {"reason": "build-script-executed", "package_id": "wgl-id", "out_dir": str(wgl)},
+                {"reason": "build-finished", "success": True},
+            ]
+            def write(items):
+                messages.write_text("\n".join(json.dumps(item) for item in items) + "\n", encoding="utf-8")
+            ids = {"egl-id": "egl@1", "wgl-id": "wgl@1"}
+            write(events)
+            rows = read_build_outputs(messages, ids)
+            self.assertEqual([(r["package"], r["path"]) for r in rows],
+                             [("egl@1", "egl.rs"), ("wgl@1", "wgl.rs")])
+            self.assertEqual(rows[0]["leading_legal_comments"], ["// Copyright fixture\n"])
+            write([events[0], events[2]])
+            with self.assertRaisesRegex(ValueError, "missing Cargo"):
+                read_build_outputs(messages, ids)
+            write(events[:-1] + [{"reason": "build-finished", "success": False}])
+            with self.assertRaisesRegex(ValueError, "successful release"):
+                read_build_outputs(messages, ids)
+            write(events)
+            (wgl / "wgl.rs").unlink()
+            with self.assertRaisesRegex(ValueError, "no generated Rust"):
+                read_build_outputs(messages, ids)
+
     def test_comments(self):
         self.assertEqual(leading_comments(b'<?xml version="1.0"?>\n<!-- Copyright X -->\n<registry/>'),
                          ["<!-- Copyright X -->"])
@@ -237,12 +327,20 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--output-directory", type=Path)
     parser.add_argument("--self-test", action="store_true")
+    parser.add_argument("--build-messages", type=Path)
+    parser.add_argument("--capture-release-build", action="store_true")
     args = parser.parse_args()
     if args.self_test:
         suite = unittest.defaultTestLoader.loadTestsFromTestCase(EvidenceTests)
         if not unittest.TextTestRunner(verbosity=2).run(suite).wasSuccessful():
             raise SystemExit(1)
+    if args.capture_release_build:
+        if not args.build_messages:
+            parser.error("--capture-release-build requires --build-messages")
+        capture_release_build(args.build_messages)
     if args.output_directory:
-        inspect(args.output_directory)
-    elif not args.self_test:
-        parser.error("specify --output-directory or --self-test")
+        if not args.build_messages:
+            parser.error("--output-directory requires --build-messages")
+        inspect(args.output_directory, args.build_messages)
+    elif not (args.self_test or args.capture_release_build):
+        parser.error("specify --output-directory, --capture-release-build or --self-test")
