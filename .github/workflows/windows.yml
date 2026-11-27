@@ -17,6 +17,14 @@ jobs:
       - uses: actions/checkout@v4
         with:
           persist-credentials: false
+          fetch-depth: 0
+      - name: Screen full reachable Git history (counts only)
+        shell: powershell
+        run: |
+          python ./scripts/audit-reachable-history.py --self-test
+          if ($LASTEXITCODE -ne 0) { throw 'History audit self-test failed' }
+          python ./scripts/audit-reachable-history.py
+          if ($LASTEXITCODE -ne 0) { throw 'History screen requires review' }
       - run: rustup default stable-x86_64-pc-windows-msvc
       - name: Run attribution parser regression tests before dependency builds
         shell: powershell
