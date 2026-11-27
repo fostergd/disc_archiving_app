@@ -102,7 +102,7 @@ def sqlite_dedication_comments(data):
     text = data[:65536].decode("utf-8-sig", errors="replace")
     return [m.group(0) for m in re.finditer(r"/\*.*?\*/", text, re.S)
             if re.search(r"public\s+domain|the author disclaims copyright to this source code",
-                         re.sub(r"\n\s*\*\s?", " ", m.group(0)), re.I)]
+                         re.sub(r"\r?\n[ \t]*\*+[ \t]*", " ", m.group(0)), re.I)]
 
 
 def file_evidence(path, base):
@@ -222,6 +222,8 @@ class EvidenceTests(unittest.TestCase):
         self.assertEqual(sqlite_dedication_comments(b'const char *x = "public domain";'), [])
         self.assertEqual(sqlite_dedication_comments(b"/* unrelated */"), [])
         self.assertEqual(sqlite_dedication_comments(b"/* Public\n** domain */"), ["/* Public\n** domain */"])
+        wrapped = b"/* The author disclaims\r\n *** copyright to this source code. */"
+        self.assertEqual(sqlite_dedication_comments(wrapped), [wrapped.decode()])
 
     def test_comments(self):
         self.assertEqual(leading_comments(b'<?xml version="1.0"?>\n<!-- Copyright X -->\n<registry/>'),
