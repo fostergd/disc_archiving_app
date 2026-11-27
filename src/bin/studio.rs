@@ -69,6 +69,7 @@ impl Studio{
         }
     }
     fn spawn(&mut self,ctx:&egui::Context,f:impl FnOnce()->anyhow::Result<Work>+Send+'static){
+        if self.worker.is_some(){return;}
         let (tx,rx)=mpsc::channel();let ctx=ctx.clone();
         std::thread::spawn(move||{let result=f().unwrap_or_else(|e|Work::Error(format!("{e:#}")));let _=tx.send(result);ctx.request_repaint();});
         self.worker=Some(rx);self.status_error=false;self.status="Working in background...".into();
@@ -173,7 +174,7 @@ impl Studio{
                 ui.horizontal(|ui|{
                     ui.vertical(|ui|{ui.strong(title);ui.label(description);});
                 });
-                if ui.button("Open workspace").clicked(){self.tab=id;}
+                if ui.push_id(id,|ui|ui.button("Open workspace")).inner.clicked(){self.tab=id;}
             });
         }
         ui.add_space(12.0);
@@ -374,7 +375,8 @@ impl Studio{
                 ui.group(|ui|{
                     ui.strong(&o.recorder);
                     if let Some(e)=&o.error{ui.colored_label(ui.visuals().error_fg_color,"Failed or uncertain - inspect journal and media");ui.label(e);}
-                    else{ui.strong("Written, physical verification pending");}
+                    else if o.receipt.is_some(){ui.strong("Written, physical verification pending");}
+                    else{ui.strong("No successful write receipt - inspect journal");}
                 });
             }
             if ui.button("Review journal and verify discs").clicked(){self.tab=9;self.burn_confirm=false;}
@@ -810,10 +812,10 @@ impl Studio{
     }
 
 }
-impl eframe::App for Studio{
-    fn update(&mut self,ctx:&egui::Context,_frame:&mut eframe::Frame){
-        self.poll();
+impl Studio{
+    fn render(&mut self,ctx:&egui::Context){
         let initial_tab=self.tab;
+        self.poll();
         if ctx.input(|i|i.viewport().close_requested()) && (self.dirty||self.worker.is_some()) {ctx.send_viewport_cmd(egui::ViewportCommand::CancelClose);self.close_prompt=true;}
         if self.close_prompt {egui::Window::new("Close application?").collapsible(false).show(ctx,|ui|{ui.label("Wait for running work to finish before exiting; unsaved project changes may be lost.");if ui.button("Keep working").clicked(){self.close_prompt=false;}if ui.add_enabled(self.worker.is_none(),egui::Button::new("Discard and exit")).clicked(){self.close_prompt=false;self.dirty=false;self.worker=None;ctx.send_viewport_cmd(egui::ViewportCommand::Close);}});}
         if self.worker.is_none(){
@@ -882,7 +884,7 @@ impl eframe::App for Studio{
                 ui.label(id);
                 match stage{
                     disc_archive::optical::BurnStage::WritingProgress{written_sectors,total_sectors}=>{
-                        let fraction=(*written_sectors as f64 / *total_sectors as f64) as f32;
+                        let fraction=utilization(*written_sectors as u128,*total_sectors as u128);
                         ui.add(egui::ProgressBar::new(fraction).text(format!("Data written: {:.1}% (finalization and verification separate)",fraction*100.0)));
                     }
                     _=>{ui.label(format!("{stage:?}"));}
@@ -899,12 +901,15 @@ impl eframe::App for Studio{
                 8=>self.drives_ui(ui,ctx),
                 9=>self.jobs_ui(ui,ctx),
                 10=>self.burn_ui(ui,ctx),
-                5=>{ui.heading("Close project");ui.label("Closing the project discards all unsaved project settings, inventory and plan. Saved files, catalogs and journals are not deleted.");if self.dirty{ui.strong("Unsaved changes remain.");if ui.button("Save new project revision").clicked(){self.save_project_dialog(ctx);}}if ui.button("Confirm close project").clicked(){*self=Self::default();}if ui.button("Cancel").clicked(){self.tab=11;}},
+                5=>{ui.heading("Close project");ui.label("Closing the project discards all unsaved project settings, inventory and plan. Saved files, catalogs and journals are not deleted.");if self.dirty{ui.strong("Unsaved changes remain.");if ui.button("Save new project revision").clicked(){self.save_project_dialog(ctx);}}if ui.add_enabled(self.worker.is_none(),egui::Button::new("Confirm close project")).clicked(){*self=Self::default();}if ui.button("Cancel").clicked(){self.tab=11;}},
                 _=>{ui.label("Closing disc plan discards unsaved edits.");if ui.button("Confirm close plan").clicked(){self.plan=None;self.selected=None;self.dirty=true;self.tab=0;self.status="Plan closed".into();}if ui.button("Cancel").clicked(){self.tab=1;}}
             });});
         });
         if self.tab!=initial_tab{self.burn_confirm=false;self.verify_confirm=false;self.reconcile_confirm=false;}
     }
+}
+impl eframe::App for Studio{
+    fn update(&mut self,ctx:&egui::Context,_frame:&mut eframe::Frame){self.render(ctx);}
 }
 fn navigation_width(screen_width:f32)->f32{
     if screen_width<950.0{170.0}else{208.0}
@@ -1060,5 +1065,60 @@ mod source_workflow_tests{
         s.add("unexpected-source".into());
         assert!(s.sources.is_empty());
         assert!(!s.dirty);
+    }
+}
+
+#[cfg(test)]
+mod redesigned_workspace_smoke_tests{
+    use super::*;
+    #[test]
+    fn every_workspace_renders_at_supported_sizes_in_both_themes(){
+        let entries=vec![
+            disc_archive::Entry{source:"fixture/episode 01.mkv".into(),archive:"Series/episode 01.mkv".into(),bytes:20480,sha256:Some("a".repeat(64))},
+            disc_archive::Entry{source:"fixture/episode 02.mkv".into(),archive:"Series/episode 02.mkv".into(),bytes:20480,sha256:Some("a".repeat(64))},
+        ];
+        let fixture_plan=plan_mixed(&entries,&[100_000_000],50_000_000,Strategy::Hybrid).unwrap();
+        let mut pages:Vec<_>=NAVIGATION.iter().flat_map(|(_,pages)|pages.iter().map(|(id,_)|*id)).collect();
+        pages.extend([3,5]);
+        for dark in [false,true]{
+            for width in [800.,1200.]{
+                for populated in [false,true]{
+                    for &tab in &pages{
+                        let ctx=egui::Context::default();
+                        apply_theme(&ctx,dark);
+                        let mut studio=Studio::default();
+                        studio.tab=tab;
+                        if populated{
+                            studio.sources=vec!["fixture".into()];
+                            studio.inventory=Some(Inventory{files:entries.clone(),..Default::default()});
+                            studio.plan=Some(fixture_plan.clone());
+                            studio.selected=fixture_plan.discs.first().map(|d|d.number);
+                            studio.comparison=editing::compare(&entries,&[100_000_000],50_000_000).unwrap();
+                            studio.duplicate_groups=vec![entries.iter().map(|e|e.archive.clone()).collect()];
+                        }
+                        // No input events, native dialogs, or physical hardware.
+                        for _ in 0..2{
+                            let input=egui::RawInput{screen_rect:Some(egui::Rect::from_min_size(egui::Pos2::ZERO,egui::vec2(width,600.))),..Default::default()};
+                            let output=ctx.run(input,|ctx|studio.render(ctx));
+                            assert!(!output.shapes.is_empty(),"Empty UI on workspace {tab}, width {width}, dark {dark}");
+                            assert_eq!(studio.tab,tab);
+                            assert!(studio.worker.is_none(),"Idle render initiated work");
+                            assert!(!studio.burn_confirm&&!studio.verify_confirm&&!studio.reconcile_confirm);
+                        }
+                    }
+                }
+            }
+        }
+    }
+    #[test]
+    fn pending_worker_cannot_be_replaced(){
+        let mut studio=Studio::default();
+        let (tx,rx)=mpsc::channel();
+        studio.worker=Some(rx);
+        studio.spawn(&egui::Context::default(),||panic!("second worker must not run"));
+        tx.send(Work::Exported("original completed".into())).unwrap();
+        studio.poll();
+        assert_eq!(studio.status,"original completed");
+        assert!(studio.worker.is_none());
     }
 }

@@ -8,6 +8,10 @@ Extract the portable package into a new local folder and verify SHA256SUMS.txt. 
 
 From a Windows source checkout, build with `cargo build --release --features gui` and assemble with `./scripts/package-windows.ps1 -Destination C:\Temp\das-preview` (destination must not exist). Windows CI builds and tests the package on each push. To request a downloadable preview, manually run the Windows build and tests workflow with publish_preview enabled, subject to available artifact quota; the artifact is retained for three days. Ordinary CI does not upload artifacts.
 
+## Redesigned desktop workflow
+
+Start at Overview and follow the grouped sidebar. Project commands are consolidated in the Project menu; save new revisions without overwriting existing files. Use the light/dark theme switch and scroll as needed on smaller windows. Source changes require rescanning before planning or saving stale inventory. The planner displays usable capacity and explicit unlocked destinations for file moves. Catalog and journal views distinguish planned assignments, written-but-unverified discs and historical readback. Run the redesigned-interface acceptance section in WINDOWS_ACCEPTANCE.md before physical operations. Headless egui layout checks in CI are not Windows desktop acceptance.
+
 ## Workflow
 
 - Scan source folders or files, optionally hashing contents; review exclusions and errors before planning. Duplicate reports never delete or exclude files automatically.

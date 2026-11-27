@@ -39,3 +39,5 @@ Phase 8A-R2 7ed2af0b47302d853967c4990c740d1d207dc125 passed Windows CI 459197242
 Phase 8A-R3a 5a82b41f3d7fbf40d9300d12b6fb09fc3450579d passed Windows CI 45921114930. R3b optical workspaces redesigned with explicit stages and authorization reset safeguards; new CI pending. Next R3c per UI_REDESIGN.md.
 
 Phase 8A-R3b 3e79e96462f6dfb6786fb36490b3e29933e22d33 passed Windows CI 45940393862. R3c catalog/project UX, search state, and narrow-window navigation implemented; new CI pending. Next R4 per UI_REDESIGN.md.
+
+Phase 8A-R3c 7d790575a78ff487610695f023b7739494395303 passed Windows CI 45941462305. R4 final combined GUI review, non-interactive egui smoke tests, worker guard and revised Windows acceptance checklist implemented. Exact-head CI pending. On success, use existing private release workflow and verify publication before Windows acceptance. No hardware acceptance claimed.
