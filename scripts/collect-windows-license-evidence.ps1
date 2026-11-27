@@ -73,9 +73,46 @@ try {
         if ((Get-FileHash -LiteralPath $target -Algorithm SHA256).Hash.ToLowerInvariant() -cne $digest) { throw 'Copied upstream notice mismatch' }
         $collected += [PSCustomObject]@{package='egui upstream 0.31.1';path=$relative;sha256=$digest}
     }
+    # Resolve every previously missing registry notice by exact crate VCS provenance.
+    $supplement = Get-Content -LiteralPath (Join-Path $root 'docs/compliance/upstream/missing-registry-provenance.json') -Raw | ConvertFrom-Json
+    $upstreamRoot = [IO.Path]::GetFullPath((Join-Path $root 'docs/compliance/upstream'))
+    $upstreamPrefix = $upstreamRoot.TrimEnd([char[]]@('\','/')) + [IO.Path]::DirectorySeparatorChar
+    foreach ($item in $supplement.notices) {
+        $source = [IO.Path]::GetFullPath((Join-Path $root $item.path))
+        if (-not $source.StartsWith($upstreamPrefix,[StringComparison]::OrdinalIgnoreCase)) { throw 'Upstream notice outside evidence root' }
+        $blob = & git hash-object --no-filters $source
+        if ($LASTEXITCODE -ne 0 -or $blob -cne $item.git_blob_sha1) { throw "Upstream Git blob mismatch: $($item.path)" }
+        $relative = Join-Path 'upstream' $source.Substring($upstreamPrefix.Length)
+        $target = Join-Path $out $relative
+        [void](New-Item -ItemType Directory -Path (Split-Path -Parent $target) -Force)
+        if (Test-Path -LiteralPath $target) { throw 'Duplicate upstream evidence' }
+        Copy-Item -LiteralPath $source -Destination $target
+        $digest = (Get-FileHash -LiteralPath $source -Algorithm SHA256).Hash.ToLowerInvariant()
+        if ((Get-FileHash -LiteralPath $target -Algorithm SHA256).Hash.ToLowerInvariant() -cne $digest) { throw 'Copied upstream notice mismatch' }
+        $collected += [PSCustomObject]@{package=$item.repository;path=$relative;sha256=$digest}
+    }
+    if (@($supplement.mappings).Count -ne $missing.Count) { throw 'Missing-license mapping count differs from observed packages' }
+    $mapped = @{}
+    foreach ($item in $supplement.mappings) {
+        $match = @($missing | Where-Object { $_.package -ceq $item.package })
+        if ($match.Count -ne 1 -or $mapped.ContainsKey($item.package)) { throw "Missing or duplicate mapping: $($item.package)" }
+        $vcs = $match[0].vcs
+        if (-not $vcs -or $vcs.git.sha1 -cne $item.commit) { throw "Crate VCS commit differs: $($item.package)" }
+        $observedPath = $null
+        if ($vcs.PSObject.Properties.Name -contains 'path_in_vcs') { $observedPath = $vcs.path_in_vcs }
+        if ($observedPath -cne $item.path_in_vcs) { throw "Crate VCS path differs: $($item.package)" }
+        if (@($item.notices).Count -eq 0) { throw 'Empty upstream notice mapping' }
+        foreach ($notice in $item.notices) {
+            $target = [IO.Path]::GetFullPath((Join-Path (Join-Path $out 'upstream') $notice))
+            $evidencePrefix = [IO.Path]::GetFullPath((Join-Path $out 'upstream')) + [IO.Path]::DirectorySeparatorChar
+            if (-not $target.StartsWith($evidencePrefix,[StringComparison]::OrdinalIgnoreCase) -or -not (Test-Path -LiteralPath $target -PathType Leaf)) { throw "Missing mapped notice $notice" }
+        }
+        $mapped[$item.package] = $true
+    }
+    Write-Output "MISSING_REGISTRY_MAPPING_PASS mapped=$($mapped.Count)"
     $report = [PSCustomObject]@{
         lock_sha256=$lock;registry_candidate_count=$packages.Count;copied_notice_count=$collected.Count;
-        missing_registry_notices=$missing;files=$collected;public_distribution_approved=$false
+        missing_registry_notices=$missing;upstream_mapped_missing_count=$mapped.Count;files=$collected;public_distribution_approved=$false
     }
     $report | ConvertTo-Json -Depth 10 | Set-Content -LiteralPath (Join-Path $out 'review-evidence.json') -Encoding UTF8
     Write-Output "NOTICE_COLLECTION_PASS copied=$($collected.Count) candidates=$($packages.Count) missing_registry=$($missing.Count)"

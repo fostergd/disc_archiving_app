@@ -1,0 +1,140 @@
+{
+  "source_run": 45948273940,
+  "source_commit": "946351585e5651e8b75c5303bfd0b2532ec0eea5",
+  "scope": "Missing registry standalone license texts; not a determination of all redistribution obligations.",
+  "notices": [
+    {
+      "repository": "DoumanAsh/clipboard-win",
+      "commit": "ed27008ae5d1f10cfbb266de039f0fb35fd05a56",
+      "upstream_path": "LICENSE",
+      "path": "docs/compliance/upstream/clipboard-win-5.4.3/LICENSE",
+      "git_blob_sha1": "36b7cd93cdfbac762f5be4c6ce276df2ea6305c2"
+    },
+    {
+      "repository": "rust-windowing/gl-rs",
+      "commit": "ea503e8d5fb6d73c6030e6191ce738cd3bf3433e",
+      "upstream_path": "LICENSE",
+      "path": "docs/compliance/upstream/gl-generator-0.14.0/LICENSE",
+      "git_blob_sha1": "d645695673349e3947e8e5ae42332d0ac3164cd7"
+    },
+    {
+      "repository": "rust-windowing/gl-rs",
+      "commit": "f150967b1c44ae888e6676f93f639ebc82771bdc",
+      "upstream_path": "LICENSE",
+      "path": "docs/compliance/upstream/khronos-api-3.1.0/LICENSE",
+      "git_blob_sha1": "d645695673349e3947e8e5ae42332d0ac3164cd7"
+    },
+    {
+      "repository": "aclysma/profiling",
+      "commit": "8271551172eb6fa4cba47369aedd93790c623df9",
+      "upstream_path": "LICENSE-MIT",
+      "path": "docs/compliance/upstream/profiling-1.0.18/LICENSE-MIT",
+      "git_blob_sha1": "6a84e059ad8b43e03c2b06bc2af4dc1d8442808d"
+    },
+    {
+      "repository": "aclysma/profiling",
+      "commit": "8271551172eb6fa4cba47369aedd93790c623df9",
+      "upstream_path": "LICENSE-APACHE",
+      "path": "docs/compliance/upstream/profiling-1.0.18/LICENSE-APACHE",
+      "git_blob_sha1": "139dce95d473c201a8561ef17536314d8b8cda65"
+    }
+  ],
+  "mappings": [
+    {
+      "package": "ecolor@0.31.1",
+      "commit": "1669e52a7ccfc3489c1b0999b9ed48894a0b3887",
+      "path_in_vcs": "crates/ecolor",
+      "notices": [
+        "egui-0.31.1/LICENSE-MIT",
+        "egui-0.31.1/LICENSE-APACHE"
+      ]
+    },
+    {
+      "package": "eframe@0.31.1",
+      "commit": "1669e52a7ccfc3489c1b0999b9ed48894a0b3887",
+      "path_in_vcs": "crates/eframe",
+      "notices": [
+        "egui-0.31.1/LICENSE-MIT",
+        "egui-0.31.1/LICENSE-APACHE"
+      ]
+    },
+    {
+      "package": "egui@0.31.1",
+      "commit": "1669e52a7ccfc3489c1b0999b9ed48894a0b3887",
+      "path_in_vcs": "crates/egui",
+      "notices": [
+        "egui-0.31.1/LICENSE-MIT",
+        "egui-0.31.1/LICENSE-APACHE"
+      ]
+    },
+    {
+      "package": "egui_glow@0.31.1",
+      "commit": "1669e52a7ccfc3489c1b0999b9ed48894a0b3887",
+      "path_in_vcs": "crates/egui_glow",
+      "notices": [
+        "egui-0.31.1/LICENSE-MIT",
+        "egui-0.31.1/LICENSE-APACHE"
+      ]
+    },
+    {
+      "package": "egui-winit@0.31.1",
+      "commit": "1669e52a7ccfc3489c1b0999b9ed48894a0b3887",
+      "path_in_vcs": "crates/egui-winit",
+      "notices": [
+        "egui-0.31.1/LICENSE-MIT",
+        "egui-0.31.1/LICENSE-APACHE"
+      ]
+    },
+    {
+      "package": "emath@0.31.1",
+      "commit": "1669e52a7ccfc3489c1b0999b9ed48894a0b3887",
+      "path_in_vcs": "crates/emath",
+      "notices": [
+        "egui-0.31.1/LICENSE-MIT",
+        "egui-0.31.1/LICENSE-APACHE"
+      ]
+    },
+    {
+      "package": "epaint@0.31.1",
+      "commit": "1669e52a7ccfc3489c1b0999b9ed48894a0b3887",
+      "path_in_vcs": "crates/epaint",
+      "notices": [
+        "egui-0.31.1/LICENSE-MIT",
+        "egui-0.31.1/LICENSE-APACHE"
+      ]
+    },
+    {
+      "package": "clipboard-win@5.4.3",
+      "commit": "ed27008ae5d1f10cfbb266de039f0fb35fd05a56",
+      "path_in_vcs": "",
+      "notices": [
+        "clipboard-win-5.4.3/LICENSE"
+      ]
+    },
+    {
+      "package": "gl_generator@0.14.0",
+      "commit": "ea503e8d5fb6d73c6030e6191ce738cd3bf3433e",
+      "path_in_vcs": null,
+      "notices": [
+        "gl-generator-0.14.0/LICENSE"
+      ]
+    },
+    {
+      "package": "khronos_api@3.1.0",
+      "commit": "f150967b1c44ae888e6676f93f639ebc82771bdc",
+      "path_in_vcs": null,
+      "notices": [
+        "khronos-api-3.1.0/LICENSE"
+      ]
+    },
+    {
+      "package": "profiling@1.0.18",
+      "commit": "8271551172eb6fa4cba47369aedd93790c623df9",
+      "path_in_vcs": "profiling",
+      "notices": [
+        "profiling-1.0.18/LICENSE-MIT",
+        "profiling-1.0.18/LICENSE-APACHE"
+      ]
+    }
+  ]
+}

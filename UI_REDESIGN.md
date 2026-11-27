@@ -29,3 +29,5 @@ Public transition: R4 run 45942238607 failed with no recorded job steps and unav
 R4 automated regression and portable package validation passed in public CI 45946699269. Public release remains blocked on third-party license compliance; actual Windows interface and hardware acceptance remain outstanding.
 
 Pinned public CI 45947538307 passed. Final UI remains CI-green. Public licensing increment adds verified-source egui/font notice evidence and hash-checked collection; new CI pending. Public binary release still gated pending complete notices and review.
+
+License collection CI 45948273940 passed. Exact upstream mapping of all eleven missing registry notice candidates implemented; new CI pending. Remaining embedded/generated/native attribution review and complete notice bundle are prerequisites to public release.

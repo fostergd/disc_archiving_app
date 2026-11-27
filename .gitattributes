@@ -1,2 +1,3 @@
 Cargo.lock -text
 docs/compliance/upstream/egui-0.31.1/* -text
+docs/compliance/upstream/** -text
