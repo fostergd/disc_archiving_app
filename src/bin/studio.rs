@@ -11,7 +11,7 @@ struct Studio {
     sources:Vec<PathBuf>, source_text:String, extensions:String, exclusions:String, hash:bool,
     capacities:String, reserve:String, strategy:Strategy, inventory:Option<Inventory>, plan:Option<Plan>,
     comparison:Vec<editing::Summary>, worker:Option<Receiver<Work>>, status:String, selected:Option<usize>,
-    pattern:String, move_path:String, destination:usize, search:String, tab:usize,
+    pattern:String, move_path:String, destination:usize, search:String, planner_folder:Option<String>, tab:usize,
     inventory_stale:bool, inventory_search:String, duplicate_groups:Vec<Vec<String>>, dirty:bool, close_prompt:bool,
     project_name:String,
     image_disc:usize, image_receipt:Option<disc_archive::image::ImageReceipt>, verify_receipt:Option<disc_archive::image::VerificationReceipt>, image_path:Option<PathBuf>, manifest_path:Option<PathBuf>,
@@ -20,7 +20,7 @@ struct Studio {
 impl Default for Studio {
     fn default()->Self{Self{burn_requests:vec![],burn_previews:vec![],burn_confirm:false,burn_progress:None,burn_stages:Default::default(),burn_outcomes:vec![],drives:None,journal_path:None,jobs:vec![],job_selection:None,job_recorder:String::new(),reconcile_note:String::new(),reconcile_confirm:false,verify_confirm:false,sources:vec![],source_text:String::new(),extensions:String::new(),exclusions:String::new(),hash:false,
         capacities:"50000000000".into(),reserve:"50000000".into(),strategy:Strategy::Hybrid,inventory:None,plan:None,comparison:vec![],
-        worker:None,status:"Add files or folders to begin.".into(),selected:None,pattern:"DISC_{n:03}".into(),move_path:String::new(),destination:1,search:String::new(),tab:11,inventory_stale:false,inventory_search:String::new(),duplicate_groups:vec![],dirty:false,close_prompt:false,project_name:"Untitled archive".into(),image_disc:1,image_receipt:None,verify_receipt:None,image_path:None,manifest_path:None,catalog_path:None,catalog_projects:vec![],catalog_rows:vec![],catalog_term:String::new(),catalog_project:None,catalog_offset:0,catalog_has_next:false,catalog_query:None}}
+        worker:None,status:"Add files or folders to begin.".into(),selected:None,pattern:"DISC_{n:03}".into(),move_path:String::new(),destination:1,search:String::new(),planner_folder:None,tab:11,inventory_stale:false,inventory_search:String::new(),duplicate_groups:vec![],dirty:false,close_prompt:false,project_name:"Untitled archive".into(),image_disc:1,image_receipt:None,verify_receipt:None,image_path:None,manifest_path:None,catalog_path:None,catalog_projects:vec![],catalog_rows:vec![],catalog_term:String::new(),catalog_project:None,catalog_offset:0,catalog_has_next:false,catalog_query:None}}
 }
 fn caps(text:&str)->anyhow::Result<Vec<u64>> {let v=text.split(',').map(|s|s.trim().parse::<u64>()).collect::<Result<Vec<_>,_>>()?;Ok(v)}
 fn save_new<T:serde::Serialize>(path:PathBuf,value:&T)->anyhow::Result<()>{
@@ -55,10 +55,10 @@ impl Studio{
             self.worker=None;
             match event{
                 Work::Inventory(i)=>{self.status=format!("Scanned {} files; {} exclusions; {} errors",i.files.len(),i.excluded.len(),i.errors.len());self.inventory=Some(i);self.plan=None;self.comparison.clear();self.duplicate_groups.clear();self.inventory_stale=false;self.dirty=true;self.tab=0;}
-                Work::Plan(p)=>{self.status=format!("{} discs; {} unassigned files",p.discs.len(),p.oversized.len());self.selected=p.discs.first().map(|d|d.number);self.reserve=p.reserve.to_string();self.strategy=p.strategy;self.plan=Some(p);self.comparison.clear();self.dirty=true;self.tab=1;}
+                Work::Plan(p)=>{self.status=format!("{} discs; {} unassigned files",p.discs.len(),p.oversized.len());self.selected=p.discs.first().map(|d|d.number);self.planner_folder=None;self.move_path.clear();self.reserve=p.reserve.to_string();self.strategy=p.strategy;self.plan=Some(p);self.comparison.clear();self.dirty=true;self.tab=1;}
                 Work::Comparison(v)=>{self.comparison=v;self.status="Comparison complete".into();self.tab=2;}
                 Work::Duplicates(v)=>{self.status=format!("{} duplicate groups",v.len());self.duplicate_groups=v;self.tab=4;}
-                Work::Project(p)=>{self.project_name=p.name;self.sources=p.sources;self.extensions=p.extensions.join(",");self.exclusions=p.exclusions.join("\n");self.hash=p.hash;self.capacities=p.capacities.iter().map(u64::to_string).collect::<Vec<_>>().join(",");self.reserve=p.reserve.to_string();self.strategy=p.strategy;self.pattern=p.naming_pattern;self.inventory=p.inventory;self.plan=p.plan;self.selected=self.plan.as_ref().and_then(|p|p.discs.first()).map(|d|d.number);self.comparison.clear();self.duplicate_groups.clear();self.tab=if self.plan.is_some(){1}else{0};self.inventory_stale=false;self.dirty=false;self.status="Project opened".into();}
+                Work::Project(p)=>{self.project_name=p.name;self.sources=p.sources;self.extensions=p.extensions.join(",");self.exclusions=p.exclusions.join("\n");self.hash=p.hash;self.capacities=p.capacities.iter().map(u64::to_string).collect::<Vec<_>>().join(",");self.reserve=p.reserve.to_string();self.strategy=p.strategy;self.pattern=p.naming_pattern;self.inventory=p.inventory;self.plan=p.plan;self.selected=self.plan.as_ref().and_then(|p|p.discs.first()).map(|d|d.number);self.comparison.clear();self.duplicate_groups.clear();self.planner_folder=None;self.move_path.clear();self.tab=if self.plan.is_some(){1}else{0};self.inventory_stale=false;self.dirty=false;self.status="Project opened".into();}
                 Work::Saved(message)=>{self.status=message;self.dirty=false;}
                 Work::Exported(message)=>self.status=message,
                 Work::CatalogOpened(path,projects)=>{self.catalog_path=Some(path);self.catalog_projects=projects;self.catalog_rows.clear();self.catalog_project=None;self.catalog_offset=0;self.catalog_has_next=false;self.catalog_query=None;self.status="Catalog opened".into();self.tab=6;}
@@ -528,57 +528,177 @@ impl Studio{
         if let Some(files)=duplicates{self.spawn(ctx,move||Ok(Work::Duplicates(disc_archive::duplicates(&files))));}
     }
     fn planner_ui(&mut self,ui:&mut egui::Ui,ctx:&egui::Context){
-        ui.heading("Disc planner");
-        if !self.inventory_ready()&&self.plan.is_none(){ui.label("Scan valid sources first, then choose media and a distribution strategy.");if ui.button("Go to sources").clicked(){self.tab=0;}}
-
-        ui.horizontal_wrapped(|ui|{for &(name,bytes) in MEDIA{if ui.button(name).clicked(){self.capacities=bytes.to_string();}}});
-        ui.label("Capacities in bytes, comma separated (last capacity repeats)");
-        ui.text_edit_singleline(&mut self.capacities);
-        ui.horizontal(|ui|{ui.label("Reserve bytes");ui.text_edit_singleline(&mut self.reserve);});
-        egui::ComboBox::from_label("Distribution").selected_text(format!("{:?}",self.strategy)).show_ui(ui,|ui|{
-            for s in [Strategy::Sequential,Strategy::Folder,Strategy::Maximum,Strategy::Hybrid]{ui.selectable_value(&mut self.strategy,s,format!("{s:?}"));}
+        ui.label(egui::RichText::new("02 / DISC PLANNER").small().weak().strong());
+        ui.heading("Plan your optical archive");
+        ui.label("Choose media, compare distribution methods and review every assigned file before creating images.");
+        if !self.inventory_ready()&&self.plan.is_none(){
+            ui.group(|ui|{
+                ui.strong("A scanned inventory is required");
+                ui.label("Scan valid sources or import a saved inventory from the Project menu.");
+                if ui.button("Go to sources").clicked(){self.tab=0;}
+            });
+        }
+        ui.group(|ui|{
+            ui.heading("Media and distribution");
+            ui.label("Choose a media preset or enter your own capacities.");
+            ui.horizontal_wrapped(|ui|{
+                for &(name,bytes) in MEDIA{
+                    let selected=self.capacities==bytes.to_string();
+                    if ui.add(egui::Button::new(name).selected(selected)).clicked(){
+                        self.capacities=bytes.to_string();self.dirty=true;
+                    }
+                }
+            });
+            ui.label("Capacity sequence in bytes (last capacity repeats)");
+            if ui.add(egui::TextEdit::singleline(&mut self.capacities).desired_width(340.0)).changed(){self.dirty=true;}
+            ui.horizontal_wrapped(|ui|{
+                ui.label("Reserve per disc (bytes)");
+                if ui.add_enabled(self.plan.is_none(),egui::TextEdit::singleline(&mut self.reserve).desired_width(140.0)).changed(){self.dirty=true;}
+            });
+            if self.plan.is_some(){ui.label("The current plan's reserve is fixed during replanning.");}
+            let prior=self.strategy;
+            egui::ComboBox::from_label("Distribution method").selected_text(strategy_label(self.strategy)).show_ui(ui,|ui|{
+                for mode in [Strategy::Sequential,Strategy::Folder,Strategy::Maximum,Strategy::Hybrid]{
+                    ui.selectable_value(&mut self.strategy,mode,strategy_label(mode));
+                }
+            });
+            if prior!=self.strategy{self.dirty=true;}
+            ui.label(strategy_description(self.strategy));
+            ui.horizontal_wrapped(|ui|{
+                if ui.add_enabled(self.inventory_ready()&&self.plan.is_none(),egui::Button::new("Create disc plan").min_size(egui::vec2(160.,36.))).clicked(){self.begin_plan(ctx,false);}
+                if ui.add_enabled(self.inventory_ready(),egui::Button::new("Compare strategies")).clicked(){self.begin_plan(ctx,true);}
+                if ui.add_enabled(self.plan.is_some(),egui::Button::new("Replan unlocked discs")).clicked(){
+                    match caps(&self.capacities){
+                        Ok(c)=>{let p=self.plan.as_ref().unwrap().clone();let mode=self.strategy;let pattern=self.pattern.clone();self.spawn(ctx,move||Ok(Work::Plan(editing::replan(&p,&c,mode,Some(&pattern))?)));}
+                        Err(e)=>self.status=e.to_string(),
+                    }
+                }
+            });
         });
-        ui.horizontal(|ui|{
-            if ui.add_enabled(self.inventory_ready()&&self.plan.is_none(),egui::Button::new("Create plan")).clicked(){self.begin_plan(ctx,false);}
-            if ui.add_enabled(self.inventory_ready(),egui::Button::new("Compare strategies")).clicked(){self.begin_plan(ctx,true);}
-            if ui.add_enabled(self.plan.is_some(),egui::Button::new("Replan unlocked")).clicked(){
-                match caps(&self.capacities){
-                    Ok(c)=>{let p=self.plan.as_ref().unwrap().clone();let s=self.strategy;let pattern=self.pattern.clone();self.spawn(ctx,move||Ok(Work::Plan(editing::replan(&p,&c,s,Some(&pattern))?)));}
+        let Some(p)=self.plan.as_mut() else{return;};
+        ui.add_space(8.0);
+        let assigned:usize=p.discs.iter().map(|d|d.files.len()).sum();
+        let used:u128=p.discs.iter().map(|d|d.estimated_used as u128).sum();
+        let usable:u128=p.discs.iter().map(|d|d.capacity.saturating_sub(p.reserve) as u128).sum();
+        ui.group(|ui|{
+            ui.heading("Distribution overview");
+            ui.horizontal_wrapped(|ui|{
+                ui.strong(format!("{} discs",p.discs.len()));ui.separator();
+                ui.label(format!("{assigned} assigned files"));ui.separator();
+                ui.label(format!("{} unassigned",p.oversized.len()));ui.separator();
+                ui.label(format!("{} locked",p.discs.iter().filter(|d|d.locked).count()));
+            });
+            ui.add(egui::ProgressBar::new(utilization(used,usable)).text(format!("{:.2} / {:.2} GB usable",used as f64/1e9,usable as f64/1e9)));
+            ui.label(format!("Current plan: {}. Includes estimated filesystem overhead; reserved space excluded.",strategy_label(p.strategy)));
+            if !p.oversized.is_empty(){ui.colored_label(ui.visuals().warn_fg_color,"Resolve unassigned files before archiving the entire collection.");}
+            if ui.add_enabled(p.oversized.is_empty()&&!p.discs.is_empty(),egui::Button::new("Continue to image creation")).clicked(){self.tab=7;}
+        });
+        ui.collapsing("Disc names and capacity adjustments",|ui|{
+            ui.horizontal_wrapped(|ui|{
+                ui.label("Naming pattern");
+                if ui.text_edit_singleline(&mut self.pattern).changed(){self.dirty=true;}
+                if ui.button("Apply to unlocked discs").clicked(){self.status=editing::rename(p,&self.pattern).map(|_|{self.dirty=true;"Names updated".to_owned()}).unwrap_or_else(|e|e.to_string());}
+            });
+            if ui.button("Add empty disc (first capacity)").clicked(){self.status=caps(&self.capacities).and_then(|c|editing::add_disc(p,c[0])).map(|_|{self.dirty=true;"Disc added".into()}).unwrap_or_else(|e|e.to_string());}
+        });
+        ui.add_space(8.0);
+        ui.heading("Discs");
+        let previous=self.selected;
+        if ui.selectable_label(self.selected.is_none(),format!("Unassigned files ({})",p.oversized.len())).clicked(){self.selected=None;}
+        egui::ScrollArea::vertical().id_salt("discs").max_height(260.).show_rows(ui,64.,p.discs.len(),|ui,range|{
+            for j in range{
+                let d=&p.discs[j];let available=d.capacity.saturating_sub(p.reserve);
+                ui.vertical(|ui|{
+                    ui.horizontal_wrapped(|ui|{
+                        if ui.selectable_label(self.selected==Some(d.number),egui::RichText::new(&d.label).strong()).clicked(){self.selected=Some(d.number);}
+                        ui.label(format!("{} files",d.files.len()));
+                        if d.locked{ui.strong("Locked");}
+                    });
+                    ui.add(egui::ProgressBar::new(utilization(d.estimated_used as u128,available as u128)).text(format!("{} used / {} usable | {} free",gb(d.estimated_used),gb(available),gb(available.saturating_sub(d.estimated_used)))));
+                });
+            }
+        });
+        if previous!=self.selected{self.planner_folder=None;self.move_path.clear();}
+        let locked=self.selected.and_then(|n|p.discs.iter().find(|d|d.number==n)).is_some_and(|d|d.locked);
+        if let Some(n)=self.selected{
+            if p.discs.iter().any(|d|d.number==n){
+                if ui.button(if locked{"Unlock selected disc"}else{"Lock selected disc"}).clicked(){self.status=editing::set_lock(p,n,!locked).map(|_|{self.dirty=true;"Lock updated".into()}).unwrap_or_else(|e|e.to_string());}
+            }
+        }
+        ui.separator();
+        ui.heading(match self.selected.and_then(|n|p.discs.iter().find(|d|d.number==n)){Some(d)=>format!("Files on {}",d.label),None=>"Unassigned files".into()});
+        ui.add(egui::TextEdit::singleline(&mut self.search).hint_text("Search archive paths").desired_width(340.0));
+        let filter=self.search.to_lowercase();
+        let entries=if let Some(n)=self.selected{p.discs.iter().find(|d|d.number==n).map(|d|d.files.as_slice()).unwrap_or(&[])}else{p.oversized.as_slice()};
+        let folders=folder_counts(entries);
+        if self.planner_folder.as_ref().is_some_and(|name|!folders.contains_key(name.as_str())){self.planner_folder=None;}
+        ui.collapsing("Browse folders",|ui|{
+            if ui.selectable_label(self.planner_folder.is_none(),"All folders").clicked(){self.planner_folder=None;}
+            let groups:Vec<_>=folders.iter().collect();
+            egui::ScrollArea::vertical().id_salt("planner_folders").max_height(180.).show_rows(ui,30.,groups.len(),|ui,range|{
+                for j in range{
+                    let (name,count)=groups[j];
+                    if ui.selectable_label(self.planner_folder.as_deref()==Some(*name),format!("{} ({count})",if name.is_empty(){"Root files"}else{*name})).clicked(){self.planner_folder=Some((*name).to_owned());}
+                }
+            });
+        });
+        let visible:Vec<_>=entries.iter().filter(|f|{
+            self.planner_folder.as_deref().is_none_or(|folder|folder==archive_folder(&f.archive))&&(filter.is_empty()||f.archive.to_lowercase().contains(&filter))
+        }).collect();
+        ui.label(format!("{} matching files",visible.len()));
+        if visible.is_empty(){ui.label("No files match the current view.");}
+        egui::ScrollArea::vertical().id_salt("files").max_height(260.).show_rows(ui,30.,visible.len(),|ui,range|{
+            for j in range{let f=visible[j];if ui.selectable_label(self.move_path==f.archive,format!("{} | {}",f.archive,gb(f.bytes))).clicked(){self.move_path=f.archive.clone();}}
+        });
+        ui.group(|ui|{
+            ui.heading("Move a file to another disc");
+            ui.label("Select a file above or enter its exact archive path. Locked discs cannot be changed.");
+            ui.add(egui::TextEdit::singleline(&mut self.move_path).hint_text("Archive path").desired_width(340.0));
+            let eligible:Vec<_>=p.discs.iter().filter(|d|!d.locked&&Some(d.number)!=self.selected).collect();
+            if !eligible.iter().any(|d|d.number==self.destination){self.destination=eligible.first().map(|d|d.number).unwrap_or(0);}
+            let target_label=eligible.iter().find(|d|d.number==self.destination).map(|d|d.label.as_str()).unwrap_or("No unlocked destination");
+            egui::ComboBox::from_label("Destination disc").selected_text(target_label).show_ui(ui,|ui|{
+                for d in &eligible{ui.selectable_value(&mut self.destination,d.number,format!("{} - {} free",d.label,gb(d.capacity.saturating_sub(p.reserve).saturating_sub(d.estimated_used))));}
+            });
+            let ready=!self.move_path.is_empty()&&self.destination!=0;
+            if ui.add_enabled(ready,egui::Button::new("Move selected file")).clicked(){
+                match editing::move_file(p,&self.move_path,self.destination){
+                    Ok(())=>{self.dirty=true;self.status="File moved".into();self.move_path.clear();}
                     Err(e)=>self.status=e.to_string(),
                 }
             }
         });
-        let Some(p)=self.plan.as_mut() else{return;};
-        ui.separator();
-        ui.label(format!("{} discs | {} unassigned",p.discs.len(),p.oversized.len()));
-        ui.horizontal(|ui|{ui.label("Naming pattern");ui.text_edit_singleline(&mut self.pattern);if ui.button("Apply").clicked(){self.status=editing::rename(p,&self.pattern).map(|_|{self.dirty=true;"Names updated".to_owned()}).unwrap_or_else(|e|e.to_string());}});
-        ui.horizontal(|ui|{
-            if ui.button("Add disc using first capacity").clicked(){self.status=caps(&self.capacities).and_then(|c|editing::add_disc(p,c[0])).map(|_|{self.dirty=true;"Disc added".into()}).unwrap_or_else(|e|e.to_string());}
-        });
-        egui::ScrollArea::vertical().id_salt("discs").max_height(220.).show_rows(ui,26.,p.discs.len(),|ui,range|{
-            for j in range{let d=&p.discs[j];ui.horizontal(|ui|{
-                if ui.selectable_label(self.selected==Some(d.number),format!("{} {}",d.label,if d.locked{"[locked]"}else{""})).clicked(){self.selected=Some(d.number);}
-                let usable=d.capacity-p.reserve;
-                ui.add(egui::ProgressBar::new((d.estimated_used as f64/usable as f64) as f32).desired_width(180.).text(format!("{} / {}",gb(d.estimated_used),gb(d.capacity))));
-                ui.label(format!("{} files",d.files.len()));
-            });}
-        });
-        if let Some(n)=self.selected{
-            if let Some(d)=p.discs.iter().find(|d|d.number==n){
-                let locked=d.locked;
-                if ui.button(if locked{"Unlock selected disc"}else{"Lock selected disc"}).clicked(){self.status=editing::set_lock(p,n,!locked).map(|_|{self.dirty=true;"Lock updated".into()}).unwrap_or_else(|e|e.to_string());}
+    }
+    fn comparison_ui(&mut self,ui:&mut egui::Ui){
+        ui.heading("Compare distribution strategies");
+        ui.label("Compare estimates using the same inventory, capacity sequence and reserve. The current plan is not changed.");
+        if self.comparison.is_empty(){
+            ui.label("No comparison yet. Generate one in the disc planner.");
+        }else{
+            for s in &self.comparison{
+                ui.group(|ui|{
+                    ui.heading(strategy_label(s.strategy));
+                    ui.label(strategy_description(s.strategy));
+                    ui.horizontal_wrapped(|ui|{
+                        ui.strong(format!("{} discs",s.discs));ui.label(format!("{} assigned",s.files));ui.label(format!("{} unassigned",s.unassigned));ui.label(format!("{} split folders",s.split_folders));
+                    });
+                    ui.add(egui::ProgressBar::new(utilization(s.estimated_used_bytes,s.capacity_bytes)).text(format!("{:.2} / {:.2} GB nominal capacity",s.estimated_used_bytes as f64/1e9,s.capacity_bytes as f64/1e9)));
+                });
             }
         }
-        ui.horizontal(|ui|{ui.label("Filter files");ui.text_edit_singleline(&mut self.search);});
-        let filter=self.search.to_lowercase();
-        let entries=if let Some(n)=self.selected{p.discs.iter().find(|d|d.number==n).map(|d|d.files.as_slice()).unwrap_or(&[])}else{p.oversized.as_slice()};
-        if ui.button("Show unassigned files").clicked(){self.selected=None;}
-        let visible:Vec<_>=entries.iter().filter(|f|filter.is_empty()||f.archive.to_lowercase().contains(&filter)).collect();
-        egui::ScrollArea::vertical().id_salt("files").max_height(240.).show_rows(ui,22.,visible.len(),|ui,range|{
-            for j in range{let f=visible[j];if ui.selectable_label(self.move_path==f.archive,format!("{} | {}",f.archive,gb(f.bytes))).clicked(){self.move_path=f.archive.clone();}}
-        });
-        ui.horizontal(|ui|{ui.label("Move archive path");ui.text_edit_singleline(&mut self.move_path);ui.label("to disc");ui.add(egui::DragValue::new(&mut self.destination).range(1..=usize::MAX));if ui.button("Move").clicked(){self.status=editing::move_file(p,&self.move_path,self.destination).map(|_|{self.dirty=true;"File moved".into()}).unwrap_or_else(|e|e.to_string());}});
+        if ui.button("Return to disc planner").clicked(){self.tab=1;}
     }
+    fn duplicates_ui(&mut self,ui:&mut egui::Ui){
+        ui.heading("Review duplicate content");
+        ui.label("Groups have matching SHA-256 and file size. No files are removed or omitted automatically.");
+        if self.duplicate_groups.is_empty(){ui.label("No duplicate groups displayed. Scan with checksums and run duplicate review from Sources.");}
+        else{ui.strong(format!("{} duplicate groups",self.duplicate_groups.len()));}
+        for (i,group) in self.duplicate_groups.iter().enumerate(){
+            ui.collapsing(format!("Group {} - {} files",i+1,group.len()),|ui|{for path in group{ui.label(path);}});
+        }
+        if ui.button("Return to sources").clicked(){self.tab=0;}
+    }
+
 }
 impl eframe::App for Studio{
     fn update(&mut self,ctx:&egui::Context,_frame:&mut eframe::Frame){
@@ -661,8 +781,8 @@ impl eframe::App for Studio{
                 11=>self.overview_ui(ui,ctx),
                 0=>self.sources_ui(ui,ctx),
                 1=>self.planner_ui(ui,ctx),
-                2=>{ui.heading("Distribution comparison");for s in &self.comparison{ui.label(format!("{:?}: {} discs | {} assigned | {} unassigned | {} split folders | {:.2} GB used / {:.2} GB capacity",s.strategy,s.discs,s.files,s.unassigned,s.split_folders,s.estimated_used_bytes as f64/1e9,s.capacity_bytes as f64/1e9));}},
-                4=>{ui.heading("Duplicate content");ui.label("Identical SHA-256 and file size. No files are removed.");for (i,group) in self.duplicate_groups.iter().enumerate(){ui.collapsing(format!("Group {} - {} files",i+1,group.len()),|ui|{for path in group{ui.label(path);}});}},
+                2=>self.comparison_ui(ui),
+                4=>self.duplicates_ui(ui),
                 6=>self.catalog_ui(ui,ctx),
                 7=>self.image_ui(ui,ctx),
                 8=>self.drives_ui(ui,ctx),
@@ -673,6 +793,34 @@ impl eframe::App for Studio{
             });});
         });
     }
+}
+fn strategy_label(mode:Strategy)->&'static str{
+    match mode{Strategy::Sequential=>"Sequential order",Strategy::Folder=>"Keep folders together",Strategy::Maximum=>"Maximum utilization",Strategy::Hybrid=>"Balanced (hybrid)"}
+}
+fn strategy_description(mode:Strategy)->&'static str{
+    match mode{Strategy::Sequential=>"Natural file order.",Strategy::Folder=>"Prefer keeping folder groups together.",Strategy::Maximum=>"Prioritize filling available disc capacity.",Strategy::Hybrid=>"Balance related files and capacity utilization."}
+}
+fn utilization(used:u128,capacity:u128)->f32{
+    if capacity==0{0.0}else{(used as f64/capacity as f64).clamp(0.0,1.0) as f32}
+}
+fn archive_folder(path:&str)->&str{path.rsplit_once('/').map(|(folder,_)|folder).unwrap_or("")}
+fn folder_counts(entries:&[disc_archive::Entry])->std::collections::BTreeMap<&str,usize>{
+    let mut result=std::collections::BTreeMap::new();
+    for f in entries{*result.entry(archive_folder(&f.archive)).or_insert(0)+=1;}
+    result
+}
+#[cfg(test)]
+#[test]
+fn planner_folder_and_capacity_display(){
+    let entries=["root.bin","Series/A/1.mkv","Series/A/2.mkv","Series/B/1.mkv"].map(|path|disc_archive::Entry{source:path.into(),archive:path.into(),bytes:1,sha256:None});
+    let folders=folder_counts(&entries);
+    assert_eq!(folders.get(""),Some(&1));
+    assert_eq!(folders.get("Series/A"),Some(&2));
+    assert_eq!(folders.get("Series/B"),Some(&1));
+    assert_eq!(folders.values().sum::<usize>(),entries.len());
+    assert_eq!(utilization(0,0),0.0);
+    assert_eq!(utilization(50,100),0.5);
+    assert_eq!(utilization(101,100),1.0);
 }
 const NAVIGATION:&[(&str,&[(usize,&str)])]=&[
     ("WORKSPACE",&[(11,"Overview"),(0,"Sources"),(1,"Disc planner"),(2,"Compare strategies"),(4,"Duplicate review")]),
