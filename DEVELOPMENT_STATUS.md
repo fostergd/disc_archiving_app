@@ -31,3 +31,5 @@ Phase 7C: alternate private release publishing, requested after manual artifact 
 
 ## Phase 8A redesign supersedes prior stopping point
 Operator accepted initial launch, CLI help/version, and package checksums. User requested a full UI usability redesign with resumed hourly GitHub-only continuation. Current R1 implementation and remaining R2–R4 stages are tracked in UI_REDESIGN.md. Do not stop at the previous Phase 7 acceptance gate; stop at the updated private portable preview readiness and Windows acceptance gate. Parent 96e0ec3dc92122ce9cc2462e174d9a8c6f01d0b0 passed CI 45906022568 and private release 45907196171. R1 CI pending.
+
+Phase 8A-R1 parent 72aa10e610096b8fef20e2f4b5bea50b1bb3cafc passed Windows CI 45912233115. R2 source workflow and state protection implemented; new CI pending. Next R3a planner usability per UI_REDESIGN.md.

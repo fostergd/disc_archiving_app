@@ -4,8 +4,8 @@ Phase 8A accepted by operator: all four package checksum entries PASS, CLI 0.1.0
 
 Constraints: preserve Rust/egui, all existing CLI and GUI capabilities, source safety, data schemas, write authorization, job recovery, private repository, tests and portable packaging. No real optical writes, deployment, artifact deletion, billing changes or scope expansion. No fabricated screenshots or claims of runtime acceptance.
 
-- R1 (current commit): sidebar navigation, overview/welcome workspace, consolidated project commands, typography, spacing, coordinated light/dark palette, retained workspace routing and regression test. Validate exact-head Windows CI.
-- R2: guided workflow and contextual next actions, source drag/drop target, selected sources list, intuitive scan settings and state transitions; preserve saved projects and protect unsaved changes; tests.
+- R1 (CI passed 45912233115): sidebar navigation, overview/welcome workspace, consolidated project commands, typography, spacing, coordinated light/dark palette, retained workspace routing and regression test. Validate exact-head Windows CI.
+- R2 (implemented, CI pending): guided workflow and contextual next actions, source drag/drop target, selected sources list, intuitive scan settings and state transitions; preserve saved projects and protect unsaved changes; tests.
 - R3a: planner usability, media presets, capacity overview, expandable folder grouping and explicit safe assignment interaction (including drag/drop where practical), comparison and duplicate review; preserve all planning/editing rules and test.
 - R3b: image creation, drive discovery, burn/verify and journal workspace usability; clear separation of planned/image/written/verified states; never relax authorization or retry rules; tests.
 - R3c: catalog and project usability, consistent empty/loading/error states, small-window and theme review; regression coverage.
@@ -13,3 +13,5 @@ Constraints: preserve Rust/egui, all existing CLI and GUI capabilities, source s
 - After updated preview: resume Phase 8B functional Windows acceptance with disposable fixture files before physical media.
 
 Use fresh main HEAD, exact CI SHA, expected-head commits, and meaningful increments. Stop on genuine intervention only. Update this file with completed stages and evidence.
+
+R2: source workspace with drop target, browse/path entry, removable source list, advanced filters, checksum explanation, scan summary, contextual planner action and duplicate review. Source/scan changes retain previous inventory for reference but block planning and project save until rescan. Existing plans protect source inputs. Plan export no longer marks the whole project saved; standalone plan import validates existing inventory compatibility. Regression tests cover invalidation and plan protection. Next R3a after green CI.

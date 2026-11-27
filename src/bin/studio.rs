@@ -3,7 +3,7 @@ use disc_archive::{scan,plan_mixed,ScanOptions,Inventory,Plan,Strategy,MEDIA};
 use disc_archive::editing;
 use eframe::egui;
 use std::{path::PathBuf,sync::mpsc::{self,Receiver},fs::File,io::{BufReader,BufWriter,Write}};
-enum Work { Inventory(Inventory), Plan(Plan), Comparison(Vec<editing::Summary>), Duplicates(Vec<Vec<String>>), Saved(String), Project(disc_archive::project::Project), CatalogOpened(PathBuf,Vec<disc_archive::catalog::ProjectRow>), CatalogResults(Vec<disc_archive::catalog::Match>,usize), CatalogImported(i64,Vec<disc_archive::catalog::ProjectRow>), CatalogLinked, ImageCreated(disc_archive::image::ImageReceipt), ImageVerified(disc_archive::image::VerificationReceipt), ManifestSaved(PathBuf), Drives(disc_archive::optical::Discovery), Jobs(PathBuf,Vec<disc_archive::jobs::Job>,String), BatchPreview(Vec<disc_archive::optical::BurnPreview>), BatchDone(Vec<disc_archive::batch::Outcome>,Vec<disc_archive::jobs::Job>), Error(String) }
+enum Work { Inventory(Inventory), Plan(Plan), Comparison(Vec<editing::Summary>), Duplicates(Vec<Vec<String>>), Saved(String), Exported(String), Project(disc_archive::project::Project), CatalogOpened(PathBuf,Vec<disc_archive::catalog::ProjectRow>), CatalogResults(Vec<disc_archive::catalog::Match>,usize), CatalogImported(i64,Vec<disc_archive::catalog::ProjectRow>), CatalogLinked, ImageCreated(disc_archive::image::ImageReceipt), ImageVerified(disc_archive::image::VerificationReceipt), ManifestSaved(PathBuf), Drives(disc_archive::optical::Discovery), Jobs(PathBuf,Vec<disc_archive::jobs::Job>,String), BatchPreview(Vec<disc_archive::optical::BurnPreview>), BatchDone(Vec<disc_archive::batch::Outcome>,Vec<disc_archive::jobs::Job>), Error(String) }
 struct Studio {
     burn_requests:Vec<disc_archive::batch::Request>, burn_previews:Vec<disc_archive::optical::BurnPreview>, burn_confirm:bool, burn_progress:Option<Receiver<(String,disc_archive::optical::BurnStage)>>, burn_stages:std::collections::BTreeMap<String,disc_archive::optical::BurnStage>, burn_outcomes:Vec<disc_archive::batch::Outcome>,
     drives:Option<disc_archive::optical::Discovery>,
@@ -12,7 +12,7 @@ struct Studio {
     capacities:String, reserve:String, strategy:Strategy, inventory:Option<Inventory>, plan:Option<Plan>,
     comparison:Vec<editing::Summary>, worker:Option<Receiver<Work>>, status:String, selected:Option<usize>,
     pattern:String, move_path:String, destination:usize, search:String, tab:usize,
-    inventory_search:String, duplicate_groups:Vec<Vec<String>>, dirty:bool, close_prompt:bool,
+    inventory_stale:bool, inventory_search:String, duplicate_groups:Vec<Vec<String>>, dirty:bool, close_prompt:bool,
     project_name:String,
     image_disc:usize, image_receipt:Option<disc_archive::image::ImageReceipt>, verify_receipt:Option<disc_archive::image::VerificationReceipt>, image_path:Option<PathBuf>, manifest_path:Option<PathBuf>,
     catalog_path:Option<PathBuf>, catalog_projects:Vec<disc_archive::catalog::ProjectRow>, catalog_rows:Vec<disc_archive::catalog::Match>, catalog_term:String, catalog_project:Option<i64>, catalog_offset:usize, catalog_has_next:bool, catalog_query:Option<(String,Option<i64>)>,
@@ -20,7 +20,7 @@ struct Studio {
 impl Default for Studio {
     fn default()->Self{Self{burn_requests:vec![],burn_previews:vec![],burn_confirm:false,burn_progress:None,burn_stages:Default::default(),burn_outcomes:vec![],drives:None,journal_path:None,jobs:vec![],job_selection:None,job_recorder:String::new(),reconcile_note:String::new(),reconcile_confirm:false,verify_confirm:false,sources:vec![],source_text:String::new(),extensions:String::new(),exclusions:String::new(),hash:false,
         capacities:"50000000000".into(),reserve:"50000000".into(),strategy:Strategy::Hybrid,inventory:None,plan:None,comparison:vec![],
-        worker:None,status:"Add files or folders to begin.".into(),selected:None,pattern:"DISC_{n:03}".into(),move_path:String::new(),destination:1,search:String::new(),tab:11,inventory_search:String::new(),duplicate_groups:vec![],dirty:false,close_prompt:false,project_name:"Untitled archive".into(),image_disc:1,image_receipt:None,verify_receipt:None,image_path:None,manifest_path:None,catalog_path:None,catalog_projects:vec![],catalog_rows:vec![],catalog_term:String::new(),catalog_project:None,catalog_offset:0,catalog_has_next:false,catalog_query:None}}
+        worker:None,status:"Add files or folders to begin.".into(),selected:None,pattern:"DISC_{n:03}".into(),move_path:String::new(),destination:1,search:String::new(),tab:11,inventory_stale:false,inventory_search:String::new(),duplicate_groups:vec![],dirty:false,close_prompt:false,project_name:"Untitled archive".into(),image_disc:1,image_receipt:None,verify_receipt:None,image_path:None,manifest_path:None,catalog_path:None,catalog_projects:vec![],catalog_rows:vec![],catalog_term:String::new(),catalog_project:None,catalog_offset:0,catalog_has_next:false,catalog_query:None}}
 }
 fn caps(text:&str)->anyhow::Result<Vec<u64>> {let v=text.split(',').map(|s|s.trim().parse::<u64>()).collect::<Result<Vec<_>,_>>()?;Ok(v)}
 fn save_new<T:serde::Serialize>(path:PathBuf,value:&T)->anyhow::Result<()>{
@@ -29,7 +29,19 @@ fn save_new<T:serde::Serialize>(path:PathBuf,value:&T)->anyhow::Result<()>{
 }
 fn gb(n:u64)->String{format!("{:.2} GB",n as f64/1e9)}
 impl Studio{
-    fn add(&mut self,p:PathBuf){if !self.sources.contains(&p){self.sources.push(p);}}
+    fn source_changed(&mut self){
+        self.dirty=true;
+        self.inventory_stale=self.inventory.is_some();
+        self.comparison.clear();
+        self.duplicate_groups.clear();
+    }
+    fn add(&mut self,p:PathBuf){
+        if self.plan.is_some(){self.status="Close the existing plan before changing sources.".into();return;}
+        if !self.sources.contains(&p){self.sources.push(p);self.source_changed();}
+    }
+    fn inventory_ready(&self)->bool{
+        !self.inventory_stale&&self.inventory.as_ref().is_some_and(|i|!i.files.is_empty()&&i.errors.is_empty())
+    }
     fn spawn(&mut self,ctx:&egui::Context,f:impl FnOnce()->anyhow::Result<Work>+Send+'static){
         let (tx,rx)=mpsc::channel();let ctx=ctx.clone();
         std::thread::spawn(move||{let result=f().unwrap_or_else(|e|Work::Error(format!("{e:#}")));let _=tx.send(result);ctx.request_repaint();});
@@ -42,12 +54,13 @@ impl Studio{
         if let Some(event)=event{
             self.worker=None;
             match event{
-                Work::Inventory(i)=>{self.status=format!("Scanned {} files; {} exclusions; {} errors",i.files.len(),i.excluded.len(),i.errors.len());self.inventory=Some(i);self.plan=None;self.comparison.clear();self.duplicate_groups.clear();self.dirty=false;}
+                Work::Inventory(i)=>{self.status=format!("Scanned {} files; {} exclusions; {} errors",i.files.len(),i.excluded.len(),i.errors.len());self.inventory=Some(i);self.plan=None;self.comparison.clear();self.duplicate_groups.clear();self.inventory_stale=false;self.dirty=true;self.tab=0;}
                 Work::Plan(p)=>{self.status=format!("{} discs; {} unassigned files",p.discs.len(),p.oversized.len());self.selected=p.discs.first().map(|d|d.number);self.reserve=p.reserve.to_string();self.strategy=p.strategy;self.plan=Some(p);self.comparison.clear();self.dirty=true;self.tab=1;}
                 Work::Comparison(v)=>{self.comparison=v;self.status="Comparison complete".into();self.tab=2;}
                 Work::Duplicates(v)=>{self.status=format!("{} duplicate groups",v.len());self.duplicate_groups=v;self.tab=4;}
-                Work::Project(p)=>{self.project_name=p.name;self.sources=p.sources;self.extensions=p.extensions.join(",");self.exclusions=p.exclusions.join("\n");self.hash=p.hash;self.capacities=p.capacities.iter().map(u64::to_string).collect::<Vec<_>>().join(",");self.reserve=p.reserve.to_string();self.strategy=p.strategy;self.pattern=p.naming_pattern;self.inventory=p.inventory;self.plan=p.plan;self.selected=self.plan.as_ref().and_then(|p|p.discs.first()).map(|d|d.number);self.comparison.clear();self.duplicate_groups.clear();self.tab=if self.plan.is_some(){1}else{0};self.dirty=false;self.status="Project opened".into();}
+                Work::Project(p)=>{self.project_name=p.name;self.sources=p.sources;self.extensions=p.extensions.join(",");self.exclusions=p.exclusions.join("\n");self.hash=p.hash;self.capacities=p.capacities.iter().map(u64::to_string).collect::<Vec<_>>().join(",");self.reserve=p.reserve.to_string();self.strategy=p.strategy;self.pattern=p.naming_pattern;self.inventory=p.inventory;self.plan=p.plan;self.selected=self.plan.as_ref().and_then(|p|p.discs.first()).map(|d|d.number);self.comparison.clear();self.duplicate_groups.clear();self.tab=if self.plan.is_some(){1}else{0};self.inventory_stale=false;self.dirty=false;self.status="Project opened".into();}
                 Work::Saved(message)=>{self.status=message;self.dirty=false;}
+                Work::Exported(message)=>self.status=message,
                 Work::CatalogOpened(path,projects)=>{self.catalog_path=Some(path);self.catalog_projects=projects;self.catalog_rows.clear();self.catalog_project=None;self.catalog_offset=0;self.catalog_has_next=false;self.catalog_query=None;self.status="Catalog opened".into();self.tab=6;}
                 Work::CatalogResults(mut rows,offset)=>{self.catalog_has_next=rows.len()>100;rows.truncate(100);self.catalog_rows=rows;self.catalog_offset=offset;self.status=format!("Catalog page {}",offset/100+1);}
                 Work::CatalogImported(id,projects)=>{self.catalog_projects=projects;self.catalog_rows.clear();self.catalog_query=None;self.catalog_has_next=false;self.catalog_offset=0;self.catalog_project=Some(id);self.status=format!("Imported planned snapshot {}",id);}
@@ -64,11 +77,13 @@ impl Studio{
         }
     }
     fn snapshot(&self)->anyhow::Result<disc_archive::project::Project>{
+        if self.inventory_stale{anyhow::bail!("Rescan changed sources before saving a project with inventory.");}
         let (reserve,strategy)=self.plan.as_ref().map(|p|(p.reserve,p.strategy)).unwrap_or((self.reserve.trim().parse()?,self.strategy));
         Ok(disc_archive::project::Project{name:self.project_name.clone(),sources:self.sources.clone(),extensions:self.extensions.split(',').map(str::trim).filter(|s|!s.is_empty()).map(str::to_owned).collect(),exclusions:self.exclusions.lines().map(str::trim).filter(|s|!s.is_empty()).map(str::to_owned).collect(),hash:self.hash,capacities:caps(&self.capacities)?,reserve,strategy,naming_pattern:self.pattern.clone(),inventory:self.inventory.clone(),plan:self.plan.clone(),..Default::default()})
     }
     fn begin_plan(&mut self,ctx:&egui::Context,compare:bool){
         let result=(||->anyhow::Result<_>{
+            if self.inventory_stale{anyhow::bail!("Source settings changed; scan sources again before planning.");}
             let capacities=caps(&self.capacities)?;let reserve=self.reserve.trim().parse::<u64>()?;
             let i=self.inventory.as_ref().ok_or_else(||anyhow::anyhow!("Scan or load an inventory first"))?;
             if !i.errors.is_empty(){anyhow::bail!("Inventory has unresolved scan errors");}
@@ -420,55 +435,102 @@ impl Studio{
         }
     }
     fn sources_ui(&mut self,ui:&mut egui::Ui,ctx:&egui::Context){
-        ui.heading("Archive sources");
-        ui.label("Drop files or folders into this window, browse, or enter a local/UNC path.");
-        ui.horizontal(|ui|{
-            if ui.button("Add folders").clicked(){if let Some(v)=rfd::FileDialog::new().pick_folders(){for p in v{self.add(p);}}}
-            if ui.button("Add files").clicked(){if let Some(v)=rfd::FileDialog::new().pick_files(){for p in v{self.add(p);}}}
-            if ui.button("Clear sources").clicked(){self.sources.clear();}
+        ui.label(egui::RichText::new("01 / SOURCES").small().weak().strong());
+        ui.heading("Select your archive files");
+        ui.label("Choose what to archive. Scanning reads files and metadata; originals are never modified.");
+        let editable=self.plan.is_none();
+        if !editable{ui.label("This plan uses the current inventory. Close the plan explicitly before changing its sources.");}
+        ui.add_enabled_ui(editable,|ui|{
+            ui.add_space(8.0);
+            ui.group(|ui|{
+                ui.set_min_height(96.0);
+                ui.vertical_centered(|ui|{
+                    ui.add_space(6.0);
+                    ui.label(egui::RichText::new("Drop files or folders here").size(20.0).strong());
+                    ui.label("Local drives, mapped drives and network shares");
+                    ui.horizontal_wrapped(|ui|{
+                        if ui.button("Browse folders").clicked(){if let Some(v)=rfd::FileDialog::new().pick_folders(){for p in v{self.add(p);}}}
+                        if ui.button("Browse files").clicked(){if let Some(v)=rfd::FileDialog::new().pick_files(){for p in v{self.add(p);}}}
+                    });
+                });
+            });
+            ui.horizontal_wrapped(|ui|{
+                let response=ui.add(egui::TextEdit::singleline(&mut self.source_text).hint_text("Enter a local or UNC path").desired_width(340.0));
+                let enter=response.lost_focus()&&ui.input(|i|i.key_pressed(egui::Key::Enter));
+                if (ui.button("Add path").clicked()||enter)&&!self.source_text.trim().is_empty(){
+                    self.add(PathBuf::from(self.source_text.trim()));self.source_text.clear();
+                }
+            });
+            ui.horizontal(|ui|{
+                ui.strong(format!("Selected sources ({})",self.sources.len()));
+                if ui.add_enabled(!self.sources.is_empty(),egui::Button::new("Clear list")).clicked(){self.sources.clear();self.source_changed();}
+            });
+            if self.sources.is_empty(){ui.label("No sources selected.");}
+            let mut remove=None;
+            egui::ScrollArea::vertical().id_salt("source_list").max_height(180.0).show(ui,|ui|{
+                for (i,p) in self.sources.iter().enumerate(){
+                    ui.horizontal_wrapped(|ui|{if ui.small_button("Remove").clicked(){remove=Some(i);}ui.label(p.display().to_string());});
+                }
+            });
+            if let Some(i)=remove{self.sources.remove(i);self.source_changed();}
+            ui.add_space(8.0);
+            ui.heading("Scan options");
+            if ui.checkbox(&mut self.hash,"Calculate file checksums (SHA-256)").changed(){self.source_changed();}
+            ui.label("Recommended for duplicate detection and verified archive catalog records. Reads every file and may take longer.");
+            ui.collapsing("Advanced filters",|ui|{
+                ui.label("Include only these extensions (comma separated; empty includes all files)");
+                if ui.add(egui::TextEdit::singleline(&mut self.extensions).hint_text("mkv, mp4, srt").desired_width(340.0)).changed(){self.source_changed();}
+                ui.label("Exclude paths matching glob patterns (one per line)");
+                if ui.add(egui::TextEdit::multiline(&mut self.exclusions).desired_rows(3).desired_width(340.0)).changed(){self.source_changed();}
+            });
+            ui.add_space(8.0);
+            if ui.add_enabled(!self.sources.is_empty(),egui::Button::new(if self.inventory.is_some(){"Rescan selected sources"}else{"Scan selected sources"}).min_size(egui::vec2(190.0,36.0))).clicked(){
+                let roots=self.sources.clone();
+                let options=ScanOptions{extensions:self.extensions.split(',').map(str::trim).filter(|s|!s.is_empty()).map(str::to_owned).collect(),
+                    exclude:self.exclusions.lines().map(str::trim).filter(|s|!s.is_empty()).map(str::to_owned).collect(),hash:self.hash};
+                self.spawn(ctx,move||Ok(Work::Inventory(scan(&roots,&options)?)));
+            }
         });
-        ui.horizontal(|ui|{ui.text_edit_singleline(&mut self.source_text);if ui.button("Add path").clicked()&&!self.source_text.trim().is_empty(){self.add(PathBuf::from(self.source_text.trim()));self.source_text.clear();}});
-        let mut remove=None;
-        for (i,p) in self.sources.iter().enumerate(){ui.horizontal(|ui|{if ui.small_button("Remove").clicked(){remove=Some(i);}ui.label(p.display().to_string());});}
-        if let Some(i)=remove{self.sources.remove(i);}
-        ui.separator();
-        ui.label("Extension allowlist (comma separated; blank includes all files)");
-        ui.text_edit_singleline(&mut self.extensions);
-        ui.label("Exclusion glob patterns (one per line)");
-        ui.text_edit_multiline(&mut self.exclusions);
-        ui.checkbox(&mut self.hash,"Calculate SHA-256 while scanning (reads all file contents)");
-        if ui.add_enabled(!self.sources.is_empty()&&self.plan.is_none(),egui::Button::new("Scan sources")).clicked(){
-            let roots=self.sources.clone();
-            let options=ScanOptions{extensions:self.extensions.split(',').map(str::trim).filter(|s|!s.is_empty()).map(str::to_owned).collect(),
-                exclude:self.exclusions.lines().map(str::trim).filter(|s|!s.is_empty()).map(str::to_owned).collect(),hash:self.hash};
-            self.spawn(ctx,move||Ok(Work::Inventory(scan(&roots,&options)?)));
+        ui.add_space(10.0);
+        if self.inventory_stale{
+            ui.group(|ui|{ui.strong("Sources or scan options changed");ui.label("The previous inventory is retained for reference only. Rescan before planning or saving a project.");});
         }
-        if self.plan.is_some(){ui.label("Close the current plan before scanning another collection.");}
+        let ready=self.inventory_ready();
+        let mut duplicates=None;
         if let Some(i)=&self.inventory{
-            ui.separator();ui.label(format!("{} files | {} exclusions | {} errors",i.files.len(),i.excluded.len(),i.errors.len()));
-            for e in i.errors.iter().take(20){ui.colored_label(egui::Color32::RED,e);}
+            ui.separator();
+            ui.heading(if self.inventory_stale{"Previous scan results"}else{"Scan results"});
+            ui.horizontal_wrapped(|ui|{
+                ui.strong(format!("{} files",i.files.len()));
+                ui.separator();ui.label(format!("{} excluded",i.excluded.len()));
+                ui.separator();ui.label(format!("{} errors",i.errors.len()));
+                ui.separator();ui.label(gb(i.files.iter().fold(0u64,|sum,f|sum.saturating_add(f.bytes))));
+            });
+            if !i.errors.is_empty(){ui.strong("Resolve scan errors before creating a plan.");}
+            for e in i.errors.iter().take(20){ui.colored_label(ui.visuals().error_fg_color,e);}
             if i.errors.len()>20{ui.label("Save inventory for the complete error report.");}
-            ui.horizontal(|ui|{ui.label("Search inventory");ui.text_edit_singleline(&mut self.inventory_search);});
+            ui.horizontal_wrapped(|ui|{
+                if ui.add_enabled(ready,egui::Button::new("Continue to disc planner").min_size(egui::vec2(200.0,36.0))).clicked(){self.tab=1;}
+                if ui.add_enabled(ready&&i.files.iter().all(|f|f.sha256.is_some()),egui::Button::new("Review duplicate content")).clicked(){duplicates=Some(i.files.clone());}
+            });
+            if i.files.iter().any(|f|f.sha256.is_none()){ui.label("For duplicate review, scan with file checksums enabled.");}
+            ui.add(egui::TextEdit::singleline(&mut self.inventory_search).hint_text("Search archive paths").desired_width(340.0));
             let filter=self.inventory_search.to_lowercase();
             let visible:Vec<_>=i.files.iter().filter(|f|filter.is_empty()||f.archive.to_lowercase().contains(&filter)).collect();
             ui.label(format!("{} matching files",visible.len()));
-            egui::ScrollArea::vertical().id_salt("inventory").max_height(350.).show_rows(ui,22.,visible.len(),|ui,range|{
+            egui::ScrollArea::vertical().id_salt("inventory").max_height(350.).show_rows(ui,30.,visible.len(),|ui,range|{
                 for j in range{let f=visible[j];ui.label(format!("{}  |  {}",f.archive,gb(f.bytes)));}
             });
-            let mut show_exclusions=false;
             ui.collapsing("Excluded paths",|ui|{
-                egui::ScrollArea::vertical().id_salt("exclusions").max_height(180.).show_rows(ui,22.,i.excluded.len(),|ui,range|{for j in range{ui.label(&i.excluded[j]);}});
+                egui::ScrollArea::vertical().id_salt("exclusions").max_height(180.).show_rows(ui,30.,i.excluded.len(),|ui,range|{for j in range{ui.label(&i.excluded[j]);}});
             });
-            if ui.button("Find duplicate content").clicked(){show_exclusions=true;}
-            if show_exclusions{
-                if !i.errors.is_empty(){self.status="Resolve scan errors before duplicate analysis.".into();}
-                else if i.files.iter().any(|f|f.sha256.is_none()){self.status="Rescan with SHA-256 enabled to detect duplicate content.".into();}
-                else {let files=i.files.clone();self.spawn(ctx,move||Ok(Work::Duplicates(disc_archive::duplicates(&files))));}
-            }
-        }
+        }else{ui.label("Scan selected sources to see file counts, exclusions and any errors.");}
+        if let Some(files)=duplicates{self.spawn(ctx,move||Ok(Work::Duplicates(disc_archive::duplicates(&files))));}
     }
     fn planner_ui(&mut self,ui:&mut egui::Ui,ctx:&egui::Context){
         ui.heading("Disc planner");
+        if !self.inventory_ready()&&self.plan.is_none(){ui.label("Scan valid sources first, then choose media and a distribution strategy.");if ui.button("Go to sources").clicked(){self.tab=0;}}
+
         ui.horizontal_wrapped(|ui|{for &(name,bytes) in MEDIA{if ui.button(name).clicked(){self.capacities=bytes.to_string();}}});
         ui.label("Capacities in bytes, comma separated (last capacity repeats)");
         ui.text_edit_singleline(&mut self.capacities);
@@ -477,8 +539,8 @@ impl Studio{
             for s in [Strategy::Sequential,Strategy::Folder,Strategy::Maximum,Strategy::Hybrid]{ui.selectable_value(&mut self.strategy,s,format!("{s:?}"));}
         });
         ui.horizontal(|ui|{
-            if ui.button("Create plan").clicked(){self.begin_plan(ctx,false);}
-            if ui.button("Compare strategies").clicked(){self.begin_plan(ctx,true);}
+            if ui.add_enabled(self.inventory_ready()&&self.plan.is_none(),egui::Button::new("Create plan")).clicked(){self.begin_plan(ctx,false);}
+            if ui.add_enabled(self.inventory_ready(),egui::Button::new("Compare strategies")).clicked(){self.begin_plan(ctx,true);}
             if ui.add_enabled(self.plan.is_some(),egui::Button::new("Replan unlocked")).clicked(){
                 match caps(&self.capacities){
                     Ok(c)=>{let p=self.plan.as_ref().unwrap().clone();let s=self.strategy;let pattern=self.pattern.clone();self.spawn(ctx,move||Ok(Work::Plan(editing::replan(&p,&c,s,Some(&pattern))?)));}
@@ -522,10 +584,10 @@ impl eframe::App for Studio{
     fn update(&mut self,ctx:&egui::Context,_frame:&mut eframe::Frame){
         self.poll();
         if ctx.input(|i|i.viewport().close_requested()) && (self.dirty||self.worker.is_some()) {ctx.send_viewport_cmd(egui::ViewportCommand::CancelClose);self.close_prompt=true;}
-        if self.close_prompt {egui::Window::new("Close application?").collapsible(false).show(ctx,|ui|{ui.label("Wait for running work to finish before exiting; unsaved plan changes may be lost.");if ui.button("Keep working").clicked(){self.close_prompt=false;}if ui.add_enabled(self.worker.is_none(),egui::Button::new("Discard and exit")).clicked(){self.close_prompt=false;self.dirty=false;self.worker=None;ctx.send_viewport_cmd(egui::ViewportCommand::Close);}});}
+        if self.close_prompt {egui::Window::new("Close application?").collapsible(false).show(ctx,|ui|{ui.label("Wait for running work to finish before exiting; unsaved project changes may be lost.");if ui.button("Keep working").clicked(){self.close_prompt=false;}if ui.add_enabled(self.worker.is_none(),egui::Button::new("Discard and exit")).clicked(){self.close_prompt=false;self.dirty=false;self.worker=None;ctx.send_viewport_cmd(egui::ViewportCommand::Close);}});}
         if self.worker.is_none(){
             let dropped=ctx.input(|i|i.raw.dropped_files.clone());
-            for f in dropped{if let Some(p)=f.path{self.add(p);if self.tab==11{self.tab=0;}}}
+            for f in dropped{if let Some(p)=f.path{self.add(p);if self.plan.is_none(){self.tab=0;}}}
         }
         egui::TopBottomPanel::top("top").show(ctx,|ui|{
             ui.add_space(8.0);
@@ -547,12 +609,12 @@ impl eframe::App for Studio{
                     if ui.add_enabled(!self.dirty&&self.plan.is_none()&&self.inventory.is_none(),egui::Button::new("Open project")).clicked(){if let Some(path)=rfd::FileDialog::new().add_filter("Archive project",&["json"]).pick_file(){self.spawn(ctx,move||Ok(Work::Project(disc_archive::project::load(&path)?)));}}
                     if ui.button("Save project as").clicked(){match self.snapshot(){Ok(p)=>{if let Some(path)=rfd::FileDialog::new().set_file_name("archive.das.json").save_file(){self.spawn(ctx,move||{disc_archive::project::save(&path,&p)?;Ok(Work::Saved("Project saved".into()))});}},Err(e)=>self.status=e.to_string()}}
                     if ui.button("Close project").clicked(){self.tab=5;}
-                    if ui.add_enabled(self.plan.is_none(),egui::Button::new("Load inventory")).clicked(){if let Some(path)=rfd::FileDialog::new().add_filter("JSON",&["json"]).pick_file(){
+                    if ui.add_enabled(self.plan.is_none()&&self.inventory.is_none()&&self.sources.is_empty(),egui::Button::new("Load inventory")).clicked(){if let Some(path)=rfd::FileDialog::new().add_filter("JSON",&["json"]).pick_file(){
                         self.spawn(ctx,move||Ok(Work::Inventory(serde_json::from_reader(BufReader::new(File::open(path)?))?)));
                     }}
                     if ui.add_enabled(self.inventory.is_some(),egui::Button::new("Save inventory")).clicked(){if let Some(path)=rfd::FileDialog::new().set_file_name("inventory.json").save_file(){self.status=save_new(path,self.inventory.as_ref().unwrap()).map(|_|"Inventory saved".into()).unwrap_or_else(|e|e.to_string());}}
-                    if ui.add_enabled(self.plan.is_none(),egui::Button::new("Load plan")).clicked(){if let Some(path)=rfd::FileDialog::new().add_filter("JSON",&["json"]).pick_file(){self.spawn(ctx,move||{let p:Plan=serde_json::from_reader(BufReader::new(File::open(path)?))?;editing::validate(&p)?;Ok(Work::Plan(p))});}}
-                    if ui.add_enabled(self.plan.is_some(),egui::Button::new("Save plan as")).clicked(){if let Some(path)=rfd::FileDialog::new().set_file_name("plan.json").save_file(){let p=self.plan.as_ref().unwrap().clone();self.spawn(ctx,move||{save_new(path,&p)?;Ok(Work::Saved("Plan saved".into()))});}}
+                    if ui.add_enabled(self.plan.is_none()&&!self.inventory_stale,egui::Button::new("Load plan")).clicked(){if let Some(path)=rfd::FileDialog::new().add_filter("JSON",&["json"]).pick_file(){let inventory=self.inventory.clone();self.spawn(ctx,move||{let p:Plan=serde_json::from_reader(BufReader::new(File::open(path)?))?;editing::validate(&p)?;let project=disc_archive::project::Project{inventory,plan:Some(p.clone()),reserve:p.reserve,strategy:p.strategy,..Default::default()};project.validate()?;Ok(Work::Plan(p))});}}
+                    if ui.add_enabled(self.plan.is_some(),egui::Button::new("Save plan as")).clicked(){if let Some(path)=rfd::FileDialog::new().set_file_name("plan.json").save_file(){let p=self.plan.as_ref().unwrap().clone();self.spawn(ctx,move||{save_new(path,&p)?;Ok(Work::Exported("Plan exported; project changes remain unsaved".into()))});}}
                     if ui.add_enabled(self.plan.is_some(),egui::Button::new("Close plan")).clicked(){self.status="Save the plan before closing; use the separate confirmation below.".into();self.tab=3;}
                     });
                     ui.separator();
@@ -607,7 +669,7 @@ impl eframe::App for Studio{
                 9=>self.jobs_ui(ui,ctx),
                 10=>self.burn_ui(ui,ctx),
                 5=>{ui.label("Closing the project discards all unsaved project settings, inventory and plan. Save a new project revision first if needed.");if ui.button("Confirm close project").clicked(){*self=Self::default();}if ui.button("Cancel").clicked(){self.tab=0;}},
-                _=>{ui.label("Closing disc plan discards unsaved edits.");if ui.button("Confirm close plan").clicked(){self.plan=None;self.selected=None;self.dirty=false;self.tab=0;self.status="Plan closed".into();}if ui.button("Cancel").clicked(){self.tab=1;}}
+                _=>{ui.label("Closing disc plan discards unsaved edits.");if ui.button("Confirm close plan").clicked(){self.plan=None;self.selected=None;self.dirty=true;self.tab=0;self.status="Plan closed".into();}if ui.button("Cancel").clicked(){self.tab=1;}}
             });});
         });
     }
@@ -663,5 +725,30 @@ mod authorization_tests {
         assert!(!batch_preview_matches(std::slice::from_ref(&r),std::slice::from_ref(&p)));
         assert!(!batch_preview_matches(&[],&[]));
         assert!(!batch_preview_matches(std::slice::from_ref(&r),&[]));
+    }
+}
+
+#[cfg(test)]
+mod source_workflow_tests{
+    use super::*;
+    #[test]
+    fn source_change_invalidates_inventory_without_erasing_it(){
+        let mut s=Studio::default();
+        s.inventory=Some(Inventory{files:vec![disc_archive::Entry{source:"fixture.mkv".into(),archive:"fixture.mkv".into(),bytes:10,sha256:None}],..Default::default()});
+        assert!(s.inventory_ready());
+        s.add("new-source".into());
+        assert!(s.dirty&&s.inventory_stale&&!s.inventory_ready());
+        assert_eq!(s.inventory.as_ref().unwrap().files.len(),1);
+        assert!(s.snapshot().is_err());
+        s.inventory_stale=false;
+        assert!(s.inventory_ready());
+    }
+    #[test]
+    fn existing_plan_blocks_source_addition(){
+        let mut s=Studio::default();
+        s.plan=Some(plan_mixed(&[],&[100000000],0,Strategy::Hybrid).unwrap());
+        s.add("unexpected-source".into());
+        assert!(s.sources.is_empty());
+        assert!(!s.dirty);
     }
 }
