@@ -37,3 +37,5 @@ Phase 8A-R1 parent 72aa10e610096b8fef20e2f4b5bea50b1bb3cafc passed Windows CI 45
 Phase 8A-R2 7ed2af0b47302d853967c4990c740d1d207dc125 passed Windows CI 45919724275. R3a planner, comparison and duplicate review redesigned; new CI pending. Next R3b per UI_REDESIGN.md.
 
 Phase 8A-R3a 5a82b41f3d7fbf40d9300d12b6fb09fc3450579d passed Windows CI 45921114930. R3b optical workspaces redesigned with explicit stages and authorization reset safeguards; new CI pending. Next R3c per UI_REDESIGN.md.
+
+Phase 8A-R3b 3e79e96462f6dfb6786fb36490b3e29933e22d33 passed Windows CI 45940393862. R3c catalog/project UX, search state, and narrow-window navigation implemented; new CI pending. Next R4 per UI_REDESIGN.md.
