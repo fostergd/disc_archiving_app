@@ -31,3 +31,5 @@ R4 automated regression and portable package validation passed in public CI 4594
 Pinned public CI 45947538307 passed. Final UI remains CI-green. Public licensing increment adds verified-source egui/font notice evidence and hash-checked collection; new CI pending. Public binary release still gated pending complete notices and review.
 
 License collection CI 45948273940 passed. Exact upstream mapping of all eleven missing registry notice candidates implemented; new CI pending. Remaining embedded/generated/native attribution review and complete notice bundle are prerequisites to public release.
+
+All missing registry notice mappings and 322 notice copies passed CI 45957870828. Embedded/font/native/generated evidence extraction added, CI pending. UI implementation remains green at prior checkpoint; release remains gated.
