@@ -12,3 +12,6 @@ Before changing visibility:
 7. Keep other repositories private and automations paused unless the owner explicitly requests resumption.
 
 Public visibility allows other users to copy/fork within GitHub under GitHub Terms of Service; copies may survive a later change to private. Never rely on a license notice as a mechanism to conceal secrets or prevent all copying.
+
+## Public conversion reported and verified
+Repository is now public. The original preview tag preview-96e0ec3dc921-45907196171-1 remains published and accessible; recommend owner make it a draft pending review if GitHub permits. No release deletion or alteration performed. Historical exposure audit and dependency clearance remain outstanding. Continue public standard-runner CI without artifact upload. The new license inventory step is a review aid, not a publication approval. Keep the existing private-only release workflow blocked for public repositories until completed notices and release gates are implemented. Only Disc Archive Studio automation may be resumed; leave other tasks paused.
