@@ -35,3 +35,5 @@ Operator accepted initial launch, CLI help/version, and package checksums. User 
 Phase 8A-R1 parent 72aa10e610096b8fef20e2f4b5bea50b1bb3cafc passed Windows CI 45912233115. R2 source workflow and state protection implemented; new CI pending. Next R3a planner usability per UI_REDESIGN.md.
 
 Phase 8A-R2 7ed2af0b47302d853967c4990c740d1d207dc125 passed Windows CI 45919724275. R3a planner, comparison and duplicate review redesigned; new CI pending. Next R3b per UI_REDESIGN.md.
+
+Phase 8A-R3a 5a82b41f3d7fbf40d9300d12b6fb09fc3450579d passed Windows CI 45921114930. R3b optical workspaces redesigned with explicit stages and authorization reset safeguards; new CI pending. Next R3c per UI_REDESIGN.md.

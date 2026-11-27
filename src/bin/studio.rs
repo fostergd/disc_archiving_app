@@ -29,6 +29,17 @@ fn save_new<T:serde::Serialize>(path:PathBuf,value:&T)->anyhow::Result<()>{
 }
 fn gb(n:u64)->String{format!("{:.2} GB",n as f64/1e9)}
 impl Studio{
+    fn invalidate_burn_preview(&mut self){
+        self.burn_previews.clear();
+        self.burn_confirm=false;
+    }
+    fn refresh_drive_snapshot(&mut self,ctx:&egui::Context){
+        self.drives=None;
+        self.invalidate_burn_preview();
+        self.verify_confirm=false;
+        self.job_recorder.clear();
+        self.spawn(ctx,move||Ok(Work::Drives(disc_archive::optical::discover()?)));
+    }
     fn source_changed(&mut self){
         self.dirty=true;
         self.inventory_stale=self.inventory.is_some();
@@ -65,9 +76,9 @@ impl Studio{
                 Work::CatalogResults(mut rows,offset)=>{self.catalog_has_next=rows.len()>100;rows.truncate(100);self.catalog_rows=rows;self.catalog_offset=offset;self.status=format!("Catalog page {}",offset/100+1);}
                 Work::CatalogImported(id,projects)=>{self.catalog_projects=projects;self.catalog_rows.clear();self.catalog_query=None;self.catalog_has_next=false;self.catalog_offset=0;self.catalog_project=Some(id);self.status=format!("Imported planned snapshot {}",id);}
                 Work::CatalogLinked=>{self.catalog_rows.clear();self.catalog_query=None;self.catalog_has_next=false;self.catalog_offset=0;self.status="Historical verification linked. Search to refresh.".into();}
-                Work::ImageCreated(receipt)=>{self.status=format!("Image created and {} files verified",receipt.verified_files);self.image_path=Some(receipt.output.clone());self.image_receipt=Some(receipt);}
+                Work::ImageCreated(receipt)=>{self.status=format!("Image created and {} files verified",receipt.verified_files);self.image_path=Some(receipt.output.clone());self.verify_receipt=None;self.image_receipt=Some(receipt);}
                 Work::ImageVerified(receipt)=>{self.status=format!("Image verified: {} files",receipt.files);self.verify_receipt=Some(receipt);}
-                Work::ManifestSaved(path)=>{self.status=format!("Preparation manifest saved: {}",path.display());self.manifest_path=Some(path);}
+                Work::ManifestSaved(path)=>{self.status=format!("Preparation manifest saved: {}",path.display());self.manifest_path=Some(path);self.verify_receipt=None;}
                 Work::Drives(d)=>{self.status=format!("{} recorders detected; {} discovery errors",d.recorders.len(),d.errors.len());self.drives=Some(d);}
                 Work::Jobs(path,jobs,message)=>{if self.journal_path.as_ref()!=Some(&path){self.burn_previews.clear();self.burn_confirm=false;}self.journal_path=Some(path);self.jobs=jobs;self.status=message;self.reconcile_confirm=false;self.verify_confirm=false;}
                 Work::BatchPreview(v)=>{self.burn_previews=v;self.burn_confirm=false;self.status="Batch preview complete; inspect each target before authorizing".into();}
@@ -226,9 +237,23 @@ impl Studio{
     }
     fn burn_ui(&mut self,ui:&mut egui::Ui,ctx:&egui::Context){
         use disc_archive::{batch,optical,jobs::Journal};
-        ui.heading("Experimental concurrent burning");
-        ui.label("Physical writing requires hardware acceptance. Use expendable blank write-once media only. No automatic retry.");
-        if let Some(p)=&self.journal_path{ui.label(format!("Journal: {}",p.display()));}else{ui.label("Open a burn journal in the Burn journal tab first.");}
+        ui.label(egui::RichText::new("04 / BURN DISCS").small().weak().strong());
+        ui.heading("Write your verified images");
+        ui.group(|ui|{
+            ui.colored_label(ui.visuals().warn_fg_color,"Experimental physical writing - irreversible");
+            ui.label("Hardware acceptance is pending. Use expendable blank write-once media only. Never retry automatically.");
+        });
+        ui.group(|ui|{
+            ui.heading("1. Select a burn journal");
+            if let Some(p)=&self.journal_path{ui.label(p.display().to_string());}
+            else{ui.label("A persistent journal is required before writing.");}
+            if ui.button(if self.journal_path.is_some(){"Review journal"}else{"Create or open journal"}).clicked(){
+                self.burn_confirm=false;self.tab=9;
+            }
+        });
+        ui.heading("2. Assign images to recorders");
+        ui.label("Each assignment needs an exact recorder, ISO, preparation manifest and approved image checksum.");
+        if self.drives.is_none(){ui.label("Refresh recorders to see currently detected devices.");}
         let mut changed=false;
         if ui.button("Load explicit batch assignments (JSON)").clicked(){
             if let Some(path)=rfd::FileDialog::new().add_filter("Batch JSON",&["json"]).pick_file(){
@@ -238,30 +263,33 @@ impl Studio{
                 }
             }
         }
-        if ui.button("Add assignment").clicked()&&self.burn_requests.len()<16{
+        if ui.add_enabled(self.burn_requests.len()<16,egui::Button::new("Add recorder assignment")).clicked(){
             self.burn_requests.push(batch::Request{recorder:String::new(),image:PathBuf::new(),manifest:PathBuf::new(),sha256:String::new()});changed=true;
         }
-        if ui.button("Refresh recorders").clicked(){self.drives=None;self.burn_previews.clear();self.burn_confirm=false;self.spawn(ctx,move||Ok(Work::Drives(optical::discover()?)));return;}
+        if ui.button("Refresh recorders").clicked(){self.refresh_drive_snapshot(ctx);return;}
         let mut remove=None;
         for (i,r) in self.burn_requests.iter_mut().enumerate(){
             ui.push_id(i,|ui|ui.group(|ui|{
-                ui.label(format!("Assignment {}",i+1));
+                ui.heading(format!("Recorder assignment {}",i+1));
                 let prior=r.recorder.clone();
                 egui::ComboBox::from_label("Recorder").selected_text(if r.recorder.is_empty(){"Select recorder"}else{&r.recorder}).show_ui(ui,|ui|{
                     if let Some(d)=&self.drives{for rec in &d.recorders{ui.selectable_value(&mut r.recorder,rec.id.clone(),format!("{} {} {}",rec.vendor,rec.product,rec.paths.join(", ")));}}
                 });
                 changed|=prior!=r.recorder;
                 if ui.button("Choose ISO").clicked(){if let Some(p)=rfd::FileDialog::new().add_filter("Image",&["iso"]).pick_file(){r.image=p;changed=true;}}
-                ui.label(r.image.display().to_string());
+                ui.label(if r.image.as_os_str().is_empty(){"No image selected".into()}else{r.image.display().to_string()});
                 if ui.button("Choose manifest").clicked(){if let Some(p)=rfd::FileDialog::new().add_filter("Manifest",&["json"]).pick_file(){r.manifest=p;changed=true;}}
-                ui.label(r.manifest.display().to_string());
+                ui.label(if r.manifest.as_os_str().is_empty(){"No manifest selected".into()}else{r.manifest.display().to_string()});
                 ui.label("Expected SHA-256 (from verified image receipt)");
-                changed|=ui.text_edit_singleline(&mut r.sha256).changed();
+                changed|=ui.add(egui::TextEdit::singleline(&mut r.sha256).hint_text("64 hexadecimal characters").desired_width(420.)).changed();
                 if ui.button("Remove assignment").clicked(){remove=Some(i);}
             }));
         }
         if let Some(i)=remove{self.burn_requests.remove(i);changed=true;}
-        if changed{self.burn_previews.clear();self.burn_confirm=false;}
+        if changed{self.invalidate_burn_preview();}
+        ui.add_space(8.);
+        ui.heading("3. Validate all assignments");
+        ui.label("Read-only image and media checks. The writer repeats safety checks before any physical write.");
         if ui.add_enabled(!self.burn_requests.is_empty(),egui::Button::new("Validate all assignments")).clicked(){
             self.burn_previews.clear();self.burn_confirm=false;
             let requests=self.burn_requests.clone();
@@ -280,7 +308,18 @@ impl Studio{
                 Ok(Work::BatchPreview(previews))
             });return;
         }
-        for p in &self.burn_previews{ui.label(format!("{} | {} | {} bytes / {} free | SHA-256 {}",p.recorder_id,p.media_type,p.image_bytes,p.free_bytes,p.image_sha256));}
+        if self.burn_previews.is_empty(){ui.label("No current validated assignments.");}
+        for p in &self.burn_previews{
+            ui.group(|ui|{
+                ui.strong("Read-only preview passed");
+                ui.label(&p.recorder_id);
+                ui.label(format!("{} | {} verified files",p.media_type,p.verified_files));
+                ui.add(egui::ProgressBar::new(utilization(p.image_bytes as u128,p.free_bytes as u128)).text(format!("{} image / {} available",gb(p.image_bytes),gb(p.free_bytes))));
+                ui.label(format!("SHA-256: {}",p.image_sha256));
+            });
+        }
+        ui.heading("4. Authorize physical writing");
+        ui.label("Preview is not permission to write. Select the confirmation below only after checking every target and the inserted media.");
         let ready=batch_preview_matches(&self.burn_requests,&self.burn_previews)&&self.journal_path.is_some();
         if !ready {self.burn_confirm=false;}
         ui.add_enabled_ui(ready,|ui|{ui.checkbox(&mut self.burn_confirm,"I authorize irreversible writing to every listed recorder and confirm the intended blank media are inserted.");});
@@ -295,12 +334,24 @@ impl Studio{
                 Ok(Work::BatchDone(outcomes,jobs))
             });
         }
-        for o in &self.burn_outcomes{ui.label(format!("{}: {}",o.recorder,o.error.as_deref().unwrap_or("Written, unverified")));}
+        if !self.burn_outcomes.is_empty(){
+            ui.separator();ui.heading("Last batch results");
+            for o in &self.burn_outcomes{
+                ui.group(|ui|{
+                    ui.strong(&o.recorder);
+                    if let Some(e)=&o.error{ui.colored_label(ui.visuals().error_fg_color,"Failed or uncertain - inspect journal and media");ui.label(e);}
+                    else{ui.strong("Written, physical verification pending");}
+                });
+            }
+            if ui.button("Review journal and verify discs").clicked(){self.tab=9;self.burn_confirm=false;}
+        }
     }
     fn jobs_ui(&mut self,ui:&mut egui::Ui,ctx:&egui::Context){
         use disc_archive::jobs::Journal;
-        ui.heading("Burn journal");
-        ui.label("Manage recorded attempts and read back an intended disc. This tab does not initiate burning.");
+        ui.label(egui::RichText::new("05 / VERIFY & RECOVER").small().weak().strong());
+        ui.heading("Burn journal and disc verification");
+        ui.label("Persistent write attempts and historical readback results. This workspace never starts a burn.");
+        ui.label("Keep the same journal for recovery; do not create a replacement to bypass unresolved attempts.");
         let mut open=None;
         if ui.button("Create journal").clicked(){if let Some(p)=rfd::FileDialog::new().set_file_name("jobs.sqlite").save_file(){open=Some((p,true));}}
         if ui.button("Open journal").clicked(){if let Some(p)=rfd::FileDialog::new().add_filter("Burn journal",&["sqlite","db"]).pick_file(){open=Some((p,false));}}
@@ -308,12 +359,17 @@ impl Studio{
             self.burn_previews.clear();self.burn_confirm=false;self.journal_path=None;self.jobs.clear();self.job_selection=None;self.job_recorder.clear();self.reconcile_note.clear();self.reconcile_confirm=false;self.verify_confirm=false;
             self.spawn(ctx,move||{let j=if create{Journal::create(&path)?}else{Journal::open(&path)?};Ok(Work::Jobs(path,j.list()?,"Journal opened".into()))});return;
         }
-        let Some(path)=self.journal_path.clone() else{return;};
+        let Some(path)=self.journal_path.clone() else{ui.label("Open or create a local journal to see recorded attempts.");return;};
         ui.label(path.display().to_string());
         if ui.button("Refresh job history").clicked(){self.spawn(ctx,move||{let j=Journal::open(&path)?;Ok(Work::Jobs(path,j.list()?,"Journal refreshed".into()))});return;}
+        ui.heading("Recorded attempts");
+        if self.jobs.is_empty(){ui.label("No burn attempts in this journal.");}
         let previous=self.job_selection;
-        egui::ScrollArea::vertical().id_salt("job_history").max_height(240.).show_rows(ui,26.,self.jobs.len(),|ui,range|{
-            for i in range{let j=&self.jobs[i];ui.selectable_value(&mut self.job_selection,Some(j.id),format!("#{} {} | {} | {}",j.id,j.label,j.state,j.verification_status.as_deref().unwrap_or("no readback")));}
+        egui::ScrollArea::vertical().id_salt("job_history").max_height(260.).show_rows(ui,34.,self.jobs.len(),|ui,range|{
+            for i in range{
+                let j=&self.jobs[i];
+                ui.selectable_value(&mut self.job_selection,Some(j.id),format!("#{} {} | {}",j.id,j.label,job_display_status(&j.state,j.verification_status.as_deref(),j.reconciliation.is_some())));
+            }
         });
         if previous!=self.job_selection{self.reconcile_confirm=false;self.verify_confirm=false;self.reconcile_note.clear();self.job_recorder.clear();}
         let Some(j)=self.jobs.iter().find(|j|Some(j.id)==self.job_selection) else{return;};
@@ -321,12 +377,15 @@ impl Studio{
         let unresolved=(j.state=="in_progress"||j.state=="outcome_unknown")&&j.reconciliation.is_none();
         let written=j.state=="written_unverified";
         ui.separator();
+        ui.heading(format!("Attempt #{} - {}",id,j.label));
+        ui.strong(job_display_status(&j.state,j.verification_status.as_deref(),j.reconciliation.is_some()));
         ui.label(format!("Recorder: {}",j.recorder));ui.label(format!("Image: {}",j.image));ui.label(format!("SHA-256: {}",j.sha256));
         ui.label(format!("Started: {} | Finished: {}",j.started,j.finished.as_deref().unwrap_or("not recorded")));
         ui.label(&j.detail);
         if let Some(note)=&j.reconciliation{ui.label(format!("Reconciliation: {} ({})",note,j.reconciled_at.as_deref().unwrap_or("unknown")));}
         if unresolved{
-            ui.label("Stop any orphaned writer and remove suspect media before reconciling. This does not assert a successful burn.");
+            ui.heading("Resolve interrupted attempt");
+            ui.colored_label(ui.visuals().warn_fg_color,"Stop any orphaned writer and remove suspect media before reconciling. This does not assert a successful burn.");
             ui.text_edit_multiline(&mut self.reconcile_note);
             ui.checkbox(&mut self.reconcile_confirm,"I confirmed the writer has stopped and suspect media was removed.");
             if ui.add_enabled(self.reconcile_confirm&&!self.reconcile_note.trim().is_empty(),egui::Button::new("Record reconciliation")).clicked(){
@@ -335,29 +394,33 @@ impl Studio{
             }
         }
         if written{
-            ui.label("Readback uses the stored manifest. Insert the intended disc and leave it inserted throughout verification.");
+            ui.heading("Verify physical disc contents");
+            ui.label("Readback uses the stored manifest. Insert the intended disc and leave it inserted throughout verification. Results are historical, not proof of the currently inserted disc.");
             let prior=self.job_recorder.clone();
             egui::ComboBox::from_label("Readback recorder").selected_text(if self.job_recorder.is_empty(){"Select recorder"}else{&self.job_recorder}).show_ui(ui,|ui|{
                 if let Some(d)=&self.drives{for r in &d.recorders{ui.selectable_value(&mut self.job_recorder,r.id.clone(),format!("{} {} {}",r.vendor,r.product,r.paths.join(", ")));}}
             });
             if prior!=self.job_recorder{self.verify_confirm=false;}
-            if ui.button("Refresh recorder list").clicked(){self.job_recorder.clear();self.verify_confirm=false;self.drives=None;self.spawn(ctx,move||Ok(Work::Drives(disc_archive::optical::discover()?)));return;}
-            ui.checkbox(&mut self.verify_confirm,"The intended disc is inserted in the selected recorder.");
-            if ui.add_enabled(self.verify_confirm&&!self.job_recorder.is_empty(),egui::Button::new("Verify recorded disc")).clicked(){
+            if ui.button("Refresh recorder list").clicked(){self.refresh_drive_snapshot(ctx);return;}
+            let recorder_selected=self.drives.as_ref().is_some_and(|d|d.recorders.iter().any(|r|r.id==self.job_recorder));
+            if !recorder_selected{self.verify_confirm=false;}
+            ui.add_enabled_ui(recorder_selected,|ui|{ui.checkbox(&mut self.verify_confirm,"The intended disc is inserted in the selected recorder.");});
+            if ui.add_enabled(self.verify_confirm&&recorder_selected,egui::Button::new("Verify recorded disc")).clicked(){
                 let recorder=self.job_recorder.clone();self.verify_confirm=false;
                 self.spawn(ctx,move||{let j=Journal::open(&path)?;let message=match disc_archive::optical::verify_logged_disc(&j,id,&recorder){Ok(r)=>format!("Verified {} files",r.files),Err(e)=>format!("Verification failed: {e:#}")};Ok(Work::Jobs(path,j.list()?,message))});
             }
         }
     }
     fn drives_ui(&mut self,ui:&mut egui::Ui,ctx:&egui::Context){
-        ui.heading("Optical recorders");
+        ui.label(egui::RichText::new("OPTICAL MEDIA / DEVICES").small().weak().strong());
+        ui.heading("Optical drives and inserted media");
         ui.label("Read-only snapshot. Refresh after changing media. No writing or eject controls are available.");
         if ui.button("Refresh recorders and media").clicked(){
-            self.drives=None;
-            self.spawn(ctx,move||Ok(Work::Drives(disc_archive::optical::discover()?)));
+            self.refresh_drive_snapshot(ctx);return;
         }
         let Some(d)=&self.drives else{ui.label("No current discovery result.");return;};
-        for e in &d.errors{ui.label(format!("Discovery error: {e}"));}
+        ui.strong(format!("{} detected recorders",d.recorders.len()));
+        for e in &d.errors{ui.colored_label(ui.visuals().error_fg_color,format!("Discovery error: {e}"));}
         if d.recorders.is_empty(){ui.label("No recorders reported by IMAPI.");}
         for r in &d.recorders{
             ui.group(|ui|{
@@ -369,7 +432,7 @@ impl Studio{
                     ui.label(format!("Physically blank: {} | Heuristically blank: {}",m.physically_blank,m.heuristically_blank));
                     ui.label(format!("Free sectors: {} / {}",m.free_sectors,m.total_sectors));
                     if let Some(bytes)=m.free_bytes(){ui.label(format!("Reported free: {}",gb(bytes)));}
-                    ui.label(if m.blank_candidate(){"Preliminary blank write-once candidate"}else{"Not a blank write-once candidate"});
+                    ui.strong(if m.blank_candidate(){"Preliminary blank write-once candidate"}else{"Not eligible for blank write-once recording"});
                     if let Some(image)=&self.image_receipt{
                         ui.label(format!("Last created image {}: {}",image.label,if m.fits_image(image.bytes){"fits reported capacity (not authorization to burn)"}else{"not eligible or insufficient capacity"}));
                     }
@@ -379,8 +442,10 @@ impl Studio{
         }
     }
     fn image_ui(&mut self,ui:&mut egui::Ui,ctx:&egui::Context){
-        ui.heading("Disc images");
+        ui.label(egui::RichText::new("03 / CREATE IMAGES").small().weak().strong());
+        ui.heading("Prepare verified disc images");
         ui.label("Create UDF 2.01 images and verify their contents. No physical media is written.");
+        ui.heading("1. Choose a planned disc");
         ui.label("Use a local NTFS destination with free space for staging and the image; Windows mounting must be available.");
         let mut chosen=None;
         if let Some(p)=self.plan.as_ref(){
@@ -389,7 +454,10 @@ impl Studio{
                 for d in &p.discs{ui.selectable_value(&mut self.image_disc,d.number,format!("{} - {} files",d.label,d.files.len()));}
             });
             if let Some(d)=p.discs.iter().find(|d|d.number==self.image_disc){
-                ui.label(format!("{} | {} files | {} estimated / {} usable",d.label,d.files.len(),gb(d.estimated_used),gb(d.capacity-p.reserve)));
+                ui.strong(format!("{} | {} files",d.label,d.files.len()));
+                ui.add(egui::ProgressBar::new(utilization(d.estimated_used as u128,d.capacity.saturating_sub(p.reserve) as u128)).text(format!("{} estimated / {} usable",gb(d.estimated_used),gb(d.capacity.saturating_sub(p.reserve)))));
+                ui.heading("2. Prepare manifest or create image");
+                ui.label("The preparation manifest records expected paths, lengths and SHA-256 hashes. Keep it with the image for later verification.");
                 let mut prepare=false;let mut create=false;
                 ui.horizontal(|ui|{
                     prepare=ui.add_enabled(!d.files.is_empty(),egui::Button::new("Save preparation manifest")).clicked();
@@ -397,7 +465,7 @@ impl Studio{
                 });
                 if prepare||create{chosen=Some((p.clone(),d.number,d.label.clone(),create));}
             }
-        }else{ui.label("Open or create a disc plan to generate an image.");}
+        }else{ui.label("Open or create a disc plan to generate an image.");if ui.button("Go to disc planner").clicked(){self.tab=1;}}
         if let Some((p,n,label,create))=chosen{
             if create{
                 if let Some(path)=rfd::FileDialog::new().add_filter("UDF image",&["iso"]).set_file_name(format!("{label}.iso")).save_file(){
@@ -409,7 +477,8 @@ impl Studio{
             }
         }
         ui.separator();
-        ui.heading("Verify an existing image");
+        ui.heading("3. Verify an existing image independently");
+        ui.label("Choose the exact image and its preparation manifest. Image verification is separate from physical disc readback.");
         ui.horizontal_wrapped(|ui|{
             if ui.button("Choose manifest").clicked(){if let Some(path)=rfd::FileDialog::new().add_filter("JSON",&["json"]).pick_file(){self.manifest_path=Some(path);self.verify_receipt=None;}}
             ui.label(self.manifest_path.as_ref().map(|p|p.display().to_string()).unwrap_or_else(||"No manifest selected".into()));
@@ -424,14 +493,21 @@ impl Studio{
             self.spawn(ctx,move||{let p:disc_archive::image::PreparedDisc=serde_json::from_reader(BufReader::new(File::open(manifest)?))?;Ok(Work::ImageVerified(disc_archive::image::verify_udf(&p,&image)?))});
         }
         if let Some(r)=&self.image_receipt{
-            ui.separator();ui.heading("Last successful image creation");
+            ui.separator();ui.heading("Last successful image creation (historical receipt)");
             ui.label(r.output.display().to_string());ui.label(format!("{} | {} bytes | {} verified files",r.label,r.bytes,r.verified_files));
             ui.label(format!("SHA-256: {}",r.sha256));
         }
         if let Some(r)=&self.verify_receipt{
-            ui.separator();ui.heading("Last successful independent verification");
+            ui.separator();ui.heading("Last successful independent image verification");
             ui.label(format!("{} files | {} payload bytes | {} image bytes",r.files,r.payload_bytes,r.image_bytes));
             ui.label(format!("SHA-256: {}",r.sha256));
+        }
+        if self.image_receipt.is_some()||self.verify_receipt.is_some(){
+            ui.label("A verified image is not a burned or physically verified disc.");
+            ui.horizontal_wrapped(|ui|{
+                if ui.button("Inspect optical drives").clicked(){self.tab=8;}
+                if ui.button("Review burn assignments").clicked(){self.burn_confirm=false;self.tab=10;}
+            });
         }
     }
     fn sources_ui(&mut self,ui:&mut egui::Ui,ctx:&egui::Context){
@@ -703,6 +779,7 @@ impl Studio{
 impl eframe::App for Studio{
     fn update(&mut self,ctx:&egui::Context,_frame:&mut eframe::Frame){
         self.poll();
+        let initial_tab=self.tab;
         if ctx.input(|i|i.viewport().close_requested()) && (self.dirty||self.worker.is_some()) {ctx.send_viewport_cmd(egui::ViewportCommand::CancelClose);self.close_prompt=true;}
         if self.close_prompt {egui::Window::new("Close application?").collapsible(false).show(ctx,|ui|{ui.label("Wait for running work to finish before exiting; unsaved project changes may be lost.");if ui.button("Keep working").clicked(){self.close_prompt=false;}if ui.add_enabled(self.worker.is_none(),egui::Button::new("Discard and exit")).clicked(){self.close_prompt=false;self.dirty=false;self.worker=None;ctx.send_viewport_cmd(egui::ViewportCommand::Close);}});}
         if self.worker.is_none(){
@@ -792,7 +869,34 @@ impl eframe::App for Studio{
                 _=>{ui.label("Closing disc plan discards unsaved edits.");if ui.button("Confirm close plan").clicked(){self.plan=None;self.selected=None;self.dirty=true;self.tab=0;self.status="Plan closed".into();}if ui.button("Cancel").clicked(){self.tab=1;}}
             });});
         });
+        if self.tab!=initial_tab{self.burn_confirm=false;self.verify_confirm=false;self.reconcile_confirm=false;}
     }
+}
+fn job_display_status(state:&str,verification:Option<&str>,reconciled:bool)->&'static str{
+    match state{
+        "written_unverified"=>match verification{
+            Some("content_verified")=>"Written; historical content verification passed",
+            Some("verification_failed")=>"Written; latest readback failed",
+            _=>"Written; physical verification pending",
+        },
+        "in_progress"|"outcome_unknown" if reconciled=>"Uncertain outcome; operator reconciled",
+        "in_progress"=>"In progress or interrupted; inspect",
+        "outcome_unknown"=>"Unknown outcome; inspect before retry",
+        _=>"Unknown state; inspect journal",
+    }
+}
+#[cfg(test)]
+#[test]
+fn optical_workspace_status_and_refresh_safety(){
+    assert_eq!(job_display_status("written_unverified",None,false),"Written; physical verification pending");
+    assert_eq!(job_display_status("written_unverified",Some("content_verified"),false),"Written; historical content verification passed");
+    assert_eq!(job_display_status("written_unverified",Some("verification_failed"),false),"Written; latest readback failed");
+    assert_eq!(job_display_status("outcome_unknown",Some("content_verified"),true),"Uncertain outcome; operator reconciled");
+    let mut s=Studio::default();
+    s.burn_confirm=true;
+    s.burn_previews.push(disc_archive::optical::BurnPreview{recorder_id:"fixture".into(),image_bytes:2048,image_sha256:"a".repeat(64),media_type:"BD-R".into(),free_bytes:4096,verified_files:1});
+    s.invalidate_burn_preview();
+    assert!(!s.burn_confirm&&s.burn_previews.is_empty());
 }
 fn strategy_label(mode:Strategy)->&'static str{
     match mode{Strategy::Sequential=>"Sequential order",Strategy::Folder=>"Keep folders together",Strategy::Maximum=>"Maximum utilization",Strategy::Hybrid=>"Balanced (hybrid)"}
