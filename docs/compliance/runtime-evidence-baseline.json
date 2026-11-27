@@ -1,0 +1,1451 @@
+{
+  "source_commit": "dba319c5c153c1288e5906dd8f8d2fee2e9e2c8b",
+  "run_id": 46072903762,
+  "job_id": 140753813584,
+  "evidence": {
+    "scope": "compiler artifacts and direct PE import evidence, not a linked SBOM or license approval",
+    "lock_sha256": "60862ef1ad2cfab8812323835ad07f16294ccd4b09b6a2b32b7ea5dc5cccc567",
+    "toolchain": "rustc 1.100.0 (0ef1bc386 2026-11-09)",
+    "compiled_packages": [
+      {
+        "name": "ab_glyph",
+        "version": "0.2.32",
+        "license": "Apache-2.0",
+        "target_kinds": [
+          "lib"
+        ]
+      },
+      {
+        "name": "ab_glyph_rasterizer",
+        "version": "0.1.10",
+        "license": "Apache-2.0",
+        "target_kinds": [
+          "lib"
+        ]
+      },
+      {
+        "name": "adler2",
+        "version": "2.0.1",
+        "license": "0BSD OR MIT OR Apache-2.0",
+        "target_kinds": [
+          "lib"
+        ]
+      },
+      {
+        "name": "ahash",
+        "version": "0.8.14",
+        "license": "MIT OR Apache-2.0",
+        "target_kinds": [
+          "custom-build",
+          "lib"
+        ]
+      },
+      {
+        "name": "aho-corasick",
+        "version": "1.1.5",
+        "license": "Unlicense OR MIT",
+        "target_kinds": [
+          "lib"
+        ]
+      },
+      {
+        "name": "anstream",
+        "version": "1.0.0",
+        "license": "MIT OR Apache-2.0",
+        "target_kinds": [
+          "lib"
+        ]
+      },
+      {
+        "name": "anstyle-parse",
+        "version": "1.0.0",
+        "license": "MIT OR Apache-2.0",
+        "target_kinds": [
+          "lib"
+        ]
+      },
+      {
+        "name": "anstyle-query",
+        "version": "1.1.5",
+        "license": "MIT OR Apache-2.0",
+        "target_kinds": [
+          "lib"
+        ]
+      },
+      {
+        "name": "anstyle-wincon",
+        "version": "3.0.11",
+        "license": "MIT OR Apache-2.0",
+        "target_kinds": [
+          "lib"
+        ]
+      },
+      {
+        "name": "anstyle",
+        "version": "1.0.14",
+        "license": "MIT OR Apache-2.0",
+        "target_kinds": [
+          "lib"
+        ]
+      },
+      {
+        "name": "anyhow",
+        "version": "1.0.105",
+        "license": "MIT OR Apache-2.0",
+        "target_kinds": [
+          "custom-build",
+          "lib"
+        ]
+      },
+      {
+        "name": "arboard",
+        "version": "3.7.0",
+        "license": "MIT OR Apache-2.0",
+        "target_kinds": [
+          "lib"
+        ]
+      },
+      {
+        "name": "autocfg",
+        "version": "1.5.1",
+        "license": "Apache-2.0 OR MIT",
+        "target_kinds": [
+          "lib"
+        ]
+      },
+      {
+        "name": "bitflags",
+        "version": "2.13.2",
+        "license": "MIT OR Apache-2.0",
+        "target_kinds": [
+          "lib"
+        ]
+      },
+      {
+        "name": "block-buffer",
+        "version": "0.10.4",
+        "license": "MIT OR Apache-2.0",
+        "target_kinds": [
+          "lib"
+        ]
+      },
+      {
+        "name": "bstr",
+        "version": "1.14.0",
+        "license": "MIT OR Apache-2.0",
+        "target_kinds": [
+          "lib"
+        ]
+      },
+      {
+        "name": "bytemuck",
+        "version": "1.25.2",
+        "license": "Zlib OR Apache-2.0 OR MIT",
+        "target_kinds": [
+          "lib"
+        ]
+      },
+      {
+        "name": "bytemuck_derive",
+        "version": "1.12.1",
+        "license": "Zlib OR Apache-2.0 OR MIT",
+        "target_kinds": [
+          "proc-macro"
+        ]
+      },
+      {
+        "name": "byteorder-lite",
+        "version": "0.1.0",
+        "license": "Unlicense OR MIT",
+        "target_kinds": [
+          "lib"
+        ]
+      },
+      {
+        "name": "cc",
+        "version": "1.11.3",
+        "license": "MIT OR Apache-2.0",
+        "target_kinds": [
+          "lib"
+        ]
+      },
+      {
+        "name": "cfg-if",
+        "version": "1.0.5",
+        "license": "MIT OR Apache-2.0",
+        "target_kinds": [
+          "lib"
+        ]
+      },
+      {
+        "name": "cfg_aliases",
+        "version": "0.2.2",
+        "license": "MIT",
+        "target_kinds": [
+          "lib"
+        ]
+      },
+      {
+        "name": "clap",
+        "version": "4.6.10",
+        "license": "MIT OR Apache-2.0",
+        "target_kinds": [
+          "lib"
+        ]
+      },
+      {
+        "name": "clap_builder",
+        "version": "4.6.10",
+        "license": "MIT OR Apache-2.0",
+        "target_kinds": [
+          "lib"
+        ]
+      },
+      {
+        "name": "clap_derive",
+        "version": "4.6.9",
+        "license": "MIT OR Apache-2.0",
+        "target_kinds": [
+          "proc-macro"
+        ]
+      },
+      {
+        "name": "clap_lex",
+        "version": "1.1.2",
+        "license": "MIT OR Apache-2.0",
+        "target_kinds": [
+          "lib"
+        ]
+      },
+      {
+        "name": "clipboard-win",
+        "version": "5.4.3",
+        "license": "BSL-1.0",
+        "target_kinds": [
+          "lib"
+        ]
+      },
+      {
+        "name": "colorchoice",
+        "version": "1.0.5",
+        "license": "MIT OR Apache-2.0",
+        "target_kinds": [
+          "lib"
+        ]
+      },
+      {
+        "name": "cpufeatures",
+        "version": "0.2.17",
+        "license": "MIT OR Apache-2.0",
+        "target_kinds": [
+          "lib"
+        ]
+      },
+      {
+        "name": "crc32fast",
+        "version": "1.5.6",
+        "license": "MIT OR Apache-2.0",
+        "target_kinds": [
+          "custom-build",
+          "lib"
+        ]
+      },
+      {
+        "name": "crypto-common",
+        "version": "0.1.7",
+        "license": "MIT OR Apache-2.0",
+        "target_kinds": [
+          "lib"
+        ]
+      },
+      {
+        "name": "cursor-icon",
+        "version": "1.2.0",
+        "license": "MIT OR Apache-2.0 OR Zlib",
+        "target_kinds": [
+          "lib"
+        ]
+      },
+      {
+        "name": "digest",
+        "version": "0.10.7",
+        "license": "MIT OR Apache-2.0",
+        "target_kinds": [
+          "lib"
+        ]
+      },
+      {
+        "name": "disc-archive",
+        "version": "0.1.0",
+        "license": null,
+        "target_kinds": [
+          "bin",
+          "lib"
+        ]
+      },
+      {
+        "name": "displaydoc",
+        "version": "0.2.7",
+        "license": "MIT OR Apache-2.0",
+        "target_kinds": [
+          "proc-macro"
+        ]
+      },
+      {
+        "name": "document-features",
+        "version": "0.2.12",
+        "license": "MIT OR Apache-2.0",
+        "target_kinds": [
+          "proc-macro"
+        ]
+      },
+      {
+        "name": "dpi",
+        "version": "0.1.2",
+        "license": "Apache-2.0 AND MIT",
+        "target_kinds": [
+          "lib"
+        ]
+      },
+      {
+        "name": "ecolor",
+        "version": "0.31.1",
+        "license": "MIT OR Apache-2.0",
+        "target_kinds": [
+          "lib"
+        ]
+      },
+      {
+        "name": "eframe",
+        "version": "0.31.1",
+        "license": "MIT OR Apache-2.0",
+        "target_kinds": [
+          "lib"
+        ]
+      },
+      {
+        "name": "egui-winit",
+        "version": "0.31.1",
+        "license": "MIT OR Apache-2.0",
+        "target_kinds": [
+          "lib"
+        ]
+      },
+      {
+        "name": "egui",
+        "version": "0.31.1",
+        "license": "MIT OR Apache-2.0",
+        "target_kinds": [
+          "lib"
+        ]
+      },
+      {
+        "name": "egui_glow",
+        "version": "0.31.1",
+        "license": "MIT OR Apache-2.0",
+        "target_kinds": [
+          "lib"
+        ]
+      },
+      {
+        "name": "emath",
+        "version": "0.31.1",
+        "license": "MIT OR Apache-2.0",
+        "target_kinds": [
+          "lib"
+        ]
+      },
+      {
+        "name": "epaint",
+        "version": "0.31.1",
+        "license": "MIT OR Apache-2.0",
+        "target_kinds": [
+          "lib"
+        ]
+      },
+      {
+        "name": "epaint_default_fonts",
+        "version": "0.31.1",
+        "license": "(MIT OR Apache-2.0) AND OFL-1.1 AND Ubuntu-font-1.0",
+        "target_kinds": [
+          "lib"
+        ]
+      },
+      {
+        "name": "error-code",
+        "version": "3.4.0",
+        "license": "BSL-1.0",
+        "target_kinds": [
+          "lib"
+        ]
+      },
+      {
+        "name": "fallible-iterator",
+        "version": "0.3.0",
+        "license": "MIT/Apache-2.0",
+        "target_kinds": [
+          "lib"
+        ]
+      },
+      {
+        "name": "fallible-streaming-iterator",
+        "version": "0.1.9",
+        "license": "MIT/Apache-2.0",
+        "target_kinds": [
+          "lib"
+        ]
+      },
+      {
+        "name": "fastrand",
+        "version": "2.5.0",
+        "license": "Apache-2.0 OR MIT",
+        "target_kinds": [
+          "lib"
+        ]
+      },
+      {
+        "name": "fdeflate",
+        "version": "0.3.7",
+        "license": "MIT OR Apache-2.0",
+        "target_kinds": [
+          "lib"
+        ]
+      },
+      {
+        "name": "find-msvc-tools",
+        "version": "0.1.15",
+        "license": "MIT OR Apache-2.0",
+        "target_kinds": [
+          "lib"
+        ]
+      },
+      {
+        "name": "flate2",
+        "version": "1.1.11",
+        "license": "MIT OR Apache-2.0",
+        "target_kinds": [
+          "lib"
+        ]
+      },
+      {
+        "name": "form_urlencoded",
+        "version": "1.2.3",
+        "license": "MIT OR Apache-2.0",
+        "target_kinds": [
+          "lib"
+        ]
+      },
+      {
+        "name": "generic-array",
+        "version": "0.14.7",
+        "license": "MIT",
+        "target_kinds": [
+          "custom-build",
+          "lib"
+        ]
+      },
+      {
+        "name": "getrandom",
+        "version": "0.4.3",
+        "license": "MIT OR Apache-2.0",
+        "target_kinds": [
+          "custom-build",
+          "lib"
+        ]
+      },
+      {
+        "name": "gl_generator",
+        "version": "0.14.0",
+        "license": "Apache-2.0",
+        "target_kinds": [
+          "lib"
+        ]
+      },
+      {
+        "name": "globset",
+        "version": "0.4.22",
+        "license": "Unlicense OR MIT",
+        "target_kinds": [
+          "lib"
+        ]
+      },
+      {
+        "name": "glow",
+        "version": "0.16.0",
+        "license": "MIT OR Apache-2.0 OR Zlib",
+        "target_kinds": [
+          "lib"
+        ]
+      },
+      {
+        "name": "glutin-winit",
+        "version": "0.5.0",
+        "license": "MIT",
+        "target_kinds": [
+          "custom-build",
+          "lib"
+        ]
+      },
+      {
+        "name": "glutin",
+        "version": "0.32.3",
+        "license": "Apache-2.0",
+        "target_kinds": [
+          "custom-build",
+          "lib"
+        ]
+      },
+      {
+        "name": "glutin_egl_sys",
+        "version": "0.7.1",
+        "license": "Apache-2.0",
+        "target_kinds": [
+          "custom-build",
+          "lib"
+        ]
+      },
+      {
+        "name": "glutin_wgl_sys",
+        "version": "0.6.1",
+        "license": "Apache-2.0",
+        "target_kinds": [
+          "custom-build",
+          "lib"
+        ]
+      },
+      {
+        "name": "hashbrown",
+        "version": "0.14.5",
+        "license": "MIT OR Apache-2.0",
+        "target_kinds": [
+          "lib"
+        ]
+      },
+      {
+        "name": "hashlink",
+        "version": "0.9.1",
+        "license": "MIT OR Apache-2.0",
+        "target_kinds": [
+          "lib"
+        ]
+      },
+      {
+        "name": "heck",
+        "version": "0.5.0",
+        "license": "MIT OR Apache-2.0",
+        "target_kinds": [
+          "lib"
+        ]
+      },
+      {
+        "name": "icu_collections",
+        "version": "2.4.0",
+        "license": "Unicode-3.0",
+        "target_kinds": [
+          "lib"
+        ]
+      },
+      {
+        "name": "icu_locale_core",
+        "version": "2.4.0",
+        "license": "Unicode-3.0",
+        "target_kinds": [
+          "lib"
+        ]
+      },
+      {
+        "name": "icu_normalizer",
+        "version": "2.4.0",
+        "license": "Unicode-3.0",
+        "target_kinds": [
+          "lib"
+        ]
+      },
+      {
+        "name": "icu_normalizer_data",
+        "version": "2.4.0",
+        "license": "Unicode-3.0",
+        "target_kinds": [
+          "custom-build",
+          "lib"
+        ]
+      },
+      {
+        "name": "icu_properties",
+        "version": "2.4.0",
+        "license": "Unicode-3.0",
+        "target_kinds": [
+          "lib"
+        ]
+      },
+      {
+        "name": "icu_properties_data",
+        "version": "2.4.0",
+        "license": "Unicode-3.0",
+        "target_kinds": [
+          "custom-build",
+          "lib"
+        ]
+      },
+      {
+        "name": "icu_provider",
+        "version": "2.4.0",
+        "license": "Unicode-3.0",
+        "target_kinds": [
+          "lib"
+        ]
+      },
+      {
+        "name": "idna",
+        "version": "1.1.0",
+        "license": "MIT OR Apache-2.0",
+        "target_kinds": [
+          "lib"
+        ]
+      },
+      {
+        "name": "idna_adapter",
+        "version": "1.2.2",
+        "license": "Apache-2.0 OR MIT",
+        "target_kinds": [
+          "lib"
+        ]
+      },
+      {
+        "name": "image",
+        "version": "0.25.10",
+        "license": "MIT OR Apache-2.0",
+        "target_kinds": [
+          "lib"
+        ]
+      },
+      {
+        "name": "is_terminal_polyfill",
+        "version": "1.70.2",
+        "license": "MIT OR Apache-2.0",
+        "target_kinds": [
+          "lib"
+        ]
+      },
+      {
+        "name": "itoa",
+        "version": "1.0.19",
+        "license": "MIT OR Apache-2.0",
+        "target_kinds": [
+          "lib"
+        ]
+      },
+      {
+        "name": "khronos_api",
+        "version": "3.1.0",
+        "license": "Apache-2.0",
+        "target_kinds": [
+          "custom-build",
+          "lib"
+        ]
+      },
+      {
+        "name": "libloading",
+        "version": "0.8.9",
+        "license": "ISC",
+        "target_kinds": [
+          "lib"
+        ]
+      },
+      {
+        "name": "libsqlite3-sys",
+        "version": "0.30.1",
+        "license": "MIT",
+        "target_kinds": [
+          "custom-build",
+          "lib"
+        ]
+      },
+      {
+        "name": "litemap",
+        "version": "0.8.3",
+        "license": "Unicode-3.0",
+        "target_kinds": [
+          "lib"
+        ]
+      },
+      {
+        "name": "litrs",
+        "version": "1.1.0",
+        "license": "MIT OR Apache-2.0",
+        "target_kinds": [
+          "lib"
+        ]
+      },
+      {
+        "name": "lock_api",
+        "version": "0.4.14",
+        "license": "MIT OR Apache-2.0",
+        "target_kinds": [
+          "lib"
+        ]
+      },
+      {
+        "name": "log",
+        "version": "0.4.35",
+        "license": "MIT OR Apache-2.0",
+        "target_kinds": [
+          "lib"
+        ]
+      },
+      {
+        "name": "memchr",
+        "version": "2.8.3",
+        "license": "Unlicense OR MIT",
+        "target_kinds": [
+          "lib"
+        ]
+      },
+      {
+        "name": "memoffset",
+        "version": "0.9.1",
+        "license": "MIT",
+        "target_kinds": [
+          "custom-build",
+          "lib"
+        ]
+      },
+      {
+        "name": "miniz_oxide",
+        "version": "0.8.9",
+        "license": "MIT OR Zlib OR Apache-2.0",
+        "target_kinds": [
+          "lib"
+        ]
+      },
+      {
+        "name": "miniz_oxide",
+        "version": "0.9.1",
+        "license": "MIT OR Zlib OR Apache-2.0",
+        "target_kinds": [
+          "lib"
+        ]
+      },
+      {
+        "name": "moxcms",
+        "version": "0.8.1",
+        "license": "BSD-3-Clause OR Apache-2.0",
+        "target_kinds": [
+          "lib"
+        ]
+      },
+      {
+        "name": "nohash-hasher",
+        "version": "0.2.0",
+        "license": "Apache-2.0 OR MIT",
+        "target_kinds": [
+          "lib"
+        ]
+      },
+      {
+        "name": "num-traits",
+        "version": "0.2.19",
+        "license": "MIT OR Apache-2.0",
+        "target_kinds": [
+          "custom-build",
+          "lib"
+        ]
+      },
+      {
+        "name": "once_cell",
+        "version": "1.21.4",
+        "license": "MIT OR Apache-2.0",
+        "target_kinds": [
+          "lib"
+        ]
+      },
+      {
+        "name": "once_cell_polyfill",
+        "version": "1.70.2",
+        "license": "MIT OR Apache-2.0",
+        "target_kinds": [
+          "lib"
+        ]
+      },
+      {
+        "name": "owned_ttf_parser",
+        "version": "0.25.1",
+        "license": "Apache-2.0",
+        "target_kinds": [
+          "lib"
+        ]
+      },
+      {
+        "name": "parking_lot",
+        "version": "0.12.5",
+        "license": "MIT OR Apache-2.0",
+        "target_kinds": [
+          "lib"
+        ]
+      },
+      {
+        "name": "parking_lot_core",
+        "version": "0.9.12",
+        "license": "MIT OR Apache-2.0",
+        "target_kinds": [
+          "custom-build",
+          "lib"
+        ]
+      },
+      {
+        "name": "percent-encoding",
+        "version": "2.3.2",
+        "license": "MIT OR Apache-2.0",
+        "target_kinds": [
+          "lib"
+        ]
+      },
+      {
+        "name": "pin-project-lite",
+        "version": "0.2.18",
+        "license": "Apache-2.0 OR MIT",
+        "target_kinds": [
+          "lib"
+        ]
+      },
+      {
+        "name": "pkg-config",
+        "version": "0.3.34",
+        "license": "MIT OR Apache-2.0",
+        "target_kinds": [
+          "lib"
+        ]
+      },
+      {
+        "name": "png",
+        "version": "0.18.1",
+        "license": "MIT OR Apache-2.0",
+        "target_kinds": [
+          "lib"
+        ]
+      },
+      {
+        "name": "potential_utf",
+        "version": "0.1.6",
+        "license": "Unicode-3.0",
+        "target_kinds": [
+          "lib"
+        ]
+      },
+      {
+        "name": "proc-macro2",
+        "version": "1.0.107",
+        "license": "MIT OR Apache-2.0",
+        "target_kinds": [
+          "custom-build",
+          "lib"
+        ]
+      },
+      {
+        "name": "profiling",
+        "version": "1.0.18",
+        "license": "MIT OR Apache-2.0",
+        "target_kinds": [
+          "lib"
+        ]
+      },
+      {
+        "name": "pxfm",
+        "version": "0.1.30",
+        "license": "BSD-3-Clause OR Apache-2.0",
+        "target_kinds": [
+          "lib"
+        ]
+      },
+      {
+        "name": "quote",
+        "version": "1.0.47",
+        "license": "MIT OR Apache-2.0",
+        "target_kinds": [
+          "custom-build",
+          "lib"
+        ]
+      },
+      {
+        "name": "raw-window-handle",
+        "version": "0.6.2",
+        "license": "MIT OR Apache-2.0 OR Zlib",
+        "target_kinds": [
+          "lib"
+        ]
+      },
+      {
+        "name": "regex-automata",
+        "version": "0.4.19",
+        "license": "MIT OR Apache-2.0",
+        "target_kinds": [
+          "lib"
+        ]
+      },
+      {
+        "name": "regex-syntax",
+        "version": "0.8.12",
+        "license": "MIT OR Apache-2.0",
+        "target_kinds": [
+          "lib"
+        ]
+      },
+      {
+        "name": "rfd",
+        "version": "0.15.4",
+        "license": "MIT",
+        "target_kinds": [
+          "custom-build",
+          "lib"
+        ]
+      },
+      {
+        "name": "rusqlite",
+        "version": "0.32.1",
+        "license": "MIT",
+        "target_kinds": [
+          "lib"
+        ]
+      },
+      {
+        "name": "same-file",
+        "version": "1.0.6",
+        "license": "Unlicense/MIT",
+        "target_kinds": [
+          "lib"
+        ]
+      },
+      {
+        "name": "scopeguard",
+        "version": "1.2.0",
+        "license": "MIT OR Apache-2.0",
+        "target_kinds": [
+          "lib"
+        ]
+      },
+      {
+        "name": "serde",
+        "version": "1.0.229",
+        "license": "MIT OR Apache-2.0",
+        "target_kinds": [
+          "custom-build",
+          "lib"
+        ]
+      },
+      {
+        "name": "serde_core",
+        "version": "1.0.229",
+        "license": "MIT OR Apache-2.0",
+        "target_kinds": [
+          "custom-build",
+          "lib"
+        ]
+      },
+      {
+        "name": "serde_derive",
+        "version": "1.0.229",
+        "license": "MIT OR Apache-2.0",
+        "target_kinds": [
+          "proc-macro"
+        ]
+      },
+      {
+        "name": "serde_json",
+        "version": "1.0.154",
+        "license": "MIT OR Apache-2.0",
+        "target_kinds": [
+          "custom-build",
+          "lib"
+        ]
+      },
+      {
+        "name": "sha2",
+        "version": "0.10.9",
+        "license": "MIT OR Apache-2.0",
+        "target_kinds": [
+          "lib"
+        ]
+      },
+      {
+        "name": "shlex",
+        "version": "2.0.1",
+        "license": "MIT OR Apache-2.0",
+        "target_kinds": [
+          "lib"
+        ]
+      },
+      {
+        "name": "simd-adler32",
+        "version": "0.3.10",
+        "license": "MIT",
+        "target_kinds": [
+          "lib"
+        ]
+      },
+      {
+        "name": "smallvec",
+        "version": "1.16.6",
+        "license": "MIT OR Apache-2.0",
+        "target_kinds": [
+          "lib"
+        ]
+      },
+      {
+        "name": "smol_str",
+        "version": "0.2.2",
+        "license": "MIT OR Apache-2.0",
+        "target_kinds": [
+          "lib"
+        ]
+      },
+      {
+        "name": "stable_deref_trait",
+        "version": "1.2.1",
+        "license": "MIT OR Apache-2.0",
+        "target_kinds": [
+          "lib"
+        ]
+      },
+      {
+        "name": "static_assertions",
+        "version": "1.1.0",
+        "license": "MIT OR Apache-2.0",
+        "target_kinds": [
+          "lib"
+        ]
+      },
+      {
+        "name": "strsim",
+        "version": "0.11.1",
+        "license": "MIT",
+        "target_kinds": [
+          "lib"
+        ]
+      },
+      {
+        "name": "syn",
+        "version": "3.0.10",
+        "license": "MIT OR Apache-2.0",
+        "target_kinds": [
+          "lib"
+        ]
+      },
+      {
+        "name": "synstructure",
+        "version": "0.14.0",
+        "license": "MIT",
+        "target_kinds": [
+          "lib"
+        ]
+      },
+      {
+        "name": "tempfile",
+        "version": "3.27.0",
+        "license": "MIT OR Apache-2.0",
+        "target_kinds": [
+          "lib"
+        ]
+      },
+      {
+        "name": "tinystr",
+        "version": "0.8.5",
+        "license": "Unicode-3.0",
+        "target_kinds": [
+          "lib"
+        ]
+      },
+      {
+        "name": "tracing-core",
+        "version": "0.1.36",
+        "license": "MIT",
+        "target_kinds": [
+          "lib"
+        ]
+      },
+      {
+        "name": "tracing",
+        "version": "0.1.44",
+        "license": "MIT",
+        "target_kinds": [
+          "lib"
+        ]
+      },
+      {
+        "name": "ttf-parser",
+        "version": "0.25.1",
+        "license": "MIT OR Apache-2.0",
+        "target_kinds": [
+          "lib"
+        ]
+      },
+      {
+        "name": "typenum",
+        "version": "1.20.1",
+        "license": "MIT OR Apache-2.0",
+        "target_kinds": [
+          "lib"
+        ]
+      },
+      {
+        "name": "unicode-ident",
+        "version": "1.0.27",
+        "license": "(MIT OR Apache-2.0) AND Unicode-3.0",
+        "target_kinds": [
+          "lib"
+        ]
+      },
+      {
+        "name": "unicode-segmentation",
+        "version": "1.13.3",
+        "license": "MIT OR Apache-2.0",
+        "target_kinds": [
+          "lib"
+        ]
+      },
+      {
+        "name": "url",
+        "version": "2.5.9",
+        "license": "MIT OR Apache-2.0",
+        "target_kinds": [
+          "lib"
+        ]
+      },
+      {
+        "name": "utf8_iter",
+        "version": "1.1.0",
+        "license": "Apache-2.0 OR MIT",
+        "target_kinds": [
+          "lib"
+        ]
+      },
+      {
+        "name": "utf8parse",
+        "version": "0.2.2",
+        "license": "Apache-2.0 OR MIT",
+        "target_kinds": [
+          "lib"
+        ]
+      },
+      {
+        "name": "utf_types",
+        "version": "1.0.0",
+        "license": "Apache-2.0 OR MIT",
+        "target_kinds": [
+          "lib"
+        ]
+      },
+      {
+        "name": "vcpkg",
+        "version": "0.2.15",
+        "license": "MIT/Apache-2.0",
+        "target_kinds": [
+          "lib"
+        ]
+      },
+      {
+        "name": "version_check",
+        "version": "0.9.5",
+        "license": "MIT/Apache-2.0",
+        "target_kinds": [
+          "lib"
+        ]
+      },
+      {
+        "name": "walkdir",
+        "version": "2.5.1",
+        "license": "Unlicense/MIT",
+        "target_kinds": [
+          "lib"
+        ]
+      },
+      {
+        "name": "web-time",
+        "version": "1.1.0",
+        "license": "MIT OR Apache-2.0",
+        "target_kinds": [
+          "lib"
+        ]
+      },
+      {
+        "name": "webbrowser",
+        "version": "1.2.7",
+        "license": "MIT OR Apache-2.0",
+        "target_kinds": [
+          "lib"
+        ]
+      },
+      {
+        "name": "winapi-util",
+        "version": "0.1.11",
+        "license": "Unlicense OR MIT",
+        "target_kinds": [
+          "lib"
+        ]
+      },
+      {
+        "name": "winapi",
+        "version": "0.3.9",
+        "license": "MIT/Apache-2.0",
+        "target_kinds": [
+          "custom-build",
+          "lib"
+        ]
+      },
+      {
+        "name": "windows-link",
+        "version": "0.2.1",
+        "license": "MIT OR Apache-2.0",
+        "target_kinds": [
+          "lib"
+        ]
+      },
+      {
+        "name": "windows-sys",
+        "version": "0.52.0",
+        "license": "MIT OR Apache-2.0",
+        "target_kinds": [
+          "lib"
+        ]
+      },
+      {
+        "name": "windows-sys",
+        "version": "0.59.0",
+        "license": "MIT OR Apache-2.0",
+        "target_kinds": [
+          "lib"
+        ]
+      },
+      {
+        "name": "windows-sys",
+        "version": "0.61.2",
+        "license": "MIT OR Apache-2.0",
+        "target_kinds": [
+          "lib"
+        ]
+      },
+      {
+        "name": "windows-targets",
+        "version": "0.52.6",
+        "license": "MIT OR Apache-2.0",
+        "target_kinds": [
+          "lib"
+        ]
+      },
+      {
+        "name": "windows_x86_64_msvc",
+        "version": "0.52.6",
+        "license": "MIT OR Apache-2.0",
+        "target_kinds": [
+          "custom-build",
+          "lib"
+        ]
+      },
+      {
+        "name": "winit",
+        "version": "0.30.13",
+        "license": "Apache-2.0",
+        "target_kinds": [
+          "custom-build",
+          "lib"
+        ]
+      },
+      {
+        "name": "writeable",
+        "version": "0.6.4",
+        "license": "Unicode-3.0",
+        "target_kinds": [
+          "lib"
+        ]
+      },
+      {
+        "name": "xml-rs",
+        "version": "0.8.29",
+        "license": "MIT",
+        "target_kinds": [
+          "lib"
+        ]
+      },
+      {
+        "name": "yoke-derive",
+        "version": "0.8.4",
+        "license": "Unicode-3.0",
+        "target_kinds": [
+          "proc-macro"
+        ]
+      },
+      {
+        "name": "yoke",
+        "version": "0.8.4",
+        "license": "Unicode-3.0",
+        "target_kinds": [
+          "lib"
+        ]
+      },
+      {
+        "name": "zerocopy",
+        "version": "0.8.66",
+        "license": "BSD-2-Clause OR Apache-2.0 OR MIT",
+        "target_kinds": [
+          "custom-build",
+          "lib"
+        ]
+      },
+      {
+        "name": "zerofrom-derive",
+        "version": "0.1.8",
+        "license": "Unicode-3.0",
+        "target_kinds": [
+          "proc-macro"
+        ]
+      },
+      {
+        "name": "zerofrom",
+        "version": "0.1.8",
+        "license": "Unicode-3.0",
+        "target_kinds": [
+          "lib"
+        ]
+      },
+      {
+        "name": "zerotrie",
+        "version": "0.2.5",
+        "license": "Unicode-3.0",
+        "target_kinds": [
+          "lib"
+        ]
+      },
+      {
+        "name": "zerovec-derive",
+        "version": "0.11.7",
+        "license": "Unicode-3.0",
+        "target_kinds": [
+          "proc-macro"
+        ]
+      },
+      {
+        "name": "zerovec",
+        "version": "0.11.9",
+        "license": "Unicode-3.0",
+        "target_kinds": [
+          "lib"
+        ]
+      },
+      {
+        "name": "zmij",
+        "version": "1.0.23",
+        "license": "MIT",
+        "target_kinds": [
+          "custom-build",
+          "lib"
+        ]
+      }
+    ],
+    "candidate_only_packages": [
+      {
+        "name": "fax",
+        "version": "0.2.7"
+      },
+      {
+        "name": "half",
+        "version": "2.7.1"
+      },
+      {
+        "name": "jobserver",
+        "version": "0.1.35"
+      },
+      {
+        "name": "quick-error",
+        "version": "2.0.1"
+      },
+      {
+        "name": "syn",
+        "version": "2.0.119"
+      },
+      {
+        "name": "tiff",
+        "version": "0.11.3"
+      },
+      {
+        "name": "tracing-attributes",
+        "version": "0.1.31"
+      },
+      {
+        "name": "weezl",
+        "version": "0.1.12"
+      },
+      {
+        "name": "zerocopy-derive",
+        "version": "0.8.66"
+      },
+      {
+        "name": "zlib-rs",
+        "version": "0.6.9"
+      },
+      {
+        "name": "zune-core",
+        "version": "0.5.3"
+      },
+      {
+        "name": "zune-jpeg",
+        "version": "0.5.15"
+      }
+    ],
+    "binaries": [
+      {
+        "name": "disc-archive.exe",
+        "sha256": "469a68d29045ab355b78d07ca2bb0b8706e6946426ec995dd70b6fbf5b39b9e7",
+        "size": 4852224,
+        "machine": "x86_64",
+        "imports": [
+          "api-ms-win-core-synch-l1-2-0.dll",
+          "api-ms-win-crt-heap-l1-1-0.dll",
+          "api-ms-win-crt-locale-l1-1-0.dll",
+          "api-ms-win-crt-math-l1-1-0.dll",
+          "api-ms-win-crt-runtime-l1-1-0.dll",
+          "api-ms-win-crt-stdio-l1-1-0.dll",
+          "api-ms-win-crt-string-l1-1-0.dll",
+          "api-ms-win-crt-time-l1-1-0.dll",
+          "api-ms-win-crt-utility-l1-1-0.dll",
+          "bcryptprimitives.dll",
+          "kernel32.dll",
+          "ntdll.dll",
+          "vcruntime140.dll"
+        ],
+        "delay_imports": []
+      },
+      {
+        "name": "disc-archive-studio.exe",
+        "sha256": "74eda6e9b72fb4d8f902ab071ac0c9f3b2f935fc0a44d7d54ac7f3ae9fd40283",
+        "size": 9125888,
+        "machine": "x86_64",
+        "imports": [
+          "advapi32.dll",
+          "api-ms-win-core-synch-l1-2-0.dll",
+          "api-ms-win-crt-heap-l1-1-0.dll",
+          "api-ms-win-crt-locale-l1-1-0.dll",
+          "api-ms-win-crt-math-l1-1-0.dll",
+          "api-ms-win-crt-runtime-l1-1-0.dll",
+          "api-ms-win-crt-stdio-l1-1-0.dll",
+          "api-ms-win-crt-string-l1-1-0.dll",
+          "api-ms-win-crt-time-l1-1-0.dll",
+          "api-ms-win-crt-utility-l1-1-0.dll",
+          "bcryptprimitives.dll",
+          "dwmapi.dll",
+          "gdi32.dll",
+          "imm32.dll",
+          "kernel32.dll",
+          "ntdll.dll",
+          "ole32.dll",
+          "opengl32.dll",
+          "shell32.dll",
+          "shlwapi.dll",
+          "user32.dll",
+          "uxtheme.dll",
+          "vcruntime140.dll"
+        ],
+        "delay_imports": []
+      }
+    ],
+    "distribution_approved": false
+  }
+}

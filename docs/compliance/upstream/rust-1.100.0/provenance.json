@@ -1,0 +1,38 @@
+{
+  "repository": "rust-lang/rust",
+  "commit": "0ef1bc386059596dada8fb65b50425aab2ea637a",
+  "toolchain": "1.100.0-x86_64-pc-windows-msvc",
+  "notices": [
+    {
+      "path": "docs/compliance/upstream/rust-1.100.0/LICENSE-MIT",
+      "upstream_path": "LICENSE-MIT",
+      "git_blob_sha1": "a2070c4be7acd5316f8d0357ca3c12419a2f3c62"
+    },
+    {
+      "path": "docs/compliance/upstream/rust-1.100.0/LICENSE-APACHE",
+      "upstream_path": "LICENSE-APACHE",
+      "git_blob_sha1": "1b5ec8b78e237b5c3b3d812a7c0a6589d0f7161d"
+    },
+    {
+      "path": "docs/compliance/upstream/rust-1.100.0/COPYRIGHT",
+      "upstream_path": "COPYRIGHT",
+      "git_blob_sha1": "4dad74f234eaaaa3c311ca031216e16fc9c4e940"
+    },
+    {
+      "path": "docs/compliance/upstream/rust-1.100.0/library/stdarch/LICENSE-MIT",
+      "upstream_path": "library/stdarch/LICENSE-MIT",
+      "git_blob_sha1": "52d82415d8b60cd3c5858c8939fa0d8fae1aeca0"
+    },
+    {
+      "path": "docs/compliance/upstream/rust-1.100.0/library/stdarch/LICENSE-APACHE",
+      "upstream_path": "library/stdarch/LICENSE-APACHE",
+      "git_blob_sha1": "16fe87b06e802f094b3fbb0894b137bca2b16ef1"
+    },
+    {
+      "path": "docs/compliance/upstream/rust-1.100.0/library/compiler-builtins/LICENSE.txt",
+      "upstream_path": "library/compiler-builtins/LICENSE.txt",
+      "git_blob_sha1": "00ae6140bd54e1b538d833f60438e11ed8be12cf"
+    }
+  ],
+  "scope": "Toolchain source notices; installed binary distribution copyright and license materials also required."
+}

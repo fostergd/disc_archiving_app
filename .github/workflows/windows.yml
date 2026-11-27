@@ -25,7 +25,7 @@ jobs:
           if ($LASTEXITCODE -ne 0) { throw 'History audit self-test failed' }
           python ./scripts/audit-reachable-history.py
           if ($LASTEXITCODE -ne 0) { throw 'History screen requires review' }
-      - run: rustup default stable-x86_64-pc-windows-msvc
+      - run: rustup toolchain install 1.100.0-x86_64-pc-windows-msvc --profile minimal
       - name: Run attribution parser regression tests before dependency builds
         shell: powershell
         run: |

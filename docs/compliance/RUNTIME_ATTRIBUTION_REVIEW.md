@@ -1,0 +1,9 @@
+# Windows runtime attribution - review checkpoint
+
+CI 46072903762 at dba319c5c153c1288e5906dd8f8d2fee2e9e2c8b: 162 compiled third-party candidate packages and 12 metadata-only candidates; both x64 executables inspected. Evidence in runtime-evidence-baseline.json. All declared candidate licenses remain conservatively represented in the notice bundle; no package removed based only on compiler artifact messages.
+
+Direct imports are Windows system/API-set libraries and vcruntime140.dll. No delayed imports observed. No separate runtime DLLs are packaged by the portable packaging scripts. Direct PE imports do not rule out dynamic loading (OpenGL/EGL and Windows APIs) or statically linked code. Do not redistribute Microsoft DLLs or install a runtime automatically; document the supported Microsoft Visual C++ runtime prerequisite and test on the intended Windows installation. Do not claim that an import list is a complete SBOM.
+
+Rust 1.100.0 (0ef1bc386059596dada8fb65b50425aab2ea637a) was used in the passing build. Pin this exact toolchain to avoid drift. The Rust standard library and compiler-builtins are not covered by the application's Cargo.lock inventory. Source MIT/Apache/copyright, stdarch and compiler-builtins texts retrieved from that exact upstream commit, with original Git blob identities. Rust's upstream COPYRIGHT describes generated COPYRIGHT.html and COPYRIGHT-library.html, shipped by the rustc distribution along with REUSE-managed license texts. The review bundle now additionally requires these installed original files and verifies their bytes against the pinned toolchain at assembly and package round-trip. Next inspect the actual collection results and the library-specific copyright report, and review any remaining native/generated source notices and distribution requirements. No public release approval.
+
+A separate review is required for historical exposure findings and legacy release assets.

@@ -4,6 +4,7 @@ import hashlib
 import json
 from pathlib import Path, PurePosixPath
 import tempfile
+import subprocess
 import unittest
 import zipfile
 
@@ -39,6 +40,49 @@ def load(path):
     return json.loads(path.read_text(encoding="utf-8-sig"))
 
 
+def toolchain_notices():
+    # Rust standard library/compiler builtins are outside the application
+    # Cargo.lock. Include official binary-distribution copyright documents
+    # and REUSE license texts from the exact installed toolchain.
+    version = subprocess.check_output(["rustc", "-vV"], cwd=ROOT, encoding="utf-8")
+    if "commit-hash: 0ef1bc386059596dada8fb65b50425aab2ea637a" not in version.splitlines():
+        raise ValueError("reviewed Rust toolchain commit changed")
+    if "host: x86_64-pc-windows-msvc" not in version.splitlines():
+        raise ValueError("unexpected Rust toolchain host")
+    sysroot = Path(subprocess.check_output(["rustc", "--print", "sysroot"], cwd=ROOT, encoding="utf-8").strip())
+    doc = sysroot / "share/doc/rust"
+    out = {}
+    for name in ("COPYRIGHT.html", "COPYRIGHT-library.html"):
+        source = doc / name
+        if not source.is_file():
+            raise ValueError("missing official toolchain notice: " + name)
+        raw = source.read_bytes()
+        if not raw or len(raw) > 32*1024*1024:
+            raise ValueError("unexpected toolchain copyright document size")
+        out["toolchain/distribution/" + name] = raw
+    license_dir = doc / "licenses"
+    sources = sorted(p for p in license_dir.rglob("*") if p.is_file())
+    if not sources:
+        raise ValueError("missing toolchain distribution license texts")
+    for source in sources:
+        if not source.resolve().is_relative_to(license_dir.resolve()):
+            raise ValueError("toolchain license outside document directory")
+        name = "toolchain/distribution/licenses/" + source.relative_to(license_dir).as_posix()
+        safe_name(name)
+        out[name] = source.read_bytes()
+    provenance = load(ROOT / "docs/compliance/upstream/rust-1.100.0/provenance.json")
+    for row in provenance["notices"]:
+        source = ROOT / row["path"]
+        raw = source.read_bytes()
+        if git_blob(raw) != row["git_blob_sha1"]:
+            raise ValueError("toolchain upstream license mismatch")
+        name = "toolchain/source/" + row["upstream_path"]
+        safe_name(name)
+        out[name] = raw
+    out["toolchain/source/provenance.json"] = (ROOT / "docs/compliance/upstream/rust-1.100.0/provenance.json").read_bytes()
+    return out
+
+
 def expected_notices():
     inventory = load(ROOT / "docs/compliance/windows-license-inventory.json")
     if inventory["lock_sha256"] != LOCK_HASH:
@@ -65,12 +109,16 @@ def expected_notices():
 
 
 def verify_bytes(items, expected):
-    if set(items) != set(expected) | EXTRA:
+    toolchain = toolchain_notices()
+    if set(items) != set(expected) | EXTRA | set(toolchain):
         raise ValueError("notice bundle entry set mismatch")
     for name, (algorithm, value) in expected.items():
         raw = items[name]
         if (digest(raw) if algorithm == "sha256" else git_blob(raw)) != value:
             raise ValueError("upstream notice identity mismatch: " + name)
+    for name, raw in toolchain.items():
+        if items[name] != raw:
+            raise ValueError("toolchain notice identity mismatch: " + name)
     angle = items["upstream/angle-7403dd2/LICENSE"]
     if git_blob(angle) != "0f65fd60fd68d465a2283378849f16532f5ee4f1":
         raise ValueError("ANGLE license identity mismatch")
@@ -136,6 +184,7 @@ def build(notice_dir, embedded, destination):
     for name in ("LICENSE", "provenance.json"):
         path = "upstream/angle-7403dd2/" + name
         items[path] = (ROOT / "docs/compliance" / path).read_bytes()
+    items.update(toolchain_notices())
     items["README.txt"] = (b"REVIEW ONLY - public distribution is not authorized by this bundle.\n"
                            b"Original third-party notices and attribution evidence. See project THIRD_PARTY_NOTICES.md.\n"
                            b"Inventory conservatively includes build/dev candidates; not a binary SBOM.\n")
