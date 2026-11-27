@@ -1,3 +1,18 @@
 /target/
 *.iso
 *.db
+
+# Local build outputs, private archive metadata and credentials
+*.sqlite
+*.sqlite3
+*.sqlite-wal
+*.sqlite-shm
+*.db-wal
+*.db-shm
+*.das.json
+*.prepared.json
+.env
+.env.*
+*.pem
+*.key
+*.pfx

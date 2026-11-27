@@ -3,13 +3,13 @@ $ErrorActionPreference = 'Stop'
 Set-StrictMode -Version Latest
 $dest = [IO.Path]::GetFullPath($Destination)
 if (-not (Test-Path -LiteralPath $dest -PathType Container)) { throw 'Missing package directory' }
-$expected = @('disc-archive.exe','disc-archive-studio.exe','README.md','WINDOWS_ACCEPTANCE.md','SHA256SUMS.txt')
+$expected = @('disc-archive.exe','disc-archive-studio.exe','README.md','WINDOWS_ACCEPTANCE.md','LICENSE.md','THIRD_PARTY_NOTICES.md','SHA256SUMS.txt')
 foreach ($name in $expected) {
   if (-not (Test-Path -LiteralPath (Join-Path $dest $name) -PathType Leaf)) { throw "Missing package file: $name" }
 }
 $lines = @(Get-Content -LiteralPath (Join-Path $dest 'SHA256SUMS.txt'))
-if ($lines.Count -ne 4) { throw 'Unexpected checksum count' }
-foreach ($name in $expected[0..3]) {
+if ($lines.Count -ne 6) { throw 'Unexpected checksum count' }
+foreach ($name in $expected[0..5]) {
   $hash = (Get-FileHash -LiteralPath (Join-Path $dest $name) -Algorithm SHA256).Hash.ToLowerInvariant()
   if ($lines -cnotcontains "$hash  $name") { throw "Checksum mismatch: $name" }
 }

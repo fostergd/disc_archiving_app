@@ -15,7 +15,9 @@ foreach ($name in $names) {
 }
 Copy-Item -LiteralPath (Join-Path $root 'README.md') -Destination (Join-Path $dest 'README.md')
 Copy-Item -LiteralPath (Join-Path $root 'WINDOWS_ACCEPTANCE.md') -Destination (Join-Path $dest 'WINDOWS_ACCEPTANCE.md')
-$lines = foreach ($name in ($names + @('README.md','WINDOWS_ACCEPTANCE.md'))) {
+Copy-Item -LiteralPath (Join-Path $root 'LICENSE.md') -Destination (Join-Path $dest 'LICENSE.md')
+Copy-Item -LiteralPath (Join-Path $root 'THIRD_PARTY_NOTICES.md') -Destination (Join-Path $dest 'THIRD_PARTY_NOTICES.md')
+$lines = foreach ($name in ($names + @('README.md','WINDOWS_ACCEPTANCE.md','LICENSE.md','THIRD_PARTY_NOTICES.md'))) {
     $hash = (Get-FileHash -LiteralPath (Join-Path $dest $name) -Algorithm SHA256).Hash.ToLowerInvariant()
     "$hash  $name"
 }

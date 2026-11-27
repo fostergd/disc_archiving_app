@@ -41,3 +41,6 @@ Phase 8A-R3a 5a82b41f3d7fbf40d9300d12b6fb09fc3450579d passed Windows CI 45921114
 Phase 8A-R3b 3e79e96462f6dfb6786fb36490b3e29933e22d33 passed Windows CI 45940393862. R3c catalog/project UX, search state, and narrow-window navigation implemented; new CI pending. Next R4 per UI_REDESIGN.md.
 
 Phase 8A-R3c 7d790575a78ff487610695f023b7739494395303 passed Windows CI 45941462305. R4 final combined GUI review, non-interactive egui smoke tests, worker guard and revised Windows acceptance checklist implemented. Exact-head CI pending. On success, use existing private release workflow and verify publication before Windows acceptance. No hardware acceptance claimed.
+
+## Publication preparation (CI intentionally skipped)
+Owner requested public visibility due to exhausted GitHub Actions compute and storage allowance. All automations remain paused. Reserved-rights/evaluation terms, third-party review inventory, security and contribution guidance and publication checklist prepared. No visibility or billing change; existing release retained. Public distribution remains on hold pending history/log/asset exposure and dependency license reviews. Current R4 application commit 547337976b8fff5fd24c56e216bea9c0243290d0 was awaiting CI at pause; do not represent publication preparation as tested. No new build requested while private.

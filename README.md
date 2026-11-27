@@ -1,5 +1,7 @@
 # Disc Archive Studio
 
+**Rights and evaluation terms:** This project is not licensed for unrestricted reuse. See [LICENSE.md](LICENSE.md) for reserved rights and evaluation terms, [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) for the outstanding dependency review, and [SECURITY.md](SECURITY.md) for safe reporting. Public binary distribution is on hold pending completion of the license and exposure review. See [PUBLICATION_CHECKLIST.md](PUBLICATION_CHECKLIST.md).
+
 Unsigned Windows 10/11 x64 portable preview for planning file archives, creating verified UDF images, and experimental single-session write-once optical recording. CLI and desktop GUI share the Rust engine. Automated Windows CI is not physical hardware or interactive desktop acceptance. Complete [WINDOWS_ACCEPTANCE.md](WINDOWS_ACCEPTANCE.md) with disposable fixtures and expendable media before trusting the writer with archive material.
 
 ## Getting started

@@ -20,5 +20,5 @@ Expand-Archive -LiteralPath $zip -DestinationPath $extract
 & (Join-Path $PSScriptRoot 'test-portable.ps1') -Destination $extract
 $hash = (Get-FileHash -LiteralPath $zip -Algorithm SHA256).Hash.ToLowerInvariant()
 "$hash  disc-archive-windows-x64-preview.zip" | Set-Content -LiteralPath $checksum -Encoding ascii
-# Check that the extracted executable and all four internal checksums passed
+# Check that the extracted executable and all six internal checksums passed
 # before writing the external checksum. No upload is performed by this script.
