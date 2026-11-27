@@ -8,8 +8,7 @@ if (Test-Path -LiteralPath $out) { throw 'License inventory directory already ex
 Push-Location $root
 try {
     if (-not (Test-Path -LiteralPath 'Cargo.lock' -PathType Leaf)) {
-        & cargo generate-lockfile
-        if ($LASTEXITCODE -ne 0) { throw 'Dependency resolution failed' }
+        throw 'Reviewed Cargo.lock is required; dependency updates need a new review'
     }
     $raw = & cargo metadata --locked --format-version 1 --filter-platform x86_64-pc-windows-msvc --features gui
     if ($LASTEXITCODE -ne 0) { throw 'Windows dependency metadata failed' }

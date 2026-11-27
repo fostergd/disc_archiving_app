@@ -15,3 +15,5 @@ Public visibility allows other users to copy/fork within GitHub under GitHub Ter
 
 ## Public conversion reported and verified
 Repository is now public. The original preview tag preview-96e0ec3dc921-45907196171-1 remains published and accessible; recommend owner make it a draft pending review if GitHub permits. No release deletion or alteration performed. Historical exposure audit and dependency clearance remain outstanding. Continue public standard-runner CI without artifact upload. The new license inventory step is a review aid, not a publication approval. Keep the existing private-only release workflow blocked for public repositories until completed notices and release gates are implemented. Only Disc Archive Studio automation may be resumed; leave other tasks paused.
+
+Public standard CI 45946699269 passed, artifact upload skipped. Recovered lockfile SHA-256 verified against runner output; pinned lockfile and candidate inventory committed. Public distribution gate remains closed pending full notice collection and assessment of 11 missing legal-file candidates and font/embedded/native obligations. Historical audit still incomplete.

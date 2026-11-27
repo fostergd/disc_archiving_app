@@ -1,0 +1,3169 @@
+{
+  "source_commit": "a404b2a9d618bcfdfcdf3f9c4d6580028bf70e53",
+  "run_id": 45946699269,
+  "job_id": 140332915159,
+  "lock_sha256": "60862ef1ad2cfab8812323835ad07f16294ccd4b09b6a2b32b7ea5dc5cccc567",
+  "target": "x86_64-pc-windows-msvc",
+  "features": [
+    "gui"
+  ],
+  "scope": "resolved candidate inventory; not a linked-binary SBOM or completed license clearance",
+  "packages": [
+    {
+      "name": "ab_glyph",
+      "version": "0.2.32",
+      "license": "Apache-2.0",
+      "license_file": null,
+      "legal_files": [
+        {
+          "path": "LICENSE",
+          "sha256": "a6cba85bc92e0cff7a450b1d873c0eaa2e9fc96bf472df0247a26bec77bf3ff9"
+        }
+      ],
+      "embedded_asset_candidates": []
+    },
+    {
+      "name": "ab_glyph_rasterizer",
+      "version": "0.1.10",
+      "license": "Apache-2.0",
+      "license_file": null,
+      "legal_files": [
+        {
+          "path": "LICENSE",
+          "sha256": "a6cba85bc92e0cff7a450b1d873c0eaa2e9fc96bf472df0247a26bec77bf3ff9"
+        }
+      ],
+      "embedded_asset_candidates": []
+    },
+    {
+      "name": "adler2",
+      "version": "2.0.1",
+      "license": "0BSD OR MIT OR Apache-2.0",
+      "license_file": null,
+      "legal_files": [
+        {
+          "path": "LICENSE-0BSD",
+          "sha256": "861399f8c21c042b110517e76dc6b63a2b334276c8cf17412fc3c8908ca8dc17"
+        },
+        {
+          "path": "LICENSE-APACHE",
+          "sha256": "8ada45cd9f843acf64e4722ae262c622a2b3b3007c7310ef36ac1061a30f6adb"
+        },
+        {
+          "path": "LICENSE-MIT",
+          "sha256": "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3"
+        }
+      ],
+      "embedded_asset_candidates": []
+    },
+    {
+      "name": "ahash",
+      "version": "0.8.14",
+      "license": "MIT OR Apache-2.0",
+      "license_file": null,
+      "legal_files": [
+        {
+          "path": "LICENSE-APACHE",
+          "sha256": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2"
+        },
+        {
+          "path": "LICENSE-MIT",
+          "sha256": "0444c6991eead6822f7b9102e654448d51624431119546492e8b231db42c48bb"
+        }
+      ],
+      "embedded_asset_candidates": []
+    },
+    {
+      "name": "aho-corasick",
+      "version": "1.1.5",
+      "license": "Unlicense OR MIT",
+      "license_file": null,
+      "legal_files": [
+        {
+          "path": "COPYING",
+          "sha256": "01c266bced4a434da0051174d6bee16a4c82cf634e2679b6155d40d75012390f"
+        },
+        {
+          "path": "LICENSE-MIT",
+          "sha256": "0f96a83840e146e43c0ec96a22ec1f392e0680e6c1226e6f3ba87e0740af850f"
+        },
+        {
+          "path": "UNLICENSE",
+          "sha256": "7e12e5df4bae12cb21581ba157ced20e1986a0508dd10d0e8a4ab9a4cf94e85c"
+        }
+      ],
+      "embedded_asset_candidates": []
+    },
+    {
+      "name": "anstream",
+      "version": "1.0.0",
+      "license": "MIT OR Apache-2.0",
+      "license_file": null,
+      "legal_files": [
+        {
+          "path": "LICENSE-APACHE",
+          "sha256": "c6596eb7be8581c18be736c846fb9173b69eccf6ef94c5135893ec56bd92ba08"
+        },
+        {
+          "path": "LICENSE-MIT",
+          "sha256": "6efb0476a1cc085077ed49357026d8c173bf33017278ef440f222fb9cbcb66e6"
+        }
+      ],
+      "embedded_asset_candidates": []
+    },
+    {
+      "name": "anstyle",
+      "version": "1.0.14",
+      "license": "MIT OR Apache-2.0",
+      "license_file": null,
+      "legal_files": [
+        {
+          "path": "LICENSE-APACHE",
+          "sha256": "c6596eb7be8581c18be736c846fb9173b69eccf6ef94c5135893ec56bd92ba08"
+        },
+        {
+          "path": "LICENSE-MIT",
+          "sha256": "6efb0476a1cc085077ed49357026d8c173bf33017278ef440f222fb9cbcb66e6"
+        }
+      ],
+      "embedded_asset_candidates": []
+    },
+    {
+      "name": "anstyle-parse",
+      "version": "1.0.0",
+      "license": "MIT OR Apache-2.0",
+      "license_file": null,
+      "legal_files": [
+        {
+          "path": "LICENSE-APACHE",
+          "sha256": "c6596eb7be8581c18be736c846fb9173b69eccf6ef94c5135893ec56bd92ba08"
+        },
+        {
+          "path": "LICENSE-MIT",
+          "sha256": "6efb0476a1cc085077ed49357026d8c173bf33017278ef440f222fb9cbcb66e6"
+        }
+      ],
+      "embedded_asset_candidates": []
+    },
+    {
+      "name": "anstyle-query",
+      "version": "1.1.5",
+      "license": "MIT OR Apache-2.0",
+      "license_file": null,
+      "legal_files": [
+        {
+          "path": "LICENSE-APACHE",
+          "sha256": "c6596eb7be8581c18be736c846fb9173b69eccf6ef94c5135893ec56bd92ba08"
+        },
+        {
+          "path": "LICENSE-MIT",
+          "sha256": "6efb0476a1cc085077ed49357026d8c173bf33017278ef440f222fb9cbcb66e6"
+        }
+      ],
+      "embedded_asset_candidates": []
+    },
+    {
+      "name": "anstyle-wincon",
+      "version": "3.0.11",
+      "license": "MIT OR Apache-2.0",
+      "license_file": null,
+      "legal_files": [
+        {
+          "path": "LICENSE-APACHE",
+          "sha256": "c6596eb7be8581c18be736c846fb9173b69eccf6ef94c5135893ec56bd92ba08"
+        },
+        {
+          "path": "LICENSE-MIT",
+          "sha256": "6efb0476a1cc085077ed49357026d8c173bf33017278ef440f222fb9cbcb66e6"
+        }
+      ],
+      "embedded_asset_candidates": []
+    },
+    {
+      "name": "anyhow",
+      "version": "1.0.105",
+      "license": "MIT OR Apache-2.0",
+      "license_file": null,
+      "legal_files": [
+        {
+          "path": "LICENSE-APACHE",
+          "sha256": "62c7a1e35f56406896d7aa7ca52d0cc0d272ac022b5d2796e7d6905db8a3636a"
+        },
+        {
+          "path": "LICENSE-MIT",
+          "sha256": "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3"
+        }
+      ],
+      "embedded_asset_candidates": []
+    },
+    {
+      "name": "arboard",
+      "version": "3.7.0",
+      "license": "MIT OR Apache-2.0",
+      "license_file": null,
+      "legal_files": [
+        {
+          "path": "LICENSE-APACHE.txt",
+          "sha256": "0d542e0c8804e39aa7f37eb00da5a762149dc682d7829451287e11b938e94594"
+        },
+        {
+          "path": "LICENSE-MIT.txt",
+          "sha256": "f35468024534e0f4f16bb94cd0e88c87fbd1314f919c2645a07d350fb77b40c0"
+        }
+      ],
+      "embedded_asset_candidates": []
+    },
+    {
+      "name": "autocfg",
+      "version": "1.5.1",
+      "license": "Apache-2.0 OR MIT",
+      "license_file": null,
+      "legal_files": [
+        {
+          "path": "LICENSE-APACHE",
+          "sha256": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2"
+        },
+        {
+          "path": "LICENSE-MIT",
+          "sha256": "27995d58ad5c1145c1a8cd86244ce844886958a35eb2b78c6b772748669999ac"
+        }
+      ],
+      "embedded_asset_candidates": []
+    },
+    {
+      "name": "bitflags",
+      "version": "2.13.2",
+      "license": "MIT OR Apache-2.0",
+      "license_file": null,
+      "legal_files": [
+        {
+          "path": "LICENSE-APACHE",
+          "sha256": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2"
+        },
+        {
+          "path": "LICENSE-MIT",
+          "sha256": "6485b8ed310d3f0340bf1ad1f47645069ce4069dcc6bb46c7d5c6faf41de1fdb"
+        }
+      ],
+      "embedded_asset_candidates": []
+    },
+    {
+      "name": "block-buffer",
+      "version": "0.10.4",
+      "license": "MIT OR Apache-2.0",
+      "license_file": null,
+      "legal_files": [
+        {
+          "path": "LICENSE-APACHE",
+          "sha256": "a9040321c3712d8fd0b09cf52b17445de04a23a10165049ae187cd39e5c86be5"
+        },
+        {
+          "path": "LICENSE-MIT",
+          "sha256": "d5c22aa3118d240e877ad41c5d9fa232f9c77d757d4aac0c2f943afc0a95e0ef"
+        }
+      ],
+      "embedded_asset_candidates": []
+    },
+    {
+      "name": "bstr",
+      "version": "1.14.0",
+      "license": "MIT OR Apache-2.0",
+      "license_file": null,
+      "legal_files": [
+        {
+          "path": "COPYING",
+          "sha256": "68653aaa727a2bfa31b7a751e31701ce33c49d695c12dd291a07d1c54da4c14b"
+        },
+        {
+          "path": "LICENSE-APACHE",
+          "sha256": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2"
+        },
+        {
+          "path": "LICENSE-MIT",
+          "sha256": "6b7374c39a57e57fc2c38eb529c4c88340152b10f51dd5ae2d819dfa67f61715"
+        }
+      ],
+      "embedded_asset_candidates": []
+    },
+    {
+      "name": "bytemuck",
+      "version": "1.25.2",
+      "license": "Zlib OR Apache-2.0 OR MIT",
+      "license_file": null,
+      "legal_files": [
+        {
+          "path": "LICENSE-APACHE",
+          "sha256": "e3ba223bb1423f0aad8c3dfce0fe3148db48926d41e6fbc3afbbf5ff9e1c89cb"
+        },
+        {
+          "path": "LICENSE-MIT",
+          "sha256": "9df9ba60a11af705f2e451b53762686e615d86f76b169cf075c3237730dbd7e2"
+        },
+        {
+          "path": "LICENSE-ZLIB",
+          "sha256": "84b34dd7608f7fb9b17bd588a6bf392bf7de504e2716f024a77d89f1b145a151"
+        }
+      ],
+      "embedded_asset_candidates": []
+    },
+    {
+      "name": "bytemuck_derive",
+      "version": "1.12.1",
+      "license": "Zlib OR Apache-2.0 OR MIT",
+      "license_file": null,
+      "legal_files": [
+        {
+          "path": "LICENSE-APACHE",
+          "sha256": "e3ba223bb1423f0aad8c3dfce0fe3148db48926d41e6fbc3afbbf5ff9e1c89cb"
+        },
+        {
+          "path": "LICENSE-MIT",
+          "sha256": "9df9ba60a11af705f2e451b53762686e615d86f76b169cf075c3237730dbd7e2"
+        },
+        {
+          "path": "LICENSE-ZLIB",
+          "sha256": "84b34dd7608f7fb9b17bd588a6bf392bf7de504e2716f024a77d89f1b145a151"
+        }
+      ],
+      "embedded_asset_candidates": []
+    },
+    {
+      "name": "byteorder-lite",
+      "version": "0.1.0",
+      "license": "Unlicense OR MIT",
+      "license_file": null,
+      "legal_files": [
+        {
+          "path": "LICENSE-MIT",
+          "sha256": "0f96a83840e146e43c0ec96a22ec1f392e0680e6c1226e6f3ba87e0740af850f"
+        },
+        {
+          "path": "UNLICENSE",
+          "sha256": "7e12e5df4bae12cb21581ba157ced20e1986a0508dd10d0e8a4ab9a4cf94e85c"
+        }
+      ],
+      "embedded_asset_candidates": []
+    },
+    {
+      "name": "cc",
+      "version": "1.11.3",
+      "license": "MIT OR Apache-2.0",
+      "license_file": null,
+      "legal_files": [
+        {
+          "path": "LICENSE-APACHE",
+          "sha256": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2"
+        },
+        {
+          "path": "LICENSE-MIT",
+          "sha256": "378f5840b258e2779c39418f3f2d7b2ba96f1c7917dd6be0713f88305dbda397"
+        }
+      ],
+      "embedded_asset_candidates": []
+    },
+    {
+      "name": "cfg_aliases",
+      "version": "0.2.2",
+      "license": "MIT",
+      "license_file": null,
+      "legal_files": [
+        {
+          "path": "LICENSE",
+          "sha256": "31b94860253d8ec7b4529f51901044d3b459d6292d996504a36b1bae3a36a812"
+        },
+        {
+          "path": "NOTICES.md",
+          "sha256": "1e2b7ade3fb228130408b9990cae6a7618eb314c75aa0b164bfe485d9d9756ee"
+        }
+      ],
+      "embedded_asset_candidates": []
+    },
+    {
+      "name": "cfg-if",
+      "version": "1.0.5",
+      "license": "MIT OR Apache-2.0",
+      "license_file": null,
+      "legal_files": [
+        {
+          "path": "LICENSE-APACHE",
+          "sha256": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2"
+        },
+        {
+          "path": "LICENSE-MIT",
+          "sha256": "378f5840b258e2779c39418f3f2d7b2ba96f1c7917dd6be0713f88305dbda397"
+        }
+      ],
+      "embedded_asset_candidates": []
+    },
+    {
+      "name": "clap",
+      "version": "4.6.10",
+      "license": "MIT OR Apache-2.0",
+      "license_file": null,
+      "legal_files": [
+        {
+          "path": "LICENSE-APACHE",
+          "sha256": "249fdb6694467dd615b259f7ddde07be3f8ae5a72cecebb0e24f6629af4215fe"
+        },
+        {
+          "path": "LICENSE-MIT",
+          "sha256": "6efb0476a1cc085077ed49357026d8c173bf33017278ef440f222fb9cbcb66e6"
+        }
+      ],
+      "embedded_asset_candidates": []
+    },
+    {
+      "name": "clap_builder",
+      "version": "4.6.10",
+      "license": "MIT OR Apache-2.0",
+      "license_file": null,
+      "legal_files": [
+        {
+          "path": "LICENSE-APACHE",
+          "sha256": "249fdb6694467dd615b259f7ddde07be3f8ae5a72cecebb0e24f6629af4215fe"
+        },
+        {
+          "path": "LICENSE-MIT",
+          "sha256": "6efb0476a1cc085077ed49357026d8c173bf33017278ef440f222fb9cbcb66e6"
+        }
+      ],
+      "embedded_asset_candidates": []
+    },
+    {
+      "name": "clap_derive",
+      "version": "4.6.9",
+      "license": "MIT OR Apache-2.0",
+      "license_file": null,
+      "legal_files": [
+        {
+          "path": "LICENSE-APACHE",
+          "sha256": "249fdb6694467dd615b259f7ddde07be3f8ae5a72cecebb0e24f6629af4215fe"
+        },
+        {
+          "path": "LICENSE-MIT",
+          "sha256": "6efb0476a1cc085077ed49357026d8c173bf33017278ef440f222fb9cbcb66e6"
+        }
+      ],
+      "embedded_asset_candidates": []
+    },
+    {
+      "name": "clap_lex",
+      "version": "1.1.2",
+      "license": "MIT OR Apache-2.0",
+      "license_file": null,
+      "legal_files": [
+        {
+          "path": "LICENSE-APACHE",
+          "sha256": "249fdb6694467dd615b259f7ddde07be3f8ae5a72cecebb0e24f6629af4215fe"
+        },
+        {
+          "path": "LICENSE-MIT",
+          "sha256": "6efb0476a1cc085077ed49357026d8c173bf33017278ef440f222fb9cbcb66e6"
+        }
+      ],
+      "embedded_asset_candidates": []
+    },
+    {
+      "name": "clipboard-win",
+      "version": "5.4.3",
+      "license": "BSL-1.0",
+      "license_file": null,
+      "legal_files": [],
+      "embedded_asset_candidates": []
+    },
+    {
+      "name": "colorchoice",
+      "version": "1.0.5",
+      "license": "MIT OR Apache-2.0",
+      "license_file": null,
+      "legal_files": [
+        {
+          "path": "LICENSE-APACHE",
+          "sha256": "c6596eb7be8581c18be736c846fb9173b69eccf6ef94c5135893ec56bd92ba08"
+        },
+        {
+          "path": "LICENSE-MIT",
+          "sha256": "6efb0476a1cc085077ed49357026d8c173bf33017278ef440f222fb9cbcb66e6"
+        }
+      ],
+      "embedded_asset_candidates": []
+    },
+    {
+      "name": "cpufeatures",
+      "version": "0.2.17",
+      "license": "MIT OR Apache-2.0",
+      "license_file": null,
+      "legal_files": [
+        {
+          "path": "LICENSE-APACHE",
+          "sha256": "a9040321c3712d8fd0b09cf52b17445de04a23a10165049ae187cd39e5c86be5"
+        },
+        {
+          "path": "LICENSE-MIT",
+          "sha256": "ae9baa7beea910273c2f384c2a6b721fb7bd02bda3436074a1072e4ee689f985"
+        }
+      ],
+      "embedded_asset_candidates": []
+    },
+    {
+      "name": "crc32fast",
+      "version": "1.5.6",
+      "license": "MIT OR Apache-2.0",
+      "license_file": null,
+      "legal_files": [
+        {
+          "path": "LICENSE-APACHE",
+          "sha256": "c6596eb7be8581c18be736c846fb9173b69eccf6ef94c5135893ec56bd92ba08"
+        },
+        {
+          "path": "LICENSE-MIT",
+          "sha256": "61d383b05b87d78f94d2937e2580cce47226d17823c0430fbcad09596537efcf"
+        }
+      ],
+      "embedded_asset_candidates": []
+    },
+    {
+      "name": "crypto-common",
+      "version": "0.1.7",
+      "license": "MIT OR Apache-2.0",
+      "license_file": null,
+      "legal_files": [
+        {
+          "path": "LICENSE-APACHE",
+          "sha256": "a9040321c3712d8fd0b09cf52b17445de04a23a10165049ae187cd39e5c86be5"
+        },
+        {
+          "path": "LICENSE-MIT",
+          "sha256": "3521672491a3479422d5fe1aca6645dd2984090f85da6e5205abfb18fb7a6897"
+        }
+      ],
+      "embedded_asset_candidates": []
+    },
+    {
+      "name": "cursor-icon",
+      "version": "1.2.0",
+      "license": "MIT OR Apache-2.0 OR Zlib",
+      "license_file": null,
+      "legal_files": [
+        {
+          "path": "LICENSE-APACHE",
+          "sha256": "b59affd015e517ed998dd735757f9a3693643cd389609947ed54074234a10784"
+        },
+        {
+          "path": "LICENSE-MIT",
+          "sha256": "c138726a726ac37bae09d0f8a48e74e8e3aa8a8952fcd10fae0fb224cc1c05f1"
+        },
+        {
+          "path": "LICENSE-ZLIB",
+          "sha256": "01e533bd94e8f1c32b2c2531e2c398de7d35d7804add3d574b4e1fe581d53537"
+        }
+      ],
+      "embedded_asset_candidates": []
+    },
+    {
+      "name": "digest",
+      "version": "0.10.7",
+      "license": "MIT OR Apache-2.0",
+      "license_file": null,
+      "legal_files": [
+        {
+          "path": "LICENSE-APACHE",
+          "sha256": "a9040321c3712d8fd0b09cf52b17445de04a23a10165049ae187cd39e5c86be5"
+        },
+        {
+          "path": "LICENSE-MIT",
+          "sha256": "9e0dfd2dd4173a530e238cb6adb37aa78c34c6bc7444e0e10c1ab5d8881f63ba"
+        }
+      ],
+      "embedded_asset_candidates": []
+    },
+    {
+      "name": "displaydoc",
+      "version": "0.2.7",
+      "license": "MIT OR Apache-2.0",
+      "license_file": null,
+      "legal_files": [
+        {
+          "path": "LICENSE-APACHE",
+          "sha256": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2"
+        },
+        {
+          "path": "LICENSE-MIT",
+          "sha256": "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3"
+        }
+      ],
+      "embedded_asset_candidates": []
+    },
+    {
+      "name": "document-features",
+      "version": "0.2.12",
+      "license": "MIT OR Apache-2.0",
+      "license_file": null,
+      "legal_files": [
+        {
+          "path": "LICENSE-APACHE",
+          "sha256": "074e6e32c86a4c0ef8b3ed25b721ca23aca83df277cd88106ef7177c354615ff"
+        },
+        {
+          "path": "LICENSE-MIT",
+          "sha256": "aa893340d14b9844625be6a50ac644169a01b52f0211cbf81b09e1874c8cd81d"
+        }
+      ],
+      "embedded_asset_candidates": []
+    },
+    {
+      "name": "dpi",
+      "version": "0.1.2",
+      "license": "Apache-2.0 AND MIT",
+      "license_file": null,
+      "legal_files": [
+        {
+          "path": "LICENSE",
+          "sha256": "6dc0e068dcf3a5bc8e054205b85b7720e1d49265bbc64bf515d2cf79197df69a"
+        },
+        {
+          "path": "LICENSE-LIBM-MIT",
+          "sha256": "9eff396a99bafd208e7126602420d6864f6066c08b84485a5b032320a9c01997"
+        }
+      ],
+      "embedded_asset_candidates": []
+    },
+    {
+      "name": "ecolor",
+      "version": "0.31.1",
+      "license": "MIT OR Apache-2.0",
+      "license_file": null,
+      "legal_files": [],
+      "embedded_asset_candidates": []
+    },
+    {
+      "name": "eframe",
+      "version": "0.31.1",
+      "license": "MIT OR Apache-2.0",
+      "license_file": null,
+      "legal_files": [],
+      "embedded_asset_candidates": []
+    },
+    {
+      "name": "egui",
+      "version": "0.31.1",
+      "license": "MIT OR Apache-2.0",
+      "license_file": null,
+      "legal_files": [],
+      "embedded_asset_candidates": []
+    },
+    {
+      "name": "egui_glow",
+      "version": "0.31.1",
+      "license": "MIT OR Apache-2.0",
+      "license_file": null,
+      "legal_files": [],
+      "embedded_asset_candidates": []
+    },
+    {
+      "name": "egui-winit",
+      "version": "0.31.1",
+      "license": "MIT OR Apache-2.0",
+      "license_file": null,
+      "legal_files": [],
+      "embedded_asset_candidates": []
+    },
+    {
+      "name": "emath",
+      "version": "0.31.1",
+      "license": "MIT OR Apache-2.0",
+      "license_file": null,
+      "legal_files": [],
+      "embedded_asset_candidates": []
+    },
+    {
+      "name": "epaint",
+      "version": "0.31.1",
+      "license": "MIT OR Apache-2.0",
+      "license_file": null,
+      "legal_files": [],
+      "embedded_asset_candidates": []
+    },
+    {
+      "name": "epaint_default_fonts",
+      "version": "0.31.1",
+      "license": "(MIT OR Apache-2.0) AND OFL-1.1 AND Ubuntu-font-1.0",
+      "license_file": null,
+      "legal_files": [
+        {
+          "path": "fonts\\OFL.txt",
+          "sha256": "6a73f9541c2de74158c0e7cf6b0a58ef774f5a780bf191f2d7ec9cc53efe2bf2"
+        }
+      ],
+      "embedded_asset_candidates": [
+        "fonts\\emoji-icon-font.ttf",
+        "fonts\\Hack-Regular.ttf",
+        "fonts\\NotoEmoji-Regular.ttf",
+        "fonts\\Ubuntu-Light.ttf"
+      ]
+    },
+    {
+      "name": "error-code",
+      "version": "3.4.0",
+      "license": "BSL-1.0",
+      "license_file": null,
+      "legal_files": [
+        {
+          "path": "LICENSE",
+          "sha256": "c9bff75738922193e67fa726fa225535870d2aa1059f91452c411736284ad566"
+        }
+      ],
+      "embedded_asset_candidates": []
+    },
+    {
+      "name": "fallible-iterator",
+      "version": "0.3.0",
+      "license": "MIT/Apache-2.0",
+      "license_file": null,
+      "legal_files": [
+        {
+          "path": "LICENSE-APACHE",
+          "sha256": "c6596eb7be8581c18be736c846fb9173b69eccf6ef94c5135893ec56bd92ba08"
+        },
+        {
+          "path": "LICENSE-MIT",
+          "sha256": "0816e154b159ba255c563f7c8c7df5bbb8cc5fc96f5ab8cf9f4743b4f41fe7eb"
+        }
+      ],
+      "embedded_asset_candidates": []
+    },
+    {
+      "name": "fallible-streaming-iterator",
+      "version": "0.1.9",
+      "license": "MIT/Apache-2.0",
+      "license_file": null,
+      "legal_files": [
+        {
+          "path": "LICENSE-APACHE",
+          "sha256": "c6596eb7be8581c18be736c846fb9173b69eccf6ef94c5135893ec56bd92ba08"
+        },
+        {
+          "path": "LICENSE-MIT",
+          "sha256": "8dcec5569a9be5b0e086c80faed6f1aefa670af0ec29cecc2f714303096887e0"
+        }
+      ],
+      "embedded_asset_candidates": []
+    },
+    {
+      "name": "fastrand",
+      "version": "2.5.0",
+      "license": "Apache-2.0 OR MIT",
+      "license_file": null,
+      "legal_files": [
+        {
+          "path": "LICENSE-APACHE",
+          "sha256": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2"
+        },
+        {
+          "path": "LICENSE-MIT",
+          "sha256": "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3"
+        }
+      ],
+      "embedded_asset_candidates": []
+    },
+    {
+      "name": "fax",
+      "version": "0.2.7",
+      "license": "MIT",
+      "license_file": null,
+      "legal_files": [
+        {
+          "path": "LICENSE",
+          "sha256": "7101390b4c8edd752f4c0de47f35d61b44d9cf0ee8dd032115e25644e277cfff"
+        }
+      ],
+      "embedded_asset_candidates": []
+    },
+    {
+      "name": "fdeflate",
+      "version": "0.3.7",
+      "license": "MIT OR Apache-2.0",
+      "license_file": null,
+      "legal_files": [
+        {
+          "path": "LICENSE-APACHE",
+          "sha256": "0d542e0c8804e39aa7f37eb00da5a762149dc682d7829451287e11b938e94594"
+        },
+        {
+          "path": "LICENSE-MIT",
+          "sha256": "c77a4cf9da729987d0fe7ccd811e3bd27393914ddf3d23467c18cc22954513b3"
+        }
+      ],
+      "embedded_asset_candidates": []
+    },
+    {
+      "name": "find-msvc-tools",
+      "version": "0.1.15",
+      "license": "MIT OR Apache-2.0",
+      "license_file": null,
+      "legal_files": [
+        {
+          "path": "LICENSE-APACHE",
+          "sha256": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2"
+        },
+        {
+          "path": "LICENSE-MIT",
+          "sha256": "378f5840b258e2779c39418f3f2d7b2ba96f1c7917dd6be0713f88305dbda397"
+        }
+      ],
+      "embedded_asset_candidates": []
+    },
+    {
+      "name": "flate2",
+      "version": "1.1.11",
+      "license": "MIT OR Apache-2.0",
+      "license_file": null,
+      "legal_files": [
+        {
+          "path": "LICENSE-APACHE",
+          "sha256": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2"
+        },
+        {
+          "path": "LICENSE-MIT",
+          "sha256": "025436edff4cfcdde17a5811fdea78892d8482efd1abdec5a17872d07a4f2112"
+        }
+      ],
+      "embedded_asset_candidates": []
+    },
+    {
+      "name": "form_urlencoded",
+      "version": "1.2.3",
+      "license": "MIT OR Apache-2.0",
+      "license_file": null,
+      "legal_files": [
+        {
+          "path": "LICENSE-APACHE",
+          "sha256": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2"
+        },
+        {
+          "path": "LICENSE-MIT",
+          "sha256": "20c7855c364d57ea4c97889a5e8d98470a9952dade37bd9248b9a54431670e5e"
+        }
+      ],
+      "embedded_asset_candidates": []
+    },
+    {
+      "name": "generic-array",
+      "version": "0.14.7",
+      "license": "MIT",
+      "license_file": null,
+      "legal_files": [
+        {
+          "path": "LICENSE",
+          "sha256": "c09aae9d3c77b531f56351a9947bc7446511d6b025b3255312d3e3442a9a7583"
+        }
+      ],
+      "embedded_asset_candidates": []
+    },
+    {
+      "name": "getrandom",
+      "version": "0.4.3",
+      "license": "MIT OR Apache-2.0",
+      "license_file": null,
+      "legal_files": [
+        {
+          "path": "LICENSE-APACHE",
+          "sha256": "aaff376532ea30a0cd5330b9502ad4a4c8bf769c539c87ffe78819d188a18ebf"
+        },
+        {
+          "path": "LICENSE-MIT",
+          "sha256": "523a42c25d245dde9c015f882cec7f4555aad883382a6cf19b4b7d9b2cd5419b"
+        }
+      ],
+      "embedded_asset_candidates": []
+    },
+    {
+      "name": "gl_generator",
+      "version": "0.14.0",
+      "license": "Apache-2.0",
+      "license_file": null,
+      "legal_files": [],
+      "embedded_asset_candidates": []
+    },
+    {
+      "name": "globset",
+      "version": "0.4.22",
+      "license": "Unlicense OR MIT",
+      "license_file": null,
+      "legal_files": [
+        {
+          "path": "COPYING",
+          "sha256": "01c266bced4a434da0051174d6bee16a4c82cf634e2679b6155d40d75012390f"
+        },
+        {
+          "path": "LICENSE-MIT",
+          "sha256": "0f96a83840e146e43c0ec96a22ec1f392e0680e6c1226e6f3ba87e0740af850f"
+        },
+        {
+          "path": "UNLICENSE",
+          "sha256": "7e12e5df4bae12cb21581ba157ced20e1986a0508dd10d0e8a4ab9a4cf94e85c"
+        }
+      ],
+      "embedded_asset_candidates": []
+    },
+    {
+      "name": "glow",
+      "version": "0.16.0",
+      "license": "MIT OR Apache-2.0 OR Zlib",
+      "license_file": null,
+      "legal_files": [
+        {
+          "path": "LICENSE-APACHE",
+          "sha256": "b8601fc79bdf8d8088f0938bea861ffc63ed0eebbedf25f44ab2cf2e85bd7edc"
+        },
+        {
+          "path": "LICENSE-MIT",
+          "sha256": "cdbd06e25b8c9c5d6019949d2de8123f56d29cee4166396423d2ba8c81700845"
+        },
+        {
+          "path": "LICENSE-ZLIB",
+          "sha256": "636f644f1e149eb62961657c0e34953681eff64435653912e7bd19992666faa5"
+        }
+      ],
+      "embedded_asset_candidates": []
+    },
+    {
+      "name": "glutin",
+      "version": "0.32.3",
+      "license": "Apache-2.0",
+      "license_file": null,
+      "legal_files": [
+        {
+          "path": "LICENSE",
+          "sha256": "a4445427440043e8ce6fadf7a43fb906cb0d7f6c573a560a9f142cf9f9bf8ff4"
+        }
+      ],
+      "embedded_asset_candidates": []
+    },
+    {
+      "name": "glutin_egl_sys",
+      "version": "0.7.1",
+      "license": "Apache-2.0",
+      "license_file": null,
+      "legal_files": [
+        {
+          "path": "LICENSE",
+          "sha256": "a4445427440043e8ce6fadf7a43fb906cb0d7f6c573a560a9f142cf9f9bf8ff4"
+        }
+      ],
+      "embedded_asset_candidates": []
+    },
+    {
+      "name": "glutin_wgl_sys",
+      "version": "0.6.1",
+      "license": "Apache-2.0",
+      "license_file": null,
+      "legal_files": [
+        {
+          "path": "LICENSE",
+          "sha256": "a4445427440043e8ce6fadf7a43fb906cb0d7f6c573a560a9f142cf9f9bf8ff4"
+        }
+      ],
+      "embedded_asset_candidates": []
+    },
+    {
+      "name": "glutin-winit",
+      "version": "0.5.0",
+      "license": "MIT",
+      "license_file": null,
+      "legal_files": [
+        {
+          "path": "LICENSE",
+          "sha256": "d35629aec828ca86834f76e4c813bd6a6f0dda9005da898b0f49021f8042c5bd"
+        }
+      ],
+      "embedded_asset_candidates": []
+    },
+    {
+      "name": "half",
+      "version": "2.7.1",
+      "license": "MIT OR Apache-2.0",
+      "license_file": null,
+      "legal_files": [
+        {
+          "path": "LICENSE-APACHE",
+          "sha256": "a6cba85bc92e0cff7a450b1d873c0eaa2e9fc96bf472df0247a26bec77bf3ff9"
+        },
+        {
+          "path": "LICENSE-MIT",
+          "sha256": "508a77d2e7b51d98adeed32648ad124b7b30241a8e70b2e72c99f92d8e5874d1"
+        }
+      ],
+      "embedded_asset_candidates": []
+    },
+    {
+      "name": "hashbrown",
+      "version": "0.14.5",
+      "license": "MIT OR Apache-2.0",
+      "license_file": null,
+      "legal_files": [
+        {
+          "path": "LICENSE-APACHE",
+          "sha256": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2"
+        },
+        {
+          "path": "LICENSE-MIT",
+          "sha256": "ff8f68cb076caf8cefe7a6430d4ac086ce6af2ca8ce2c4e5a2004d4552ef52a2"
+        }
+      ],
+      "embedded_asset_candidates": []
+    },
+    {
+      "name": "hashlink",
+      "version": "0.9.1",
+      "license": "MIT OR Apache-2.0",
+      "license_file": null,
+      "legal_files": [
+        {
+          "path": "LICENSE-APACHE",
+          "sha256": "c144680885b29e4719e2a51f0aab5439a1e02d980692b5aaf086cae12727f28b"
+        },
+        {
+          "path": "LICENSE-MIT",
+          "sha256": "e915669a595b11a200873df8286561881b0e04932f6412a585db6297ba0bc97c"
+        }
+      ],
+      "embedded_asset_candidates": []
+    },
+    {
+      "name": "heck",
+      "version": "0.5.0",
+      "license": "MIT OR Apache-2.0",
+      "license_file": null,
+      "legal_files": [
+        {
+          "path": "LICENSE-APACHE",
+          "sha256": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2"
+        },
+        {
+          "path": "LICENSE-MIT",
+          "sha256": "7b63ecd5f1902af1b63729947373683c32745c16a10e8e6292e2e2dcd7e90ae0"
+        }
+      ],
+      "embedded_asset_candidates": []
+    },
+    {
+      "name": "icu_collections",
+      "version": "2.4.0",
+      "license": "Unicode-3.0",
+      "license_file": null,
+      "legal_files": [
+        {
+          "path": "LICENSE",
+          "sha256": "f367c1b8e1aa262435251e442901da4607b4650e0e63a026f5044473ecfb90f2"
+        }
+      ],
+      "embedded_asset_candidates": []
+    },
+    {
+      "name": "icu_locale_core",
+      "version": "2.4.0",
+      "license": "Unicode-3.0",
+      "license_file": null,
+      "legal_files": [
+        {
+          "path": "LICENSE",
+          "sha256": "f367c1b8e1aa262435251e442901da4607b4650e0e63a026f5044473ecfb90f2"
+        }
+      ],
+      "embedded_asset_candidates": []
+    },
+    {
+      "name": "icu_normalizer",
+      "version": "2.4.0",
+      "license": "Unicode-3.0",
+      "license_file": null,
+      "legal_files": [
+        {
+          "path": "LICENSE",
+          "sha256": "f367c1b8e1aa262435251e442901da4607b4650e0e63a026f5044473ecfb90f2"
+        }
+      ],
+      "embedded_asset_candidates": []
+    },
+    {
+      "name": "icu_normalizer_data",
+      "version": "2.4.0",
+      "license": "Unicode-3.0",
+      "license_file": null,
+      "legal_files": [
+        {
+          "path": "LICENSE",
+          "sha256": "f367c1b8e1aa262435251e442901da4607b4650e0e63a026f5044473ecfb90f2"
+        }
+      ],
+      "embedded_asset_candidates": []
+    },
+    {
+      "name": "icu_properties",
+      "version": "2.4.0",
+      "license": "Unicode-3.0",
+      "license_file": null,
+      "legal_files": [
+        {
+          "path": "LICENSE",
+          "sha256": "f367c1b8e1aa262435251e442901da4607b4650e0e63a026f5044473ecfb90f2"
+        }
+      ],
+      "embedded_asset_candidates": []
+    },
+    {
+      "name": "icu_properties_data",
+      "version": "2.4.0",
+      "license": "Unicode-3.0",
+      "license_file": null,
+      "legal_files": [
+        {
+          "path": "LICENSE",
+          "sha256": "f367c1b8e1aa262435251e442901da4607b4650e0e63a026f5044473ecfb90f2"
+        }
+      ],
+      "embedded_asset_candidates": []
+    },
+    {
+      "name": "icu_provider",
+      "version": "2.4.0",
+      "license": "Unicode-3.0",
+      "license_file": null,
+      "legal_files": [
+        {
+          "path": "LICENSE",
+          "sha256": "f367c1b8e1aa262435251e442901da4607b4650e0e63a026f5044473ecfb90f2"
+        }
+      ],
+      "embedded_asset_candidates": []
+    },
+    {
+      "name": "idna",
+      "version": "1.1.0",
+      "license": "MIT OR Apache-2.0",
+      "license_file": null,
+      "legal_files": [
+        {
+          "path": "LICENSE-APACHE",
+          "sha256": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2"
+        },
+        {
+          "path": "LICENSE-MIT",
+          "sha256": "b38f11f6096706e6de553dabe2a7ed142d59b6fa8c97e290c67496154745cdd5"
+        }
+      ],
+      "embedded_asset_candidates": []
+    },
+    {
+      "name": "idna_adapter",
+      "version": "1.2.2",
+      "license": "Apache-2.0 OR MIT",
+      "license_file": null,
+      "legal_files": [
+        {
+          "path": "LICENSE-APACHE",
+          "sha256": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2"
+        },
+        {
+          "path": "LICENSE-MIT",
+          "sha256": "8b43ce8accd61e9d370b5ca9e9c4f953279b5c239926c62315b40e24df51b726"
+        }
+      ],
+      "embedded_asset_candidates": []
+    },
+    {
+      "name": "image",
+      "version": "0.25.10",
+      "license": "MIT OR Apache-2.0",
+      "license_file": null,
+      "legal_files": [
+        {
+          "path": "LICENSE-APACHE",
+          "sha256": "0d542e0c8804e39aa7f37eb00da5a762149dc682d7829451287e11b938e94594"
+        },
+        {
+          "path": "LICENSE-MIT",
+          "sha256": "c77a4cf9da729987d0fe7ccd811e3bd27393914ddf3d23467c18cc22954513b3"
+        }
+      ],
+      "embedded_asset_candidates": []
+    },
+    {
+      "name": "is_terminal_polyfill",
+      "version": "1.70.2",
+      "license": "MIT OR Apache-2.0",
+      "license_file": null,
+      "legal_files": [
+        {
+          "path": "LICENSE-APACHE",
+          "sha256": "c6596eb7be8581c18be736c846fb9173b69eccf6ef94c5135893ec56bd92ba08"
+        },
+        {
+          "path": "LICENSE-MIT",
+          "sha256": "6efb0476a1cc085077ed49357026d8c173bf33017278ef440f222fb9cbcb66e6"
+        }
+      ],
+      "embedded_asset_candidates": []
+    },
+    {
+      "name": "itoa",
+      "version": "1.0.19",
+      "license": "MIT OR Apache-2.0",
+      "license_file": null,
+      "legal_files": [
+        {
+          "path": "LICENSE-APACHE",
+          "sha256": "62c7a1e35f56406896d7aa7ca52d0cc0d272ac022b5d2796e7d6905db8a3636a"
+        },
+        {
+          "path": "LICENSE-MIT",
+          "sha256": "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3"
+        }
+      ],
+      "embedded_asset_candidates": []
+    },
+    {
+      "name": "jobserver",
+      "version": "0.1.35",
+      "license": "MIT OR Apache-2.0",
+      "license_file": null,
+      "legal_files": [
+        {
+          "path": "LICENSE-APACHE",
+          "sha256": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2"
+        },
+        {
+          "path": "LICENSE-MIT",
+          "sha256": "378f5840b258e2779c39418f3f2d7b2ba96f1c7917dd6be0713f88305dbda397"
+        }
+      ],
+      "embedded_asset_candidates": []
+    },
+    {
+      "name": "khronos_api",
+      "version": "3.1.0",
+      "license": "Apache-2.0",
+      "license_file": null,
+      "legal_files": [],
+      "embedded_asset_candidates": []
+    },
+    {
+      "name": "libloading",
+      "version": "0.8.9",
+      "license": "ISC",
+      "license_file": null,
+      "legal_files": [
+        {
+          "path": "LICENSE",
+          "sha256": "b29f8b01452350c20dd1af16ef83b598fea3053578ccc1c7a0ef40e57be2620f"
+        }
+      ],
+      "embedded_asset_candidates": [
+        "tests\\nagisa32.dll",
+        "tests\\nagisa64.dll"
+      ]
+    },
+    {
+      "name": "libsqlite3-sys",
+      "version": "0.30.1",
+      "license": "MIT",
+      "license_file": null,
+      "legal_files": [
+        {
+          "path": "LICENSE",
+          "sha256": "f59ba65550f2a5adff98ec6478d783402c8e0a3eb515025c0b3438f3d30dc39e"
+        },
+        {
+          "path": "sqlcipher\\LICENSE",
+          "sha256": "ea4fcb309f14a22065e1ea45362d494d320012249ed865fe9c7c0946db754131"
+        }
+      ],
+      "embedded_asset_candidates": []
+    },
+    {
+      "name": "litemap",
+      "version": "0.8.3",
+      "license": "Unicode-3.0",
+      "license_file": null,
+      "legal_files": [
+        {
+          "path": "LICENSE",
+          "sha256": "f367c1b8e1aa262435251e442901da4607b4650e0e63a026f5044473ecfb90f2"
+        }
+      ],
+      "embedded_asset_candidates": []
+    },
+    {
+      "name": "litrs",
+      "version": "1.1.0",
+      "license": "MIT OR Apache-2.0",
+      "license_file": null,
+      "legal_files": [
+        {
+          "path": "LICENSE-APACHE",
+          "sha256": "62c7a1e35f56406896d7aa7ca52d0cc0d272ac022b5d2796e7d6905db8a3636a"
+        },
+        {
+          "path": "LICENSE-MIT",
+          "sha256": "7dc1552e88f49132cb358b1b962fc5e79fa42d70bcbb88c526d33e45b8e98036"
+        }
+      ],
+      "embedded_asset_candidates": []
+    },
+    {
+      "name": "lock_api",
+      "version": "0.4.14",
+      "license": "MIT OR Apache-2.0",
+      "license_file": null,
+      "legal_files": [
+        {
+          "path": "LICENSE-APACHE",
+          "sha256": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2"
+        },
+        {
+          "path": "LICENSE-MIT",
+          "sha256": "c9a75f18b9ab2927829a208fc6aa2cf4e63b8420887ba29cdb265d6619ae82d5"
+        }
+      ],
+      "embedded_asset_candidates": []
+    },
+    {
+      "name": "log",
+      "version": "0.4.35",
+      "license": "MIT OR Apache-2.0",
+      "license_file": null,
+      "legal_files": [
+        {
+          "path": "LICENSE-APACHE",
+          "sha256": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2"
+        },
+        {
+          "path": "LICENSE-MIT",
+          "sha256": "6485b8ed310d3f0340bf1ad1f47645069ce4069dcc6bb46c7d5c6faf41de1fdb"
+        }
+      ],
+      "embedded_asset_candidates": []
+    },
+    {
+      "name": "memchr",
+      "version": "2.8.3",
+      "license": "Unlicense OR MIT",
+      "license_file": null,
+      "legal_files": [
+        {
+          "path": "COPYING",
+          "sha256": "01c266bced4a434da0051174d6bee16a4c82cf634e2679b6155d40d75012390f"
+        },
+        {
+          "path": "LICENSE-MIT",
+          "sha256": "0f96a83840e146e43c0ec96a22ec1f392e0680e6c1226e6f3ba87e0740af850f"
+        },
+        {
+          "path": "UNLICENSE",
+          "sha256": "7e12e5df4bae12cb21581ba157ced20e1986a0508dd10d0e8a4ab9a4cf94e85c"
+        }
+      ],
+      "embedded_asset_candidates": []
+    },
+    {
+      "name": "memoffset",
+      "version": "0.9.1",
+      "license": "MIT",
+      "license_file": null,
+      "legal_files": [
+        {
+          "path": "LICENSE",
+          "sha256": "3234ac55816264ee7b6c7ee27efd61cf0a1fe775806870e3d9b4c41ea73c5cb1"
+        }
+      ],
+      "embedded_asset_candidates": []
+    },
+    {
+      "name": "miniz_oxide",
+      "version": "0.8.9",
+      "license": "MIT OR Zlib OR Apache-2.0",
+      "license_file": null,
+      "legal_files": [
+        {
+          "path": "LICENSE",
+          "sha256": "4108245a1f2df9d4e94df8abed5b4ba0759bb2f9b40a6b939f1be141077ae50b"
+        },
+        {
+          "path": "LICENSE-APACHE.md",
+          "sha256": "0d542e0c8804e39aa7f37eb00da5a762149dc682d7829451287e11b938e94594"
+        },
+        {
+          "path": "LICENSE-MIT.md",
+          "sha256": "799e9ca9d179295ef372f25d3769cdda7d25bb2668add6a6a1e22d1e4c678b8d"
+        },
+        {
+          "path": "LICENSE-ZLIB.md",
+          "sha256": "0a54e647fe54104658b5e563c04c6f9edf251710e47bce692e0bd990a4ddaa39"
+        }
+      ],
+      "embedded_asset_candidates": []
+    },
+    {
+      "name": "miniz_oxide",
+      "version": "0.9.1",
+      "license": "MIT OR Zlib OR Apache-2.0",
+      "license_file": null,
+      "legal_files": [
+        {
+          "path": "LICENSE",
+          "sha256": "4108245a1f2df9d4e94df8abed5b4ba0759bb2f9b40a6b939f1be141077ae50b"
+        },
+        {
+          "path": "LICENSE-APACHE.md",
+          "sha256": "0d542e0c8804e39aa7f37eb00da5a762149dc682d7829451287e11b938e94594"
+        },
+        {
+          "path": "LICENSE-MIT.md",
+          "sha256": "799e9ca9d179295ef372f25d3769cdda7d25bb2668add6a6a1e22d1e4c678b8d"
+        },
+        {
+          "path": "LICENSE-ZLIB.md",
+          "sha256": "0a54e647fe54104658b5e563c04c6f9edf251710e47bce692e0bd990a4ddaa39"
+        }
+      ],
+      "embedded_asset_candidates": []
+    },
+    {
+      "name": "moxcms",
+      "version": "0.8.1",
+      "license": "BSD-3-Clause OR Apache-2.0",
+      "license_file": null,
+      "legal_files": [
+        {
+          "path": "LICENSE.md",
+          "sha256": "2aa92cada6431e75615e3fe6cb1a9082c98f777d48ae1c087c0da0e37f7b8bff"
+        },
+        {
+          "path": "LICENSE-APACHE.md",
+          "sha256": "90bf2d659c43045111b65c733ab2a6d4cbcb422a098368c8c58a9ba3db4ed0c5"
+        }
+      ],
+      "embedded_asset_candidates": []
+    },
+    {
+      "name": "nohash-hasher",
+      "version": "0.2.0",
+      "license": "Apache-2.0 OR MIT",
+      "license_file": null,
+      "legal_files": [
+        {
+          "path": "LICENSE-APACHE",
+          "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
+        },
+        {
+          "path": "LICENSE-MIT",
+          "sha256": "ec353d4fecf7963b4c054384557e5dbc3c7a717997eb4a3815b315721a6aa75a"
+        }
+      ],
+      "embedded_asset_candidates": []
+    },
+    {
+      "name": "num-traits",
+      "version": "0.2.19",
+      "license": "MIT OR Apache-2.0",
+      "license_file": null,
+      "legal_files": [
+        {
+          "path": "LICENSE-APACHE",
+          "sha256": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2"
+        },
+        {
+          "path": "LICENSE-MIT",
+          "sha256": "6485b8ed310d3f0340bf1ad1f47645069ce4069dcc6bb46c7d5c6faf41de1fdb"
+        }
+      ],
+      "embedded_asset_candidates": []
+    },
+    {
+      "name": "once_cell",
+      "version": "1.21.4",
+      "license": "MIT OR Apache-2.0",
+      "license_file": null,
+      "legal_files": [
+        {
+          "path": "LICENSE-APACHE",
+          "sha256": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2"
+        },
+        {
+          "path": "LICENSE-MIT",
+          "sha256": "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3"
+        }
+      ],
+      "embedded_asset_candidates": []
+    },
+    {
+      "name": "once_cell_polyfill",
+      "version": "1.70.2",
+      "license": "MIT OR Apache-2.0",
+      "license_file": null,
+      "legal_files": [
+        {
+          "path": "LICENSE-APACHE",
+          "sha256": "c6596eb7be8581c18be736c846fb9173b69eccf6ef94c5135893ec56bd92ba08"
+        },
+        {
+          "path": "LICENSE-MIT",
+          "sha256": "6efb0476a1cc085077ed49357026d8c173bf33017278ef440f222fb9cbcb66e6"
+        }
+      ],
+      "embedded_asset_candidates": []
+    },
+    {
+      "name": "owned_ttf_parser",
+      "version": "0.25.1",
+      "license": "Apache-2.0",
+      "license_file": null,
+      "legal_files": [
+        {
+          "path": "LICENSE",
+          "sha256": "a6cba85bc92e0cff7a450b1d873c0eaa2e9fc96bf472df0247a26bec77bf3ff9"
+        }
+      ],
+      "embedded_asset_candidates": []
+    },
+    {
+      "name": "parking_lot",
+      "version": "0.12.5",
+      "license": "MIT OR Apache-2.0",
+      "license_file": null,
+      "legal_files": [
+        {
+          "path": "LICENSE-APACHE",
+          "sha256": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2"
+        },
+        {
+          "path": "LICENSE-MIT",
+          "sha256": "c9a75f18b9ab2927829a208fc6aa2cf4e63b8420887ba29cdb265d6619ae82d5"
+        }
+      ],
+      "embedded_asset_candidates": []
+    },
+    {
+      "name": "parking_lot_core",
+      "version": "0.9.12",
+      "license": "MIT OR Apache-2.0",
+      "license_file": null,
+      "legal_files": [
+        {
+          "path": "LICENSE-APACHE",
+          "sha256": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2"
+        },
+        {
+          "path": "LICENSE-MIT",
+          "sha256": "c9a75f18b9ab2927829a208fc6aa2cf4e63b8420887ba29cdb265d6619ae82d5"
+        }
+      ],
+      "embedded_asset_candidates": []
+    },
+    {
+      "name": "percent-encoding",
+      "version": "2.3.2",
+      "license": "MIT OR Apache-2.0",
+      "license_file": null,
+      "legal_files": [
+        {
+          "path": "LICENSE-APACHE",
+          "sha256": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2"
+        },
+        {
+          "path": "LICENSE-MIT",
+          "sha256": "b38f11f6096706e6de553dabe2a7ed142d59b6fa8c97e290c67496154745cdd5"
+        }
+      ],
+      "embedded_asset_candidates": []
+    },
+    {
+      "name": "pin-project-lite",
+      "version": "0.2.18",
+      "license": "Apache-2.0 OR MIT",
+      "license_file": null,
+      "legal_files": [
+        {
+          "path": "LICENSE-APACHE",
+          "sha256": "0d542e0c8804e39aa7f37eb00da5a762149dc682d7829451287e11b938e94594"
+        },
+        {
+          "path": "LICENSE-MIT",
+          "sha256": "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3"
+        }
+      ],
+      "embedded_asset_candidates": []
+    },
+    {
+      "name": "pkg-config",
+      "version": "0.3.34",
+      "license": "MIT OR Apache-2.0",
+      "license_file": null,
+      "legal_files": [
+        {
+          "path": "LICENSE-APACHE",
+          "sha256": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2"
+        },
+        {
+          "path": "LICENSE-MIT",
+          "sha256": "378f5840b258e2779c39418f3f2d7b2ba96f1c7917dd6be0713f88305dbda397"
+        }
+      ],
+      "embedded_asset_candidates": []
+    },
+    {
+      "name": "png",
+      "version": "0.18.1",
+      "license": "MIT OR Apache-2.0",
+      "license_file": null,
+      "legal_files": [
+        {
+          "path": "LICENSE-APACHE",
+          "sha256": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2"
+        },
+        {
+          "path": "LICENSE-MIT",
+          "sha256": "eaf40297c75da471f7cda1f3458e8d91b4b2ec866e609527a13acfa93b638652"
+        }
+      ],
+      "embedded_asset_candidates": []
+    },
+    {
+      "name": "potential_utf",
+      "version": "0.1.6",
+      "license": "Unicode-3.0",
+      "license_file": null,
+      "legal_files": [
+        {
+          "path": "LICENSE",
+          "sha256": "f367c1b8e1aa262435251e442901da4607b4650e0e63a026f5044473ecfb90f2"
+        }
+      ],
+      "embedded_asset_candidates": []
+    },
+    {
+      "name": "proc-macro2",
+      "version": "1.0.107",
+      "license": "MIT OR Apache-2.0",
+      "license_file": null,
+      "legal_files": [
+        {
+          "path": "LICENSE-APACHE",
+          "sha256": "62c7a1e35f56406896d7aa7ca52d0cc0d272ac022b5d2796e7d6905db8a3636a"
+        },
+        {
+          "path": "LICENSE-MIT",
+          "sha256": "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3"
+        }
+      ],
+      "embedded_asset_candidates": []
+    },
+    {
+      "name": "profiling",
+      "version": "1.0.18",
+      "license": "MIT OR Apache-2.0",
+      "license_file": null,
+      "legal_files": [],
+      "embedded_asset_candidates": []
+    },
+    {
+      "name": "pxfm",
+      "version": "0.1.30",
+      "license": "BSD-3-Clause OR Apache-2.0",
+      "license_file": null,
+      "legal_files": [
+        {
+          "path": "LICENSE.md",
+          "sha256": "2aa92cada6431e75615e3fe6cb1a9082c98f777d48ae1c087c0da0e37f7b8bff"
+        },
+        {
+          "path": "LICENSE-APACHE.md",
+          "sha256": "90bf2d659c43045111b65c733ab2a6d4cbcb422a098368c8c58a9ba3db4ed0c5"
+        }
+      ],
+      "embedded_asset_candidates": []
+    },
+    {
+      "name": "quick-error",
+      "version": "2.0.1",
+      "license": "MIT/Apache-2.0",
+      "license_file": null,
+      "legal_files": [
+        {
+          "path": "LICENSE-APACHE",
+          "sha256": "c6596eb7be8581c18be736c846fb9173b69eccf6ef94c5135893ec56bd92ba08"
+        },
+        {
+          "path": "LICENSE-MIT",
+          "sha256": "058f01fe181608d027fcde7e528fc03ea3cf90f30903c407644b0a9bbc54f500"
+        }
+      ],
+      "embedded_asset_candidates": []
+    },
+    {
+      "name": "quote",
+      "version": "1.0.47",
+      "license": "MIT OR Apache-2.0",
+      "license_file": null,
+      "legal_files": [
+        {
+          "path": "LICENSE-APACHE",
+          "sha256": "62c7a1e35f56406896d7aa7ca52d0cc0d272ac022b5d2796e7d6905db8a3636a"
+        },
+        {
+          "path": "LICENSE-MIT",
+          "sha256": "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3"
+        }
+      ],
+      "embedded_asset_candidates": []
+    },
+    {
+      "name": "raw-window-handle",
+      "version": "0.6.2",
+      "license": "MIT OR Apache-2.0 OR Zlib",
+      "license_file": null,
+      "legal_files": [
+        {
+          "path": "LICENSE-APACHE.md",
+          "sha256": "0d542e0c8804e39aa7f37eb00da5a762149dc682d7829451287e11b938e94594"
+        },
+        {
+          "path": "LICENSE-MIT.md",
+          "sha256": "9c5a80639a57c1c945570e7ebbca0706305849ce3c098021325cca9db2f7acc4"
+        },
+        {
+          "path": "LICENSE-ZLIB.md",
+          "sha256": "ae895c8576e682f310fb70d93d9f99b1dd82872094c54a8f6cdfe2ca5c2d6ecb"
+        }
+      ],
+      "embedded_asset_candidates": []
+    },
+    {
+      "name": "regex-automata",
+      "version": "0.4.19",
+      "license": "MIT OR Apache-2.0",
+      "license_file": null,
+      "legal_files": [
+        {
+          "path": "LICENSE-APACHE",
+          "sha256": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2"
+        },
+        {
+          "path": "LICENSE-MIT",
+          "sha256": "6485b8ed310d3f0340bf1ad1f47645069ce4069dcc6bb46c7d5c6faf41de1fdb"
+        }
+      ],
+      "embedded_asset_candidates": []
+    },
+    {
+      "name": "regex-syntax",
+      "version": "0.8.12",
+      "license": "MIT OR Apache-2.0",
+      "license_file": null,
+      "legal_files": [
+        {
+          "path": "LICENSE-APACHE",
+          "sha256": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2"
+        },
+        {
+          "path": "LICENSE-MIT",
+          "sha256": "6485b8ed310d3f0340bf1ad1f47645069ce4069dcc6bb46c7d5c6faf41de1fdb"
+        },
+        {
+          "path": "src\\unicode_tables\\LICENSE-UNICODE",
+          "sha256": "74db5baf44a41b1000312c673544b3374e4198af5605c7f9080a402cec42cfa3"
+        }
+      ],
+      "embedded_asset_candidates": []
+    },
+    {
+      "name": "rfd",
+      "version": "0.15.4",
+      "license": "MIT",
+      "license_file": null,
+      "legal_files": [
+        {
+          "path": "LICENSE",
+          "sha256": "65fc947f4bac882a2cd104ef73c246b1b037059df9f2b3a58b7f77f0b9e56071"
+        }
+      ],
+      "embedded_asset_candidates": []
+    },
+    {
+      "name": "rusqlite",
+      "version": "0.32.1",
+      "license": "MIT",
+      "license_file": null,
+      "legal_files": [
+        {
+          "path": "LICENSE",
+          "sha256": "f59ba65550f2a5adff98ec6478d783402c8e0a3eb515025c0b3438f3d30dc39e"
+        }
+      ],
+      "embedded_asset_candidates": []
+    },
+    {
+      "name": "same-file",
+      "version": "1.0.6",
+      "license": "Unlicense/MIT",
+      "license_file": null,
+      "legal_files": [
+        {
+          "path": "COPYING",
+          "sha256": "01c266bced4a434da0051174d6bee16a4c82cf634e2679b6155d40d75012390f"
+        },
+        {
+          "path": "LICENSE-MIT",
+          "sha256": "cb3c929a05e6cbc9de9ab06a4c57eeb60ca8c724bef6c138c87d3a577e27aa14"
+        },
+        {
+          "path": "UNLICENSE",
+          "sha256": "7e12e5df4bae12cb21581ba157ced20e1986a0508dd10d0e8a4ab9a4cf94e85c"
+        }
+      ],
+      "embedded_asset_candidates": []
+    },
+    {
+      "name": "scopeguard",
+      "version": "1.2.0",
+      "license": "MIT OR Apache-2.0",
+      "license_file": null,
+      "legal_files": [
+        {
+          "path": "LICENSE-APACHE",
+          "sha256": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2"
+        },
+        {
+          "path": "LICENSE-MIT",
+          "sha256": "fb77f0a9c53e473abe5103c8632ef9f0f2874d4fb3f17cb2d8c661aab9cee9d7"
+        }
+      ],
+      "embedded_asset_candidates": []
+    },
+    {
+      "name": "serde",
+      "version": "1.0.229",
+      "license": "MIT OR Apache-2.0",
+      "license_file": null,
+      "legal_files": [
+        {
+          "path": "LICENSE-APACHE",
+          "sha256": "62c7a1e35f56406896d7aa7ca52d0cc0d272ac022b5d2796e7d6905db8a3636a"
+        },
+        {
+          "path": "LICENSE-MIT",
+          "sha256": "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3"
+        }
+      ],
+      "embedded_asset_candidates": []
+    },
+    {
+      "name": "serde_core",
+      "version": "1.0.229",
+      "license": "MIT OR Apache-2.0",
+      "license_file": null,
+      "legal_files": [
+        {
+          "path": "LICENSE-APACHE",
+          "sha256": "62c7a1e35f56406896d7aa7ca52d0cc0d272ac022b5d2796e7d6905db8a3636a"
+        },
+        {
+          "path": "LICENSE-MIT",
+          "sha256": "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3"
+        }
+      ],
+      "embedded_asset_candidates": []
+    },
+    {
+      "name": "serde_derive",
+      "version": "1.0.229",
+      "license": "MIT OR Apache-2.0",
+      "license_file": null,
+      "legal_files": [
+        {
+          "path": "LICENSE-APACHE",
+          "sha256": "62c7a1e35f56406896d7aa7ca52d0cc0d272ac022b5d2796e7d6905db8a3636a"
+        },
+        {
+          "path": "LICENSE-MIT",
+          "sha256": "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3"
+        }
+      ],
+      "embedded_asset_candidates": []
+    },
+    {
+      "name": "serde_json",
+      "version": "1.0.154",
+      "license": "MIT OR Apache-2.0",
+      "license_file": null,
+      "legal_files": [
+        {
+          "path": "LICENSE-APACHE",
+          "sha256": "62c7a1e35f56406896d7aa7ca52d0cc0d272ac022b5d2796e7d6905db8a3636a"
+        },
+        {
+          "path": "LICENSE-MIT",
+          "sha256": "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3"
+        }
+      ],
+      "embedded_asset_candidates": []
+    },
+    {
+      "name": "sha2",
+      "version": "0.10.9",
+      "license": "MIT OR Apache-2.0",
+      "license_file": null,
+      "legal_files": [
+        {
+          "path": "LICENSE-APACHE",
+          "sha256": "a9040321c3712d8fd0b09cf52b17445de04a23a10165049ae187cd39e5c86be5"
+        },
+        {
+          "path": "LICENSE-MIT",
+          "sha256": "b4eb00df6e2a4d22518fcaa6a2b4646f249b3a3c9814509b22bd2091f1392ff1"
+        }
+      ],
+      "embedded_asset_candidates": []
+    },
+    {
+      "name": "shlex",
+      "version": "2.0.1",
+      "license": "MIT OR Apache-2.0",
+      "license_file": null,
+      "legal_files": [
+        {
+          "path": "LICENSE-APACHE",
+          "sha256": "553fffcd9b1cb158bc3e9edc35da85ca5c3b3d7d2e61c883ebcfa8a65814b583"
+        },
+        {
+          "path": "LICENSE-MIT",
+          "sha256": "4455bf75a91154108304cb283e0fea9948c14f13e20d60887cf2552449dea3b1"
+        }
+      ],
+      "embedded_asset_candidates": []
+    },
+    {
+      "name": "simd-adler32",
+      "version": "0.3.10",
+      "license": "MIT",
+      "license_file": null,
+      "legal_files": [
+        {
+          "path": "LICENSE.md",
+          "sha256": "42a35170233e83e18856792e748de4c1ce4a63b2afce9a370c89ef3fe23f9f2d"
+        }
+      ],
+      "embedded_asset_candidates": []
+    },
+    {
+      "name": "smallvec",
+      "version": "1.16.6",
+      "license": "MIT OR Apache-2.0",
+      "license_file": null,
+      "legal_files": [
+        {
+          "path": "LICENSE-APACHE",
+          "sha256": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2"
+        },
+        {
+          "path": "LICENSE-MIT",
+          "sha256": "0b28172679e0009b655da42797c03fd163a3379d5cfa67ba1f1655e974a2a1a9"
+        }
+      ],
+      "embedded_asset_candidates": []
+    },
+    {
+      "name": "smol_str",
+      "version": "0.2.2",
+      "license": "MIT OR Apache-2.0",
+      "license_file": null,
+      "legal_files": [
+        {
+          "path": "LICENSE-APACHE",
+          "sha256": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2"
+        },
+        {
+          "path": "LICENSE-MIT",
+          "sha256": "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3"
+        }
+      ],
+      "embedded_asset_candidates": []
+    },
+    {
+      "name": "stable_deref_trait",
+      "version": "1.2.1",
+      "license": "MIT OR Apache-2.0",
+      "license_file": null,
+      "legal_files": [
+        {
+          "path": "LICENSE-APACHE",
+          "sha256": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2"
+        },
+        {
+          "path": "LICENSE-MIT",
+          "sha256": "5e05b024f653a5ce199e77cbbbd42fb5553562ec714b819421ed0c3e552a75d7"
+        }
+      ],
+      "embedded_asset_candidates": []
+    },
+    {
+      "name": "static_assertions",
+      "version": "1.1.0",
+      "license": "MIT OR Apache-2.0",
+      "license_file": null,
+      "legal_files": [
+        {
+          "path": "LICENSE-APACHE",
+          "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
+        },
+        {
+          "path": "LICENSE-MIT",
+          "sha256": "ea084a2373ebc1f0902c09266e7bf25a05ab3814c1805bb017ffa7308f90c061"
+        }
+      ],
+      "embedded_asset_candidates": []
+    },
+    {
+      "name": "strsim",
+      "version": "0.11.1",
+      "license": "MIT",
+      "license_file": null,
+      "legal_files": [
+        {
+          "path": "LICENSE",
+          "sha256": "1e697ce8d21401fbf1bddd9b5c3fd4c4c79ae1e3bdf51f81761c85e11d5a89cd"
+        }
+      ],
+      "embedded_asset_candidates": []
+    },
+    {
+      "name": "syn",
+      "version": "2.0.119",
+      "license": "MIT OR Apache-2.0",
+      "license_file": null,
+      "legal_files": [
+        {
+          "path": "LICENSE-APACHE",
+          "sha256": "62c7a1e35f56406896d7aa7ca52d0cc0d272ac022b5d2796e7d6905db8a3636a"
+        },
+        {
+          "path": "LICENSE-MIT",
+          "sha256": "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3"
+        }
+      ],
+      "embedded_asset_candidates": []
+    },
+    {
+      "name": "syn",
+      "version": "3.0.10",
+      "license": "MIT OR Apache-2.0",
+      "license_file": null,
+      "legal_files": [
+        {
+          "path": "LICENSE-APACHE",
+          "sha256": "62c7a1e35f56406896d7aa7ca52d0cc0d272ac022b5d2796e7d6905db8a3636a"
+        },
+        {
+          "path": "LICENSE-MIT",
+          "sha256": "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3"
+        }
+      ],
+      "embedded_asset_candidates": []
+    },
+    {
+      "name": "synstructure",
+      "version": "0.14.0",
+      "license": "MIT",
+      "license_file": null,
+      "legal_files": [
+        {
+          "path": "LICENSE",
+          "sha256": "219920e865eee70b7dcfc948a86b099e7f4fe2de01bcca2ca9a20c0a033f2b59"
+        }
+      ],
+      "embedded_asset_candidates": []
+    },
+    {
+      "name": "tempfile",
+      "version": "3.27.0",
+      "license": "MIT OR Apache-2.0",
+      "license_file": null,
+      "legal_files": [
+        {
+          "path": "LICENSE-APACHE",
+          "sha256": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2"
+        },
+        {
+          "path": "LICENSE-MIT",
+          "sha256": "8b427f5bc501764575e52ba4f9d95673cf8f6d80a86d0d06599852e1a9a20a36"
+        }
+      ],
+      "embedded_asset_candidates": []
+    },
+    {
+      "name": "tiff",
+      "version": "0.11.3",
+      "license": "MIT",
+      "license_file": null,
+      "legal_files": [
+        {
+          "path": "LICENSE",
+          "sha256": "20c097d0de27e2adc179140a3d542091951a030699c7e1c78655f2a2d08d4e3e"
+        },
+        {
+          "path": "tests\\COPYRIGHT",
+          "sha256": "c6d1d56bb6e2fe4f0aed4aa8553261dd65247db6db50c87c9e9f3fbe095e2202"
+        }
+      ],
+      "embedded_asset_candidates": []
+    },
+    {
+      "name": "tinystr",
+      "version": "0.8.5",
+      "license": "Unicode-3.0",
+      "license_file": null,
+      "legal_files": [
+        {
+          "path": "LICENSE",
+          "sha256": "f367c1b8e1aa262435251e442901da4607b4650e0e63a026f5044473ecfb90f2"
+        }
+      ],
+      "embedded_asset_candidates": []
+    },
+    {
+      "name": "tracing",
+      "version": "0.1.44",
+      "license": "MIT",
+      "license_file": null,
+      "legal_files": [
+        {
+          "path": "LICENSE",
+          "sha256": "898b1ae9821e98daf8964c8d6c7f61641f5f5aa78ad500020771c0939ee0dea1"
+        }
+      ],
+      "embedded_asset_candidates": []
+    },
+    {
+      "name": "tracing-attributes",
+      "version": "0.1.31",
+      "license": "MIT",
+      "license_file": null,
+      "legal_files": [
+        {
+          "path": "LICENSE",
+          "sha256": "898b1ae9821e98daf8964c8d6c7f61641f5f5aa78ad500020771c0939ee0dea1"
+        }
+      ],
+      "embedded_asset_candidates": []
+    },
+    {
+      "name": "tracing-core",
+      "version": "0.1.36",
+      "license": "MIT",
+      "license_file": null,
+      "legal_files": [
+        {
+          "path": "LICENSE",
+          "sha256": "898b1ae9821e98daf8964c8d6c7f61641f5f5aa78ad500020771c0939ee0dea1"
+        },
+        {
+          "path": "src\\spin\\LICENSE",
+          "sha256": "58545fed1565e42d687aecec6897d35c6d37ccb71479a137c0deb2203e125c79"
+        }
+      ],
+      "embedded_asset_candidates": []
+    },
+    {
+      "name": "ttf-parser",
+      "version": "0.25.1",
+      "license": "MIT OR Apache-2.0",
+      "license_file": null,
+      "legal_files": [
+        {
+          "path": "LICENSE-APACHE",
+          "sha256": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2"
+        },
+        {
+          "path": "LICENSE-MIT",
+          "sha256": "f3c9fe731c701ed77fd5fbaac573872af04dc5869385eb9bd5e3c73c42713814"
+        }
+      ],
+      "embedded_asset_candidates": [
+        "examples\\wasm\\TTC.ttc",
+        "tests\\fonts\\colr_1.ttf",
+        "tests\\fonts\\colr_1_variable.ttf",
+        "tests\\fonts\\demo.ttf"
+      ]
+    },
+    {
+      "name": "typenum",
+      "version": "1.20.1",
+      "license": "MIT OR Apache-2.0",
+      "license_file": null,
+      "legal_files": [
+        {
+          "path": "LICENSE",
+          "sha256": "db11fec9946737df39ca3898d9cd8c10ec6f6c3a884a6802b0ad0b81b4e8f23a"
+        },
+        {
+          "path": "LICENSE-APACHE",
+          "sha256": "516b24e051bf5630880ebbd55c40a25ce9552ebaf8970a53e8976eb70e522406"
+        },
+        {
+          "path": "LICENSE-MIT",
+          "sha256": "a825bd853ab71619a4923d7b4311221427848070ff44d990da39b0b274c1683f"
+        }
+      ],
+      "embedded_asset_candidates": []
+    },
+    {
+      "name": "unicode-ident",
+      "version": "1.0.27",
+      "license": "(MIT OR Apache-2.0) AND Unicode-3.0",
+      "license_file": null,
+      "legal_files": [
+        {
+          "path": "LICENSE-APACHE",
+          "sha256": "62c7a1e35f56406896d7aa7ca52d0cc0d272ac022b5d2796e7d6905db8a3636a"
+        },
+        {
+          "path": "LICENSE-MIT",
+          "sha256": "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3"
+        },
+        {
+          "path": "LICENSE-UNICODE",
+          "sha256": "f7db81051789b729fea528a63ec4c938fdcb93d9d61d97dc8cc2e9df6d47f2a1"
+        }
+      ],
+      "embedded_asset_candidates": []
+    },
+    {
+      "name": "unicode-segmentation",
+      "version": "1.13.3",
+      "license": "MIT OR Apache-2.0",
+      "license_file": null,
+      "legal_files": [
+        {
+          "path": "COPYRIGHT",
+          "sha256": "23860c2a7b5d96b21569afedf033469bab9fe14a1b24a35068b8641c578ce24d"
+        },
+        {
+          "path": "LICENSE-APACHE",
+          "sha256": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2"
+        },
+        {
+          "path": "LICENSE-MIT",
+          "sha256": "7b63ecd5f1902af1b63729947373683c32745c16a10e8e6292e2e2dcd7e90ae0"
+        }
+      ],
+      "embedded_asset_candidates": []
+    },
+    {
+      "name": "url",
+      "version": "2.5.9",
+      "license": "MIT OR Apache-2.0",
+      "license_file": null,
+      "legal_files": [
+        {
+          "path": "LICENSE-APACHE",
+          "sha256": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2"
+        },
+        {
+          "path": "LICENSE-MIT",
+          "sha256": "b38f11f6096706e6de553dabe2a7ed142d59b6fa8c97e290c67496154745cdd5"
+        }
+      ],
+      "embedded_asset_candidates": []
+    },
+    {
+      "name": "utf_types",
+      "version": "1.0.0",
+      "license": "Apache-2.0 OR MIT",
+      "license_file": null,
+      "legal_files": [
+        {
+          "path": "COPYRIGHT",
+          "sha256": "3210be7332b5bdf48eb24a945258b9f38616a2cceb0dfc06e3c3c7e9740475a0"
+        },
+        {
+          "path": "LICENSE-APACHE",
+          "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
+        },
+        {
+          "path": "LICENSE-MIT",
+          "sha256": "3fa4ca83dcc9237839b1bdeb2e6d16bdfb5ec0c5ce42b24694d8bbf0dcbef72c"
+        }
+      ],
+      "embedded_asset_candidates": []
+    },
+    {
+      "name": "utf8_iter",
+      "version": "1.1.0",
+      "license": "Apache-2.0 OR MIT",
+      "license_file": null,
+      "legal_files": [
+        {
+          "path": "COPYRIGHT",
+          "sha256": "c30152c94a6d75e021adbc52b3a52470366a46edb917e17deae3259251af244c"
+        },
+        {
+          "path": "LICENSE-APACHE",
+          "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
+        },
+        {
+          "path": "LICENSE-MIT",
+          "sha256": "3fa4ca83dcc9237839b1bdeb2e6d16bdfb5ec0c5ce42b24694d8bbf0dcbef72c"
+        }
+      ],
+      "embedded_asset_candidates": []
+    },
+    {
+      "name": "utf8parse",
+      "version": "0.2.2",
+      "license": "Apache-2.0 OR MIT",
+      "license_file": null,
+      "legal_files": [
+        {
+          "path": "LICENSE-APACHE",
+          "sha256": "62c7a1e35f56406896d7aa7ca52d0cc0d272ac022b5d2796e7d6905db8a3636a"
+        },
+        {
+          "path": "LICENSE-MIT",
+          "sha256": "e4c9b06fa850cb9b540a5e400e9f6394cf15efcf4098144de477d1d3dae10150"
+        }
+      ],
+      "embedded_asset_candidates": []
+    },
+    {
+      "name": "vcpkg",
+      "version": "0.2.15",
+      "license": "MIT/Apache-2.0",
+      "license_file": null,
+      "legal_files": [
+        {
+          "path": "LICENSE-APACHE",
+          "sha256": "60c93a31f490375aadf64098b75f10715010379541021e00261045d7800611d3"
+        },
+        {
+          "path": "LICENSE-MIT",
+          "sha256": "016d20f335060a70e79d9fcf8dfaa6201114d65d592211f4bdfb8ae9ca2bc1dc"
+        }
+      ],
+      "embedded_asset_candidates": [
+        "test-data\\no-status\\installed\\x64-windows\\bin\\boost_atomic-vc141-mt-x64-1_67.dll",
+        "test-data\\no-status\\installed\\x64-windows\\bin\\boost_chrono-vc141-mt-x64-1_67.dll",
+        "test-data\\no-status\\installed\\x64-windows\\bin\\boost_container-vc141-mt-x64-1_67.dll",
+        "test-data\\no-status\\installed\\x64-windows\\bin\\boost_date_time-vc141-mt-x64-1_67.dll",
+        "test-data\\no-status\\installed\\x64-windows\\bin\\boost_filesystem-vc141-mt-x64-1_67.dll",
+        "test-data\\no-status\\installed\\x64-windows\\bin\\boost_graph-vc141-mt-x64-1_67.dll",
+        "test-data\\no-status\\installed\\x64-windows\\bin\\boost_iostreams-vc141-mt-x32-1_67.dll",
+        "test-data\\no-status\\installed\\x64-windows\\bin\\boost_locale-vc141-mt-x64-1_67.dll",
+        "test-data\\no-status\\installed\\x64-windows\\bin\\boost_math_c99-vc141-mt-x64-1_67.dll",
+        "test-data\\no-status\\installed\\x64-windows\\bin\\boost_math_c99f-vc141-mt-x64-1_67.dll",
+        "test-data\\no-status\\installed\\x64-windows\\bin\\boost_math_c99l-vc141-mt-x64-1_67.dll",
+        "test-data\\no-status\\installed\\x64-windows\\bin\\boost_math_tr1-vc141-mt-x64-1_67.dll",
+        "test-data\\no-status\\installed\\x64-windows\\bin\\boost_math_tr1f-vc141-mt-x64-1_67.dll",
+        "test-data\\no-status\\installed\\x64-windows\\bin\\boost_math_tr1l-vc141-mt-x64-1_67.dll",
+        "test-data\\no-status\\installed\\x64-windows\\bin\\boost_prg_exec_monitor-vc141-mt-x64-1_67.dll",
+        "test-data\\no-status\\installed\\x64-windows\\bin\\boost_random-vc141-mt-x64-1_67.dll",
+        "test-data\\no-status\\installed\\x64-windows\\bin\\boost_regex-vc141-mt-x64-1_67.dll",
+        "test-data\\no-status\\installed\\x64-windows\\bin\\boost_serialization-vc141-mt-x64-1_67.dll",
+        "test-data\\no-status\\installed\\x64-windows\\bin\\boost_system-vc141-mt-x64-1_67.dll",
+        "test-data\\no-status\\installed\\x64-windows\\bin\\boost_thread-vc141-mt-x64-1_67.dll",
+        "test-data\\no-status\\installed\\x64-windows\\bin\\boost_timer-vc141-mt-x64-1_67.dll",
+        "test-data\\no-status\\installed\\x64-windows\\bin\\boost_unit_test_framework-vc141-mt-x64-1_67.dll",
+        "test-data\\no-status\\installed\\x64-windows\\bin\\boost_wserialization-vc141-mt-x64-1_67.dll",
+        "test-data\\no-status\\installed\\x64-windows\\bin\\icudt61.dll",
+        "test-data\\no-status\\installed\\x64-windows\\bin\\icuin61.dll",
+        "test-data\\no-status\\installed\\x64-windows\\bin\\icuio61.dll",
+        "test-data\\no-status\\installed\\x64-windows\\bin\\icutu61.dll",
+        "test-data\\no-status\\installed\\x64-windows\\bin\\icuuc61.dll",
+        "test-data\\no-status\\installed\\x64-windows\\bin\\libbz2.dll",
+        "test-data\\no-status\\installed\\x64-windows\\bin\\libeay32.dll",
+        "test-data\\no-status\\installed\\x64-windows\\bin\\libmysql.dll",
+        "test-data\\no-status\\installed\\x64-windows\\bin\\lz4.dll",
+        "test-data\\no-status\\installed\\x64-windows\\bin\\lzma.dll",
+        "test-data\\no-status\\installed\\x64-windows\\bin\\ssleay32.dll",
+        "test-data\\no-status\\installed\\x64-windows\\bin\\zlib1.dll",
+        "test-data\\no-status\\installed\\x64-windows\\lib\\boost_atomic-vc140-mt.lib",
+        "test-data\\no-status\\installed\\x64-windows\\lib\\boost_chrono-vc140-mt.lib",
+        "test-data\\no-status\\installed\\x64-windows\\lib\\boost_container-vc140-mt.lib",
+        "test-data\\no-status\\installed\\x64-windows\\lib\\boost_date_time-vc140-mt.lib",
+        "test-data\\no-status\\installed\\x64-windows\\lib\\boost_exception-vc140-mt.lib",
+        "test-data\\no-status\\installed\\x64-windows\\lib\\boost_filesystem-vc140-mt.lib",
+        "test-data\\no-status\\installed\\x64-windows\\lib\\boost_graph-vc140-mt.lib",
+        "test-data\\no-status\\installed\\x64-windows\\lib\\boost_iostreams-vc140-mt.lib",
+        "test-data\\no-status\\installed\\x64-windows\\lib\\boost_locale-vc140-mt.lib",
+        "test-data\\no-status\\installed\\x64-windows\\lib\\boost_math_c99-vc140-mt.lib",
+        "test-data\\no-status\\installed\\x64-windows\\lib\\boost_math_c99f-vc140-mt.lib",
+        "test-data\\no-status\\installed\\x64-windows\\lib\\boost_math_c99l-vc140-mt.lib",
+        "test-data\\no-status\\installed\\x64-windows\\lib\\boost_math_tr1-vc140-mt.lib",
+        "test-data\\no-status\\installed\\x64-windows\\lib\\boost_math_tr1f-vc140-mt.lib",
+        "test-data\\no-status\\installed\\x64-windows\\lib\\boost_math_tr1l-vc140-mt.lib",
+        "test-data\\no-status\\installed\\x64-windows\\lib\\boost_random-vc140-mt.lib",
+        "test-data\\no-status\\installed\\x64-windows\\lib\\boost_regex-vc140-mt.lib",
+        "test-data\\no-status\\installed\\x64-windows\\lib\\boost_serialization-vc140-mt.lib",
+        "test-data\\no-status\\installed\\x64-windows\\lib\\boost_system-vc140-mt.lib",
+        "test-data\\no-status\\installed\\x64-windows\\lib\\boost_thread-vc140-mt.lib",
+        "test-data\\no-status\\installed\\x64-windows\\lib\\boost_timer-vc140-mt.lib",
+        "test-data\\no-status\\installed\\x64-windows\\lib\\boost_unit_test_framework-vc140-mt.lib",
+        "test-data\\no-status\\installed\\x64-windows\\lib\\boost_wserialization-vc140-mt.lib",
+        "test-data\\no-status\\installed\\x64-windows\\lib\\bz2.lib",
+        "test-data\\no-status\\installed\\x64-windows\\lib\\event.lib",
+        "test-data\\no-status\\installed\\x64-windows\\lib\\event_core.lib",
+        "test-data\\no-status\\installed\\x64-windows\\lib\\event_extra.lib",
+        "test-data\\no-status\\installed\\x64-windows\\lib\\icudt.lib",
+        "test-data\\no-status\\installed\\x64-windows\\lib\\icuin.lib",
+        "test-data\\no-status\\installed\\x64-windows\\lib\\icuio.lib",
+        "test-data\\no-status\\installed\\x64-windows\\lib\\icutu.lib",
+        "test-data\\no-status\\installed\\x64-windows\\lib\\icuuc.lib",
+        "test-data\\no-status\\installed\\x64-windows\\lib\\libeay32.lib",
+        "test-data\\no-status\\installed\\x64-windows\\lib\\libmysql.lib",
+        "test-data\\no-status\\installed\\x64-windows\\lib\\lz4.lib",
+        "test-data\\no-status\\installed\\x64-windows\\lib\\lzma.lib",
+        "test-data\\no-status\\installed\\x64-windows\\lib\\ssleay32.lib",
+        "test-data\\no-status\\installed\\x64-windows\\lib\\zlib.lib",
+        "test-data\\no-status\\installed\\x64-windows\\lib\\manual-link\\boost_prg_exec_monitor-vc140-mt.lib",
+        "test-data\\no-status\\installed\\x64-windows\\lib\\manual-link\\boost_test_exec_monitor-vc140-mt.lib",
+        "test-data\\no-status\\installed\\x64-windows\\tools\\openssl\\LIBEAY32.dll",
+        "test-data\\no-status\\installed\\x64-windows\\tools\\openssl\\SSLEAY32.dll",
+        "test-data\\normalized\\installed\\arm64-ios\\lib\\libbz2.a",
+        "test-data\\normalized\\installed\\arm64-ios\\lib\\libfreetype.a",
+        "test-data\\normalized\\installed\\arm64-ios\\lib\\libharfbuzz.a",
+        "test-data\\normalized\\installed\\arm64-ios\\lib\\libpng16.a",
+        "test-data\\normalized\\installed\\arm64-ios\\lib\\libz.a",
+        "test-data\\normalized\\installed\\x64-osx\\lib\\libbz2.a",
+        "test-data\\normalized\\installed\\x64-osx\\lib\\libfreetype.a",
+        "test-data\\normalized\\installed\\x64-osx\\lib\\libharfbuzz.a",
+        "test-data\\normalized\\installed\\x64-osx\\lib\\libpng16.a",
+        "test-data\\normalized\\installed\\x64-osx\\lib\\libz.a",
+        "test-data\\normalized\\installed\\x64-windows\\bin\\boost_atomic-vc141-mt-x64-1_67.dll",
+        "test-data\\normalized\\installed\\x64-windows\\bin\\boost_chrono-vc141-mt-x64-1_67.dll",
+        "test-data\\normalized\\installed\\x64-windows\\bin\\boost_container-vc141-mt-x64-1_67.dll",
+        "test-data\\normalized\\installed\\x64-windows\\bin\\boost_date_time-vc141-mt-x64-1_67.dll",
+        "test-data\\normalized\\installed\\x64-windows\\bin\\boost_filesystem-vc141-mt-x64-1_67.dll",
+        "test-data\\normalized\\installed\\x64-windows\\bin\\boost_graph-vc141-mt-x64-1_67.dll",
+        "test-data\\normalized\\installed\\x64-windows\\bin\\boost_iostreams-vc141-mt-x32-1_67.dll",
+        "test-data\\normalized\\installed\\x64-windows\\bin\\boost_locale-vc141-mt-x64-1_67.dll",
+        "test-data\\normalized\\installed\\x64-windows\\bin\\boost_math_c99-vc141-mt-x64-1_67.dll",
+        "test-data\\normalized\\installed\\x64-windows\\bin\\boost_math_c99f-vc141-mt-x64-1_67.dll",
+        "test-data\\normalized\\installed\\x64-windows\\bin\\boost_math_c99l-vc141-mt-x64-1_67.dll",
+        "test-data\\normalized\\installed\\x64-windows\\bin\\boost_math_tr1-vc141-mt-x64-1_67.dll",
+        "test-data\\normalized\\installed\\x64-windows\\bin\\boost_math_tr1f-vc141-mt-x64-1_67.dll",
+        "test-data\\normalized\\installed\\x64-windows\\bin\\boost_math_tr1l-vc141-mt-x64-1_67.dll",
+        "test-data\\normalized\\installed\\x64-windows\\bin\\boost_prg_exec_monitor-vc141-mt-x64-1_67.dll",
+        "test-data\\normalized\\installed\\x64-windows\\bin\\boost_random-vc141-mt-x64-1_67.dll",
+        "test-data\\normalized\\installed\\x64-windows\\bin\\boost_regex-vc141-mt-x64-1_67.dll",
+        "test-data\\normalized\\installed\\x64-windows\\bin\\boost_serialization-vc141-mt-x64-1_67.dll",
+        "test-data\\normalized\\installed\\x64-windows\\bin\\boost_system-vc141-mt-x64-1_67.dll",
+        "test-data\\normalized\\installed\\x64-windows\\bin\\boost_thread-vc141-mt-x64-1_67.dll",
+        "test-data\\normalized\\installed\\x64-windows\\bin\\boost_timer-vc141-mt-x64-1_67.dll",
+        "test-data\\normalized\\installed\\x64-windows\\bin\\boost_unit_test_framework-vc141-mt-x64-1_67.dll",
+        "test-data\\normalized\\installed\\x64-windows\\bin\\boost_wserialization-vc141-mt-x64-1_67.dll",
+        "test-data\\normalized\\installed\\x64-windows\\bin\\icudt61.dll",
+        "test-data\\normalized\\installed\\x64-windows\\bin\\icuin61.dll",
+        "test-data\\normalized\\installed\\x64-windows\\bin\\icuio61.dll",
+        "test-data\\normalized\\installed\\x64-windows\\bin\\icutu61.dll",
+        "test-data\\normalized\\installed\\x64-windows\\bin\\icuuc61.dll",
+        "test-data\\normalized\\installed\\x64-windows\\bin\\libbz2.dll",
+        "test-data\\normalized\\installed\\x64-windows\\bin\\libeay32.dll",
+        "test-data\\normalized\\installed\\x64-windows\\bin\\libmysql.dll",
+        "test-data\\normalized\\installed\\x64-windows\\bin\\lz4.dll",
+        "test-data\\normalized\\installed\\x64-windows\\bin\\lzma.dll",
+        "test-data\\normalized\\installed\\x64-windows\\bin\\ssleay32.dll",
+        "test-data\\normalized\\installed\\x64-windows\\bin\\zlib1.dll",
+        "test-data\\normalized\\installed\\x64-windows\\debug\\bin\\boost_atomic-vc141-mt-gd-x64-1_67.dll",
+        "test-data\\normalized\\installed\\x64-windows\\debug\\bin\\boost_chrono-vc141-mt-gd-x64-1_67.dll",
+        "test-data\\normalized\\installed\\x64-windows\\debug\\bin\\boost_container-vc141-mt-gd-x64-1_67.dll",
+        "test-data\\normalized\\installed\\x64-windows\\debug\\bin\\boost_date_time-vc141-mt-gd-x64-1_67.dll",
+        "test-data\\normalized\\installed\\x64-windows\\debug\\bin\\boost_filesystem-vc141-mt-gd-x64-1_67.dll",
+        "test-data\\normalized\\installed\\x64-windows\\debug\\bin\\boost_graph-vc141-mt-gd-x64-1_67.dll",
+        "test-data\\normalized\\installed\\x64-windows\\debug\\bin\\boost_iostreams-vc141-mt-gd-x32-1_67.dll",
+        "test-data\\normalized\\installed\\x64-windows\\debug\\bin\\boost_locale-vc141-mt-gd-x64-1_67.dll",
+        "test-data\\normalized\\installed\\x64-windows\\debug\\bin\\boost_math_c99-vc141-mt-gd-x64-1_67.dll",
+        "test-data\\normalized\\installed\\x64-windows\\debug\\bin\\boost_math_c99f-vc141-mt-gd-x64-1_67.dll",
+        "test-data\\normalized\\installed\\x64-windows\\debug\\bin\\boost_math_c99l-vc141-mt-gd-x64-1_67.dll",
+        "test-data\\normalized\\installed\\x64-windows\\debug\\bin\\boost_math_tr1-vc141-mt-gd-x64-1_67.dll",
+        "test-data\\normalized\\installed\\x64-windows\\debug\\bin\\boost_math_tr1f-vc141-mt-gd-x64-1_67.dll",
+        "test-data\\normalized\\installed\\x64-windows\\debug\\bin\\boost_math_tr1l-vc141-mt-gd-x64-1_67.dll",
+        "test-data\\normalized\\installed\\x64-windows\\debug\\bin\\boost_prg_exec_monitor-vc141-mt-gd-x64-1_67.dll",
+        "test-data\\normalized\\installed\\x64-windows\\debug\\bin\\boost_random-vc141-mt-gd-x64-1_67.dll",
+        "test-data\\normalized\\installed\\x64-windows\\debug\\bin\\boost_regex-vc141-mt-gd-x64-1_67.dll",
+        "test-data\\normalized\\installed\\x64-windows\\debug\\bin\\boost_serialization-vc141-mt-gd-x64-1_67.dll",
+        "test-data\\normalized\\installed\\x64-windows\\debug\\bin\\boost_system-vc141-mt-gd-x64-1_67.dll",
+        "test-data\\normalized\\installed\\x64-windows\\debug\\bin\\boost_thread-vc141-mt-gd-x64-1_67.dll",
+        "test-data\\normalized\\installed\\x64-windows\\debug\\bin\\boost_timer-vc141-mt-gd-x64-1_67.dll",
+        "test-data\\normalized\\installed\\x64-windows\\debug\\bin\\boost_unit_test_framework-vc141-mt-gd-x64-1_67.dll",
+        "test-data\\normalized\\installed\\x64-windows\\debug\\bin\\boost_wserialization-vc141-mt-gd-x64-1_67.dll",
+        "test-data\\normalized\\installed\\x64-windows\\debug\\bin\\icudtd61.dll",
+        "test-data\\normalized\\installed\\x64-windows\\debug\\bin\\icuind61.dll",
+        "test-data\\normalized\\installed\\x64-windows\\debug\\bin\\icuiod61.dll",
+        "test-data\\normalized\\installed\\x64-windows\\debug\\bin\\icutud61.dll",
+        "test-data\\normalized\\installed\\x64-windows\\debug\\bin\\icuucd61.dll",
+        "test-data\\normalized\\installed\\x64-windows\\debug\\bin\\libbz2d.dll",
+        "test-data\\normalized\\installed\\x64-windows\\debug\\bin\\libeay32.dll",
+        "test-data\\normalized\\installed\\x64-windows\\debug\\bin\\libmysql.dll",
+        "test-data\\normalized\\installed\\x64-windows\\debug\\bin\\lz4d.dll",
+        "test-data\\normalized\\installed\\x64-windows\\debug\\bin\\lzma.dll",
+        "test-data\\normalized\\installed\\x64-windows\\debug\\bin\\ssleay32.dll",
+        "test-data\\normalized\\installed\\x64-windows\\debug\\bin\\zlibd1.dll",
+        "test-data\\normalized\\installed\\x64-windows\\debug\\lib\\boost_atomic-vc140-mt-gd.lib",
+        "test-data\\normalized\\installed\\x64-windows\\debug\\lib\\boost_chrono-vc140-mt-gd.lib",
+        "test-data\\normalized\\installed\\x64-windows\\debug\\lib\\boost_container-vc140-mt-gd.lib",
+        "test-data\\normalized\\installed\\x64-windows\\debug\\lib\\boost_date_time-vc140-mt-gd.lib",
+        "test-data\\normalized\\installed\\x64-windows\\debug\\lib\\boost_exception-vc140-mt-gd.lib",
+        "test-data\\normalized\\installed\\x64-windows\\debug\\lib\\boost_filesystem-vc140-mt-gd.lib",
+        "test-data\\normalized\\installed\\x64-windows\\debug\\lib\\boost_graph-vc140-mt-gd.lib",
+        "test-data\\normalized\\installed\\x64-windows\\debug\\lib\\boost_iostreams-vc140-mt-gd.lib",
+        "test-data\\normalized\\installed\\x64-windows\\debug\\lib\\boost_locale-vc140-mt-gd.lib",
+        "test-data\\normalized\\installed\\x64-windows\\debug\\lib\\boost_math_c99-vc140-mt-gd.lib",
+        "test-data\\normalized\\installed\\x64-windows\\debug\\lib\\boost_math_c99f-vc140-mt-gd.lib",
+        "test-data\\normalized\\installed\\x64-windows\\debug\\lib\\boost_math_c99l-vc140-mt-gd.lib",
+        "test-data\\normalized\\installed\\x64-windows\\debug\\lib\\boost_math_tr1-vc140-mt-gd.lib",
+        "test-data\\normalized\\installed\\x64-windows\\debug\\lib\\boost_math_tr1f-vc140-mt-gd.lib",
+        "test-data\\normalized\\installed\\x64-windows\\debug\\lib\\boost_math_tr1l-vc140-mt-gd.lib",
+        "test-data\\normalized\\installed\\x64-windows\\debug\\lib\\boost_random-vc140-mt-gd.lib",
+        "test-data\\normalized\\installed\\x64-windows\\debug\\lib\\boost_regex-vc140-mt-gd.lib",
+        "test-data\\normalized\\installed\\x64-windows\\debug\\lib\\boost_serialization-vc140-mt-gd.lib",
+        "test-data\\normalized\\installed\\x64-windows\\debug\\lib\\boost_system-vc140-mt-gd.lib",
+        "test-data\\normalized\\installed\\x64-windows\\debug\\lib\\boost_thread-vc140-mt-gd.lib",
+        "test-data\\normalized\\installed\\x64-windows\\debug\\lib\\boost_timer-vc140-mt-gd.lib",
+        "test-data\\normalized\\installed\\x64-windows\\debug\\lib\\boost_unit_test_framework-vc140-mt-gd.lib",
+        "test-data\\normalized\\installed\\x64-windows\\debug\\lib\\boost_wserialization-vc140-mt-gd.lib",
+        "test-data\\normalized\\installed\\x64-windows\\debug\\lib\\bz2d.lib",
+        "test-data\\normalized\\installed\\x64-windows\\debug\\lib\\event.lib",
+        "test-data\\normalized\\installed\\x64-windows\\debug\\lib\\event_core.lib",
+        "test-data\\normalized\\installed\\x64-windows\\debug\\lib\\event_extra.lib",
+        "test-data\\normalized\\installed\\x64-windows\\debug\\lib\\icudtd.lib",
+        "test-data\\normalized\\installed\\x64-windows\\debug\\lib\\icuind.lib",
+        "test-data\\normalized\\installed\\x64-windows\\debug\\lib\\icuiod.lib",
+        "test-data\\normalized\\installed\\x64-windows\\debug\\lib\\icutud.lib",
+        "test-data\\normalized\\installed\\x64-windows\\debug\\lib\\icuucd.lib",
+        "test-data\\normalized\\installed\\x64-windows\\debug\\lib\\libeay32.lib",
+        "test-data\\normalized\\installed\\x64-windows\\debug\\lib\\libmysql.lib",
+        "test-data\\normalized\\installed\\x64-windows\\debug\\lib\\lz4d.lib",
+        "test-data\\normalized\\installed\\x64-windows\\debug\\lib\\lzma.lib",
+        "test-data\\normalized\\installed\\x64-windows\\debug\\lib\\ssleay32.lib",
+        "test-data\\normalized\\installed\\x64-windows\\debug\\lib\\zlibd.lib",
+        "test-data\\normalized\\installed\\x64-windows\\debug\\lib\\manual-link\\boost_prg_exec_monitor-vc140-mt-gd.lib",
+        "test-data\\normalized\\installed\\x64-windows\\debug\\lib\\manual-link\\boost_test_exec_monitor-vc140-mt-gd.lib",
+        "test-data\\normalized\\installed\\x64-windows\\lib\\boost_atomic-vc140-mt.lib",
+        "test-data\\normalized\\installed\\x64-windows\\lib\\boost_chrono-vc140-mt.lib",
+        "test-data\\normalized\\installed\\x64-windows\\lib\\boost_container-vc140-mt.lib",
+        "test-data\\normalized\\installed\\x64-windows\\lib\\boost_date_time-vc140-mt.lib",
+        "test-data\\normalized\\installed\\x64-windows\\lib\\boost_exception-vc140-mt.lib",
+        "test-data\\normalized\\installed\\x64-windows\\lib\\boost_filesystem-vc140-mt.lib",
+        "test-data\\normalized\\installed\\x64-windows\\lib\\boost_graph-vc140-mt.lib",
+        "test-data\\normalized\\installed\\x64-windows\\lib\\boost_iostreams-vc140-mt.lib",
+        "test-data\\normalized\\installed\\x64-windows\\lib\\boost_locale-vc140-mt.lib",
+        "test-data\\normalized\\installed\\x64-windows\\lib\\boost_math_c99-vc140-mt.lib",
+        "test-data\\normalized\\installed\\x64-windows\\lib\\boost_math_c99f-vc140-mt.lib",
+        "test-data\\normalized\\installed\\x64-windows\\lib\\boost_math_c99l-vc140-mt.lib",
+        "test-data\\normalized\\installed\\x64-windows\\lib\\boost_math_tr1-vc140-mt.lib",
+        "test-data\\normalized\\installed\\x64-windows\\lib\\boost_math_tr1f-vc140-mt.lib",
+        "test-data\\normalized\\installed\\x64-windows\\lib\\boost_math_tr1l-vc140-mt.lib",
+        "test-data\\normalized\\installed\\x64-windows\\lib\\boost_random-vc140-mt.lib",
+        "test-data\\normalized\\installed\\x64-windows\\lib\\boost_regex-vc140-mt.lib",
+        "test-data\\normalized\\installed\\x64-windows\\lib\\boost_serialization-vc140-mt.lib",
+        "test-data\\normalized\\installed\\x64-windows\\lib\\boost_system-vc140-mt.lib",
+        "test-data\\normalized\\installed\\x64-windows\\lib\\boost_thread-vc140-mt.lib",
+        "test-data\\normalized\\installed\\x64-windows\\lib\\boost_timer-vc140-mt.lib",
+        "test-data\\normalized\\installed\\x64-windows\\lib\\boost_unit_test_framework-vc140-mt.lib",
+        "test-data\\normalized\\installed\\x64-windows\\lib\\boost_wserialization-vc140-mt.lib",
+        "test-data\\normalized\\installed\\x64-windows\\lib\\bz2.lib",
+        "test-data\\normalized\\installed\\x64-windows\\lib\\event.lib",
+        "test-data\\normalized\\installed\\x64-windows\\lib\\event_core.lib",
+        "test-data\\normalized\\installed\\x64-windows\\lib\\event_extra.lib",
+        "test-data\\normalized\\installed\\x64-windows\\lib\\icudt.lib",
+        "test-data\\normalized\\installed\\x64-windows\\lib\\icuin.lib",
+        "test-data\\normalized\\installed\\x64-windows\\lib\\icuio.lib",
+        "test-data\\normalized\\installed\\x64-windows\\lib\\icutu.lib",
+        "test-data\\normalized\\installed\\x64-windows\\lib\\icuuc.lib",
+        "test-data\\normalized\\installed\\x64-windows\\lib\\libeay32.lib",
+        "test-data\\normalized\\installed\\x64-windows\\lib\\libmysql.lib",
+        "test-data\\normalized\\installed\\x64-windows\\lib\\lz4.lib",
+        "test-data\\normalized\\installed\\x64-windows\\lib\\lzma.lib",
+        "test-data\\normalized\\installed\\x64-windows\\lib\\ssleay32.lib",
+        "test-data\\normalized\\installed\\x64-windows\\lib\\zlib.lib",
+        "test-data\\normalized\\installed\\x64-windows\\lib\\manual-link\\boost_prg_exec_monitor-vc140-mt.lib",
+        "test-data\\normalized\\installed\\x64-windows\\lib\\manual-link\\boost_test_exec_monitor-vc140-mt.lib",
+        "test-data\\normalized\\installed\\x64-windows\\tools\\openssl\\LIBEAY32.dll",
+        "test-data\\normalized\\installed\\x64-windows\\tools\\openssl\\SSLEAY32.dll",
+        "test-data\\normalized\\installed\\x64-windows-static\\debug\\lib\\boost_atomic-vc140-mt-gd.lib",
+        "test-data\\normalized\\installed\\x64-windows-static\\debug\\lib\\boost_chrono-vc140-mt-gd.lib",
+        "test-data\\normalized\\installed\\x64-windows-static\\debug\\lib\\boost_container-vc140-mt-gd.lib",
+        "test-data\\normalized\\installed\\x64-windows-static\\debug\\lib\\boost_date_time-vc140-mt-gd.lib",
+        "test-data\\normalized\\installed\\x64-windows-static\\debug\\lib\\boost_exception-vc140-mt-gd.lib",
+        "test-data\\normalized\\installed\\x64-windows-static\\debug\\lib\\boost_filesystem-vc140-mt-gd.lib",
+        "test-data\\normalized\\installed\\x64-windows-static\\debug\\lib\\boost_graph-vc140-mt-gd.lib",
+        "test-data\\normalized\\installed\\x64-windows-static\\debug\\lib\\boost_iostreams-vc140-mt-gd.lib",
+        "test-data\\normalized\\installed\\x64-windows-static\\debug\\lib\\boost_locale-vc140-mt-gd.lib",
+        "test-data\\normalized\\installed\\x64-windows-static\\debug\\lib\\boost_math_c99-vc140-mt-gd.lib",
+        "test-data\\normalized\\installed\\x64-windows-static\\debug\\lib\\boost_math_c99f-vc140-mt-gd.lib",
+        "test-data\\normalized\\installed\\x64-windows-static\\debug\\lib\\boost_math_c99l-vc140-mt-gd.lib",
+        "test-data\\normalized\\installed\\x64-windows-static\\debug\\lib\\boost_math_tr1-vc140-mt-gd.lib",
+        "test-data\\normalized\\installed\\x64-windows-static\\debug\\lib\\boost_math_tr1f-vc140-mt-gd.lib",
+        "test-data\\normalized\\installed\\x64-windows-static\\debug\\lib\\boost_math_tr1l-vc140-mt-gd.lib",
+        "test-data\\normalized\\installed\\x64-windows-static\\debug\\lib\\boost_random-vc140-mt-gd.lib",
+        "test-data\\normalized\\installed\\x64-windows-static\\debug\\lib\\boost_regex-vc140-mt-gd.lib",
+        "test-data\\normalized\\installed\\x64-windows-static\\debug\\lib\\boost_serialization-vc140-mt-gd.lib",
+        "test-data\\normalized\\installed\\x64-windows-static\\debug\\lib\\boost_system-vc140-mt-gd.lib",
+        "test-data\\normalized\\installed\\x64-windows-static\\debug\\lib\\boost_thread-vc140-mt-gd.lib",
+        "test-data\\normalized\\installed\\x64-windows-static\\debug\\lib\\boost_timer-vc140-mt-gd.lib",
+        "test-data\\normalized\\installed\\x64-windows-static\\debug\\lib\\boost_unit_test_framework-vc140-mt-gd.lib",
+        "test-data\\normalized\\installed\\x64-windows-static\\debug\\lib\\boost_wserialization-vc140-mt-gd.lib",
+        "test-data\\normalized\\installed\\x64-windows-static\\debug\\lib\\bz2d.lib",
+        "test-data\\normalized\\installed\\x64-windows-static\\debug\\lib\\event.lib",
+        "test-data\\normalized\\installed\\x64-windows-static\\debug\\lib\\event_core.lib",
+        "test-data\\normalized\\installed\\x64-windows-static\\debug\\lib\\event_extra.lib",
+        "test-data\\normalized\\installed\\x64-windows-static\\debug\\lib\\icudtd.lib",
+        "test-data\\normalized\\installed\\x64-windows-static\\debug\\lib\\icuind.lib",
+        "test-data\\normalized\\installed\\x64-windows-static\\debug\\lib\\icuiod.lib",
+        "test-data\\normalized\\installed\\x64-windows-static\\debug\\lib\\icutud.lib",
+        "test-data\\normalized\\installed\\x64-windows-static\\debug\\lib\\icuucd.lib",
+        "test-data\\normalized\\installed\\x64-windows-static\\debug\\lib\\libeay32.lib",
+        "test-data\\normalized\\installed\\x64-windows-static\\debug\\lib\\lz4d.lib",
+        "test-data\\normalized\\installed\\x64-windows-static\\debug\\lib\\lzma.lib",
+        "test-data\\normalized\\installed\\x64-windows-static\\debug\\lib\\mysqlclient.lib",
+        "test-data\\normalized\\installed\\x64-windows-static\\debug\\lib\\ssleay32.lib",
+        "test-data\\normalized\\installed\\x64-windows-static\\debug\\lib\\zlibd.lib",
+        "test-data\\normalized\\installed\\x64-windows-static\\debug\\lib\\manual-link\\boost_prg_exec_monitor-vc140-mt-gd.lib",
+        "test-data\\normalized\\installed\\x64-windows-static\\debug\\lib\\manual-link\\boost_test_exec_monitor-vc140-mt-gd.lib",
+        "test-data\\normalized\\installed\\x64-windows-static\\lib\\boost_atomic-vc140-mt.lib",
+        "test-data\\normalized\\installed\\x64-windows-static\\lib\\boost_chrono-vc140-mt.lib",
+        "test-data\\normalized\\installed\\x64-windows-static\\lib\\boost_container-vc140-mt.lib",
+        "test-data\\normalized\\installed\\x64-windows-static\\lib\\boost_date_time-vc140-mt.lib",
+        "test-data\\normalized\\installed\\x64-windows-static\\lib\\boost_exception-vc140-mt.lib",
+        "test-data\\normalized\\installed\\x64-windows-static\\lib\\boost_filesystem-vc140-mt.lib",
+        "test-data\\normalized\\installed\\x64-windows-static\\lib\\boost_graph-vc140-mt.lib",
+        "test-data\\normalized\\installed\\x64-windows-static\\lib\\boost_iostreams-vc140-mt.lib",
+        "test-data\\normalized\\installed\\x64-windows-static\\lib\\boost_locale-vc140-mt.lib",
+        "test-data\\normalized\\installed\\x64-windows-static\\lib\\boost_math_c99-vc140-mt.lib",
+        "test-data\\normalized\\installed\\x64-windows-static\\lib\\boost_math_c99f-vc140-mt.lib",
+        "test-data\\normalized\\installed\\x64-windows-static\\lib\\boost_math_c99l-vc140-mt.lib",
+        "test-data\\normalized\\installed\\x64-windows-static\\lib\\boost_math_tr1-vc140-mt.lib",
+        "test-data\\normalized\\installed\\x64-windows-static\\lib\\boost_math_tr1f-vc140-mt.lib",
+        "test-data\\normalized\\installed\\x64-windows-static\\lib\\boost_math_tr1l-vc140-mt.lib",
+        "test-data\\normalized\\installed\\x64-windows-static\\lib\\boost_random-vc140-mt.lib",
+        "test-data\\normalized\\installed\\x64-windows-static\\lib\\boost_regex-vc140-mt.lib",
+        "test-data\\normalized\\installed\\x64-windows-static\\lib\\boost_serialization-vc140-mt.lib",
+        "test-data\\normalized\\installed\\x64-windows-static\\lib\\boost_system-vc140-mt.lib",
+        "test-data\\normalized\\installed\\x64-windows-static\\lib\\boost_thread-vc140-mt.lib",
+        "test-data\\normalized\\installed\\x64-windows-static\\lib\\boost_timer-vc140-mt.lib",
+        "test-data\\normalized\\installed\\x64-windows-static\\lib\\boost_unit_test_framework-vc140-mt.lib",
+        "test-data\\normalized\\installed\\x64-windows-static\\lib\\boost_wserialization-vc140-mt.lib",
+        "test-data\\normalized\\installed\\x64-windows-static\\lib\\bz2.lib",
+        "test-data\\normalized\\installed\\x64-windows-static\\lib\\event.lib",
+        "test-data\\normalized\\installed\\x64-windows-static\\lib\\event_core.lib",
+        "test-data\\normalized\\installed\\x64-windows-static\\lib\\event_extra.lib",
+        "test-data\\normalized\\installed\\x64-windows-static\\lib\\icudt.lib",
+        "test-data\\normalized\\installed\\x64-windows-static\\lib\\icuin.lib",
+        "test-data\\normalized\\installed\\x64-windows-static\\lib\\icuio.lib",
+        "test-data\\normalized\\installed\\x64-windows-static\\lib\\icutu.lib",
+        "test-data\\normalized\\installed\\x64-windows-static\\lib\\icuuc.lib",
+        "test-data\\normalized\\installed\\x64-windows-static\\lib\\libeay32.lib",
+        "test-data\\normalized\\installed\\x64-windows-static\\lib\\lz4.lib",
+        "test-data\\normalized\\installed\\x64-windows-static\\lib\\lzma.lib",
+        "test-data\\normalized\\installed\\x64-windows-static\\lib\\mysqlclient.lib",
+        "test-data\\normalized\\installed\\x64-windows-static\\lib\\ssleay32.lib",
+        "test-data\\normalized\\installed\\x64-windows-static\\lib\\zlib.lib",
+        "test-data\\normalized\\installed\\x64-windows-static\\lib\\manual-link\\boost_prg_exec_monitor-vc140-mt.lib",
+        "test-data\\normalized\\installed\\x64-windows-static\\lib\\manual-link\\boost_test_exec_monitor-vc140-mt.lib",
+        "test-data\\normalized\\installed\\x86-windows\\bin\\freetype.dll",
+        "test-data\\normalized\\installed\\x86-windows\\bin\\graphite2.dll",
+        "test-data\\normalized\\installed\\x86-windows\\bin\\harfbuzz.dll",
+        "test-data\\normalized\\installed\\x86-windows\\bin\\icudt61.dll",
+        "test-data\\normalized\\installed\\x86-windows\\bin\\icuin61.dll",
+        "test-data\\normalized\\installed\\x86-windows\\bin\\icuio61.dll",
+        "test-data\\normalized\\installed\\x86-windows\\bin\\icutu61.dll",
+        "test-data\\normalized\\installed\\x86-windows\\bin\\icuuc61.dll",
+        "test-data\\normalized\\installed\\x86-windows\\bin\\libbz2.dll",
+        "test-data\\normalized\\installed\\x86-windows\\bin\\libpng16.dll",
+        "test-data\\normalized\\installed\\x86-windows\\bin\\zlib1.dll",
+        "test-data\\normalized\\installed\\x86-windows\\lib\\bz2.lib",
+        "test-data\\normalized\\installed\\x86-windows\\lib\\freetype.lib",
+        "test-data\\normalized\\installed\\x86-windows\\lib\\graphite2.lib",
+        "test-data\\normalized\\installed\\x86-windows\\lib\\harfbuzz.lib",
+        "test-data\\normalized\\installed\\x86-windows\\lib\\icudt.lib",
+        "test-data\\normalized\\installed\\x86-windows\\lib\\icuin.lib",
+        "test-data\\normalized\\installed\\x86-windows\\lib\\icuio.lib",
+        "test-data\\normalized\\installed\\x86-windows\\lib\\icutu.lib",
+        "test-data\\normalized\\installed\\x86-windows\\lib\\icuuc.lib",
+        "test-data\\normalized\\installed\\x86-windows\\lib\\libpng16.lib",
+        "test-data\\normalized\\installed\\x86-windows\\lib\\zlib.lib"
+      ]
+    },
+    {
+      "name": "version_check",
+      "version": "0.9.5",
+      "license": "MIT/Apache-2.0",
+      "license_file": null,
+      "legal_files": [
+        {
+          "path": "LICENSE-APACHE",
+          "sha256": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2"
+        },
+        {
+          "path": "LICENSE-MIT",
+          "sha256": "b7e650f3fce5c53249d1cdc608b54df156a97edd636cf9d23498d0cfe7aec63e"
+        }
+      ],
+      "embedded_asset_candidates": []
+    },
+    {
+      "name": "walkdir",
+      "version": "2.5.1",
+      "license": "Unlicense/MIT",
+      "license_file": null,
+      "legal_files": [
+        {
+          "path": "COPYING",
+          "sha256": "01c266bced4a434da0051174d6bee16a4c82cf634e2679b6155d40d75012390f"
+        },
+        {
+          "path": "LICENSE-MIT",
+          "sha256": "0f96a83840e146e43c0ec96a22ec1f392e0680e6c1226e6f3ba87e0740af850f"
+        },
+        {
+          "path": "UNLICENSE",
+          "sha256": "7e12e5df4bae12cb21581ba157ced20e1986a0508dd10d0e8a4ab9a4cf94e85c"
+        }
+      ],
+      "embedded_asset_candidates": []
+    },
+    {
+      "name": "webbrowser",
+      "version": "1.2.7",
+      "license": "MIT OR Apache-2.0",
+      "license_file": null,
+      "legal_files": [
+        {
+          "path": "LICENSE-APACHE",
+          "sha256": "b0f7d40eaa9577d99132579866bf1eaf448577dc737582b8a34f1b3e7fab8994"
+        },
+        {
+          "path": "LICENSE-MIT",
+          "sha256": "7f0f4f8802c102d35110806d1755b7681127575b644f64750810cc47fa78df5b"
+        }
+      ],
+      "embedded_asset_candidates": []
+    },
+    {
+      "name": "web-time",
+      "version": "1.1.0",
+      "license": "MIT OR Apache-2.0",
+      "license_file": null,
+      "legal_files": [
+        {
+          "path": "LICENSE-APACHE",
+          "sha256": "54a744942eb3fa63a74d8d359989ed6962c04f3f10ff20cfa08ff8aa7efbe4e6"
+        },
+        {
+          "path": "LICENSE-MIT",
+          "sha256": "f428305bbf2e70fbd807af0f3c7ac1b7acfb95311640f451e9d2e48db6d7e96b"
+        }
+      ],
+      "embedded_asset_candidates": []
+    },
+    {
+      "name": "weezl",
+      "version": "0.1.12",
+      "license": "MIT OR Apache-2.0",
+      "license_file": null,
+      "legal_files": [
+        {
+          "path": "LICENSE-APACHE",
+          "sha256": "769f80b5bcb42ed0af4e4d2fd74e1ac9bf843cb80c5a29219d1ef3544428a6bb"
+        },
+        {
+          "path": "LICENSE-MIT",
+          "sha256": "573f5227db835cd30bbdd3aed3f82615f80119a4d5c82b4daf642dbfe2b6afde"
+        }
+      ],
+      "embedded_asset_candidates": []
+    },
+    {
+      "name": "winapi",
+      "version": "0.3.9",
+      "license": "MIT/Apache-2.0",
+      "license_file": null,
+      "legal_files": [
+        {
+          "path": "LICENSE-APACHE",
+          "sha256": "b40930bbcf80744c86c46a12bc9da056641d722716c378f5659b9e555ef833e1"
+        },
+        {
+          "path": "LICENSE-MIT",
+          "sha256": "ce7bc3499fee93d5022ef430d5e4201e79a6d9154f3974e42f41349f0569e09b"
+        }
+      ],
+      "embedded_asset_candidates": []
+    },
+    {
+      "name": "winapi-util",
+      "version": "0.1.11",
+      "license": "Unlicense OR MIT",
+      "license_file": null,
+      "legal_files": [
+        {
+          "path": "COPYING",
+          "sha256": "01c266bced4a434da0051174d6bee16a4c82cf634e2679b6155d40d75012390f"
+        },
+        {
+          "path": "LICENSE-MIT",
+          "sha256": "cb3c929a05e6cbc9de9ab06a4c57eeb60ca8c724bef6c138c87d3a577e27aa14"
+        },
+        {
+          "path": "UNLICENSE",
+          "sha256": "7e12e5df4bae12cb21581ba157ced20e1986a0508dd10d0e8a4ab9a4cf94e85c"
+        }
+      ],
+      "embedded_asset_candidates": []
+    },
+    {
+      "name": "windows_x86_64_msvc",
+      "version": "0.52.6",
+      "license": "MIT OR Apache-2.0",
+      "license_file": null,
+      "legal_files": [
+        {
+          "path": "license-apache-2.0",
+          "sha256": "c16f8dcf1a368b83be78d826ea23de4079fe1b4469a0ab9ee20563f37ff3d44b"
+        },
+        {
+          "path": "license-mit",
+          "sha256": "c2cfccb812fe482101a8f04597dfc5a9991a6b2748266c47ac91b6a5aae15383"
+        }
+      ],
+      "embedded_asset_candidates": [
+        "lib\\windows.0.52.0.lib"
+      ]
+    },
+    {
+      "name": "windows-link",
+      "version": "0.2.1",
+      "license": "MIT OR Apache-2.0",
+      "license_file": null,
+      "legal_files": [
+        {
+          "path": "license-apache-2.0",
+          "sha256": "c16f8dcf1a368b83be78d826ea23de4079fe1b4469a0ab9ee20563f37ff3d44b"
+        },
+        {
+          "path": "license-mit",
+          "sha256": "c2cfccb812fe482101a8f04597dfc5a9991a6b2748266c47ac91b6a5aae15383"
+        }
+      ],
+      "embedded_asset_candidates": []
+    },
+    {
+      "name": "windows-sys",
+      "version": "0.52.0",
+      "license": "MIT OR Apache-2.0",
+      "license_file": null,
+      "legal_files": [
+        {
+          "path": "license-apache-2.0",
+          "sha256": "c16f8dcf1a368b83be78d826ea23de4079fe1b4469a0ab9ee20563f37ff3d44b"
+        },
+        {
+          "path": "license-mit",
+          "sha256": "c2cfccb812fe482101a8f04597dfc5a9991a6b2748266c47ac91b6a5aae15383"
+        }
+      ],
+      "embedded_asset_candidates": []
+    },
+    {
+      "name": "windows-sys",
+      "version": "0.59.0",
+      "license": "MIT OR Apache-2.0",
+      "license_file": null,
+      "legal_files": [
+        {
+          "path": "license-apache-2.0",
+          "sha256": "c16f8dcf1a368b83be78d826ea23de4079fe1b4469a0ab9ee20563f37ff3d44b"
+        },
+        {
+          "path": "license-mit",
+          "sha256": "c2cfccb812fe482101a8f04597dfc5a9991a6b2748266c47ac91b6a5aae15383"
+        }
+      ],
+      "embedded_asset_candidates": []
+    },
+    {
+      "name": "windows-sys",
+      "version": "0.61.2",
+      "license": "MIT OR Apache-2.0",
+      "license_file": null,
+      "legal_files": [
+        {
+          "path": "license-apache-2.0",
+          "sha256": "c16f8dcf1a368b83be78d826ea23de4079fe1b4469a0ab9ee20563f37ff3d44b"
+        },
+        {
+          "path": "license-mit",
+          "sha256": "c2cfccb812fe482101a8f04597dfc5a9991a6b2748266c47ac91b6a5aae15383"
+        }
+      ],
+      "embedded_asset_candidates": []
+    },
+    {
+      "name": "windows-targets",
+      "version": "0.52.6",
+      "license": "MIT OR Apache-2.0",
+      "license_file": null,
+      "legal_files": [
+        {
+          "path": "license-apache-2.0",
+          "sha256": "c16f8dcf1a368b83be78d826ea23de4079fe1b4469a0ab9ee20563f37ff3d44b"
+        },
+        {
+          "path": "license-mit",
+          "sha256": "c2cfccb812fe482101a8f04597dfc5a9991a6b2748266c47ac91b6a5aae15383"
+        }
+      ],
+      "embedded_asset_candidates": []
+    },
+    {
+      "name": "winit",
+      "version": "0.30.13",
+      "license": "Apache-2.0",
+      "license_file": null,
+      "legal_files": [
+        {
+          "path": "LICENSE",
+          "sha256": "6dc0e068dcf3a5bc8e054205b85b7720e1d49265bbc64bf515d2cf79197df69a"
+        }
+      ],
+      "embedded_asset_candidates": []
+    },
+    {
+      "name": "writeable",
+      "version": "0.6.4",
+      "license": "Unicode-3.0",
+      "license_file": null,
+      "legal_files": [
+        {
+          "path": "LICENSE",
+          "sha256": "f367c1b8e1aa262435251e442901da4607b4650e0e63a026f5044473ecfb90f2"
+        }
+      ],
+      "embedded_asset_candidates": []
+    },
+    {
+      "name": "xml-rs",
+      "version": "0.8.29",
+      "license": "MIT",
+      "license_file": null,
+      "legal_files": [
+        {
+          "path": "LICENSE",
+          "sha256": "0dc18d924dc0a5f41172a393012843a5eaaef338e795b3645da9cc3b6068220b"
+        }
+      ],
+      "embedded_asset_candidates": []
+    },
+    {
+      "name": "yoke",
+      "version": "0.8.4",
+      "license": "Unicode-3.0",
+      "license_file": null,
+      "legal_files": [
+        {
+          "path": "LICENSE",
+          "sha256": "f367c1b8e1aa262435251e442901da4607b4650e0e63a026f5044473ecfb90f2"
+        }
+      ],
+      "embedded_asset_candidates": []
+    },
+    {
+      "name": "yoke-derive",
+      "version": "0.8.4",
+      "license": "Unicode-3.0",
+      "license_file": null,
+      "legal_files": [
+        {
+          "path": "LICENSE",
+          "sha256": "f367c1b8e1aa262435251e442901da4607b4650e0e63a026f5044473ecfb90f2"
+        }
+      ],
+      "embedded_asset_candidates": []
+    },
+    {
+      "name": "zerocopy",
+      "version": "0.8.66",
+      "license": "BSD-2-Clause OR Apache-2.0 OR MIT",
+      "license_file": null,
+      "legal_files": [
+        {
+          "path": "LICENSE-APACHE",
+          "sha256": "9d185ac6703c4b0453974c0d85e9eee43e6941009296bb1f5eb0b54e2329e9f3"
+        },
+        {
+          "path": "LICENSE-BSD",
+          "sha256": "83c1763356e822adde0a2cae748d938a73fdc263849ccff6b27776dff213bd32"
+        },
+        {
+          "path": "LICENSE-MIT",
+          "sha256": "1a2f5c12ddc934d58956aa5dbdd3255fe55fd957633ab7d0d39e4f0daa73f7df"
+        }
+      ],
+      "embedded_asset_candidates": []
+    },
+    {
+      "name": "zerocopy-derive",
+      "version": "0.8.66",
+      "license": "BSD-2-Clause OR Apache-2.0 OR MIT",
+      "license_file": null,
+      "legal_files": [
+        {
+          "path": "LICENSE-APACHE",
+          "sha256": "9d185ac6703c4b0453974c0d85e9eee43e6941009296bb1f5eb0b54e2329e9f3"
+        },
+        {
+          "path": "LICENSE-BSD",
+          "sha256": "83c1763356e822adde0a2cae748d938a73fdc263849ccff6b27776dff213bd32"
+        },
+        {
+          "path": "LICENSE-MIT",
+          "sha256": "1a2f5c12ddc934d58956aa5dbdd3255fe55fd957633ab7d0d39e4f0daa73f7df"
+        }
+      ],
+      "embedded_asset_candidates": []
+    },
+    {
+      "name": "zerofrom",
+      "version": "0.1.8",
+      "license": "Unicode-3.0",
+      "license_file": null,
+      "legal_files": [
+        {
+          "path": "LICENSE",
+          "sha256": "f367c1b8e1aa262435251e442901da4607b4650e0e63a026f5044473ecfb90f2"
+        }
+      ],
+      "embedded_asset_candidates": []
+    },
+    {
+      "name": "zerofrom-derive",
+      "version": "0.1.8",
+      "license": "Unicode-3.0",
+      "license_file": null,
+      "legal_files": [
+        {
+          "path": "LICENSE",
+          "sha256": "f367c1b8e1aa262435251e442901da4607b4650e0e63a026f5044473ecfb90f2"
+        }
+      ],
+      "embedded_asset_candidates": []
+    },
+    {
+      "name": "zerotrie",
+      "version": "0.2.5",
+      "license": "Unicode-3.0",
+      "license_file": null,
+      "legal_files": [
+        {
+          "path": "LICENSE",
+          "sha256": "f367c1b8e1aa262435251e442901da4607b4650e0e63a026f5044473ecfb90f2"
+        }
+      ],
+      "embedded_asset_candidates": []
+    },
+    {
+      "name": "zerovec",
+      "version": "0.11.9",
+      "license": "Unicode-3.0",
+      "license_file": null,
+      "legal_files": [
+        {
+          "path": "LICENSE",
+          "sha256": "f367c1b8e1aa262435251e442901da4607b4650e0e63a026f5044473ecfb90f2"
+        }
+      ],
+      "embedded_asset_candidates": []
+    },
+    {
+      "name": "zerovec-derive",
+      "version": "0.11.7",
+      "license": "Unicode-3.0",
+      "license_file": null,
+      "legal_files": [
+        {
+          "path": "LICENSE",
+          "sha256": "f367c1b8e1aa262435251e442901da4607b4650e0e63a026f5044473ecfb90f2"
+        }
+      ],
+      "embedded_asset_candidates": []
+    },
+    {
+      "name": "zlib-rs",
+      "version": "0.6.9",
+      "license": "Zlib",
+      "license_file": null,
+      "legal_files": [
+        {
+          "path": "LICENSE",
+          "sha256": "e72111c52b7d96ebe25348dee19f0744f444d3c95ae6b1ecb6ccaecc5bce05ba"
+        }
+      ],
+      "embedded_asset_candidates": []
+    },
+    {
+      "name": "zmij",
+      "version": "1.0.23",
+      "license": "MIT",
+      "license_file": null,
+      "legal_files": [
+        {
+          "path": "LICENSE-MIT",
+          "sha256": "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3"
+        }
+      ],
+      "embedded_asset_candidates": []
+    },
+    {
+      "name": "zune-core",
+      "version": "0.5.3",
+      "license": "MIT OR Apache-2.0 OR Zlib",
+      "license_file": null,
+      "legal_files": [
+        {
+          "path": "LICENSE-APACHE",
+          "sha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4"
+        },
+        {
+          "path": "LICENSE-MIT",
+          "sha256": "d30047bca3b516639339a3c279bb84c3483124fb5a9dafe3c75056a85090e745"
+        },
+        {
+          "path": "LICENSE-ZLIB",
+          "sha256": "d201d14804d3bcd3b944147173175e4abfbd838b7c8069b6bd3452496bf13e6c"
+        }
+      ],
+      "embedded_asset_candidates": []
+    },
+    {
+      "name": "zune-jpeg",
+      "version": "0.5.15",
+      "license": "MIT OR Apache-2.0 OR Zlib",
+      "license_file": null,
+      "legal_files": [
+        {
+          "path": "LICENSE-APACHE",
+          "sha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4"
+        },
+        {
+          "path": "LICENSE-MIT",
+          "sha256": "d30047bca3b516639339a3c279bb84c3483124fb5a9dafe3c75056a85090e745"
+        },
+        {
+          "path": "LICENSE-ZLIB",
+          "sha256": "d201d14804d3bcd3b944147173175e4abfbd838b7c8069b6bd3452496bf13e6c"
+        }
+      ],
+      "embedded_asset_candidates": []
+    }
+  ]
+}
