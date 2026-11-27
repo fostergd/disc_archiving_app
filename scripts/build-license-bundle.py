@@ -184,7 +184,11 @@ def build(notice_dir, embedded, destination):
     for name in ("LICENSE", "provenance.json"):
         path = "upstream/angle-7403dd2/" + name
         items[path] = (ROOT / "docs/compliance" / path).read_bytes()
-    items.update(toolchain_notices())
+    toolchain = toolchain_notices()
+    items.update(toolchain)
+    print("TOOLCHAIN_NOTICE_IDENTITIES " + json.dumps(
+        [{"path": name, "sha256": digest(raw), "bytes": len(raw)}
+         for name, raw in sorted(toolchain.items())], separators=(",", ":")))
     items["README.txt"] = (b"REVIEW ONLY - public distribution is not authorized by this bundle.\n"
                            b"Original third-party notices and attribution evidence. See project THIRD_PARTY_NOTICES.md.\n"
                            b"Inventory conservatively includes build/dev candidates; not a binary SBOM.\n")

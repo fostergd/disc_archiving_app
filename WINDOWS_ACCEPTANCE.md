@@ -31,3 +31,6 @@ Repeat package checksum and startup checks for the newly downloaded ZIP, even if
 Record Windows version, drive models, media types, package hashes, results and errors. Do not claim hardware acceptance until these checks pass.
 
 The CI package assembly checks and native file-stream tests do not exercise a real optical write. Confirm the selected Windows installation can complete the guarded ISO verification and native burn/readback sequence using disposable media before trusting it with archive material.
+
+## Runtime acceptance
+Confirm both x64 executables launch on the intended Windows installation. The release imports the Microsoft Visual C++ runtime (vcruntime140.dll) and Windows system/Universal CRT libraries. If required, use the applicable official Microsoft Visual C++ v14 x64 redistributable; no runtime installer or separate Microsoft DLL is included in the package. Record any missing-runtime or launch errors rather than bypassing them.
