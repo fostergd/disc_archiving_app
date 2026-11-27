@@ -18,6 +18,11 @@ jobs:
         with:
           persist-credentials: false
       - run: rustup default stable-x86_64-pc-windows-msvc
+      - name: Run attribution parser regression tests before dependency builds
+        shell: powershell
+        run: |
+          python ./scripts/inspect-embedded-license-evidence.py --self-test
+          if ($LASTEXITCODE -ne 0) { throw 'Attribution parser regression failed' }
       - name: Inventory exact Windows dependency licenses (no artifact upload)
         shell: powershell
         run: ./scripts/inventory-windows-licenses.ps1 -OutputDirectory (Join-Path $env:RUNNER_TEMP 'das-license-review')
@@ -33,7 +38,7 @@ jobs:
       - name: Inspect embedded fonts, SQLite and generated binding evidence (no upload)
         shell: powershell
         run: |
-          python ./scripts/inspect-embedded-license-evidence.py --self-test --build-messages (Join-Path $env:RUNNER_TEMP 'das-release-build.jsonl') --output-directory (Join-Path $env:RUNNER_TEMP 'das-embedded-evidence')
+          python ./scripts/inspect-embedded-license-evidence.py --build-messages (Join-Path $env:RUNNER_TEMP 'das-release-build.jsonl') --output-directory (Join-Path $env:RUNNER_TEMP 'das-embedded-evidence')
           if ($LASTEXITCODE -ne 0) { throw 'Embedded attribution evidence failed' }
       - run: target/release/disc-archive.exe --help
       - name: Verify GUI executable exists

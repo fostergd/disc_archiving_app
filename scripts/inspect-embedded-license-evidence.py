@@ -288,8 +288,10 @@ class EvidenceTests(unittest.TestCase):
             wgl = base / "different" / "wgl"
             egl.mkdir(parents=True)
             wgl.mkdir(parents=True)
-            (egl / "egl.rs").write_text("// Copyright fixture\n", encoding="utf-8")
-            (wgl / "wgl.rs").write_text("// binding fixture\n", encoding="utf-8")
+            # Use explicit bytes: Windows text-mode writes translate LF into CRLF.
+            # Exercise both formats and require preservation of the original comment.
+            (egl / "egl.rs").write_bytes(b"// Copyright fixture\n")
+            (wgl / "wgl.rs").write_bytes(b"// Copyright Windows fixture\r\n")
             messages = base / "messages.jsonl"
             events = [
                 {"reason": "build-script-executed", "package_id": "egl-id", "out_dir": str(egl)},
@@ -304,6 +306,9 @@ class EvidenceTests(unittest.TestCase):
             self.assertEqual([(r["package"], r["path"]) for r in rows],
                              [("egl@1", "egl.rs"), ("wgl@1", "wgl.rs")])
             self.assertEqual(rows[0]["leading_legal_comments"], ["// Copyright fixture\n"])
+            self.assertEqual(rows[1]["leading_legal_comments"], ["// Copyright Windows fixture\r\n"])
+            self.assertEqual(rows[0]["sha256"], sha256(b"// Copyright fixture\n"))
+            self.assertEqual(rows[1]["sha256"], sha256(b"// Copyright Windows fixture\r\n"))
             write([events[0], events[2]])
             with self.assertRaisesRegex(ValueError, "missing Cargo"):
                 read_build_outputs(messages, ids)
