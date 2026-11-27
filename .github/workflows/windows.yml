@@ -23,6 +23,8 @@ jobs:
         run: |
           python ./scripts/inspect-embedded-license-evidence.py --self-test
           if ($LASTEXITCODE -ne 0) { throw 'Attribution parser regression failed' }
+          python ./scripts/build-license-bundle.py --self-test
+          if ($LASTEXITCODE -ne 0) { throw 'Notice bundle regression failed' }
       - name: Inventory exact Windows dependency licenses (no artifact upload)
         shell: powershell
         run: ./scripts/inventory-windows-licenses.ps1 -OutputDirectory (Join-Path $env:RUNNER_TEMP 'das-license-review')
@@ -40,14 +42,19 @@ jobs:
         run: |
           python ./scripts/inspect-embedded-license-evidence.py --build-messages (Join-Path $env:RUNNER_TEMP 'das-release-build.jsonl') --output-directory (Join-Path $env:RUNNER_TEMP 'das-embedded-evidence')
           if ($LASTEXITCODE -ne 0) { throw 'Embedded attribution evidence failed' }
+      - name: Assemble and validate review-only license bundle (no upload)
+        shell: powershell
+        run: |
+          python ./scripts/build-license-bundle.py --notice-directory (Join-Path $env:RUNNER_TEMP 'das-notice-evidence') --embedded-report (Join-Path $env:RUNNER_TEMP 'das-embedded-evidence/embedded-evidence.json') --output (Join-Path $env:RUNNER_TEMP 'THIRD_PARTY_LICENSES.zip')
+          if ($LASTEXITCODE -ne 0) { throw 'Review notice bundle validation failed' }
       - run: target/release/disc-archive.exe --help
       - name: Verify GUI executable exists
         run: if (-not (Test-Path target/release/disc-archive-studio.exe)) { throw 'GUI executable missing' }
       - name: Assemble and validate portable preview
         shell: powershell
         run: |
-          ./scripts/build-and-test-portable.ps1 -Destination (Join-Path $env:RUNNER_TEMP 'das-portable')
-          ./scripts/new-preview-zip.ps1 -PackageDirectory (Join-Path $env:RUNNER_TEMP 'das-portable') -OutputDirectory (Join-Path $env:RUNNER_TEMP 'das-zip-validation')
+          ./scripts/build-and-test-portable.ps1 -Destination (Join-Path $env:RUNNER_TEMP 'das-portable') -NoticeBundle (Join-Path $env:RUNNER_TEMP 'THIRD_PARTY_LICENSES.zip')
+          ./scripts/new-preview-zip.ps1 -PackageDirectory (Join-Path $env:RUNNER_TEMP 'das-portable') -OutputDirectory (Join-Path $env:RUNNER_TEMP 'das-zip-validation') -RequireNoticeBundle
       - name: Publish requested preview
         if: ${{ github.event.repository.private && github.event_name == 'workflow_dispatch' && inputs.publish_preview }}
         uses: actions/upload-artifact@v4

@@ -24,3 +24,6 @@ Actual build-script events yielded egl_bindings.rs, wgl_bindings.rs and wgl_extr
 ## Open items
 
 Review the improved XML evidence, other source-header/native obligations and exact Windows runtime/build candidates; assemble a complete notice bundle, validate its contents, finish historical exposure review and public release gate. The existing legacy public preview predates this review. No public binary authorization yet.
+
+## Expanded XML evidence - CI 46065482256
+The verified XML scan identified Khronos copyright and Apache-2.0 notices in GL/GLX/WGL, Khronos permissive notices in EGL, and ANGLE BSD references in egl_angle_ext.xml/gl_angle_ext.xml. Exact extracted text is retained in embedded-evidence-xml.json. The gl-rs commit f150967b1c44ae888e6676f93f639ebc82771bdc pins google/angle submodule 7403dd2cd3764fe96660fe09892e764e9ae1dbca; original ANGLE LICENSE and provenance retained. The candidate bundle preserves all 322 verified registry/upstream texts, exact embedded report, review document and ANGLE license/provenance. This is conservative review evidence, not proof of complete source-header/native compliance. Historical audit and final distribution review remain open.

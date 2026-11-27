@@ -1,15 +1,22 @@
-param([Parameter(Mandatory=$true)][string]$Destination)
+param([Parameter(Mandatory=$true)][string]$Destination,[switch]$RequireNoticeBundle)
 $ErrorActionPreference = 'Stop'
 Set-StrictMode -Version Latest
 $dest = [IO.Path]::GetFullPath($Destination)
 if (-not (Test-Path -LiteralPath $dest -PathType Container)) { throw 'Missing package directory' }
-$expected = @('disc-archive.exe','disc-archive-studio.exe','README.md','WINDOWS_ACCEPTANCE.md','LICENSE.md','THIRD_PARTY_NOTICES.md','SHA256SUMS.txt')
+$payload = @('disc-archive.exe','disc-archive-studio.exe','README.md','WINDOWS_ACCEPTANCE.md','LICENSE.md','THIRD_PARTY_NOTICES.md')
+$bundle = Join-Path $dest 'THIRD_PARTY_LICENSES.zip'
+if (Test-Path -LiteralPath $bundle -PathType Leaf) {
+    $payload += 'THIRD_PARTY_LICENSES.zip'
+    python (Join-Path $PSScriptRoot 'build-license-bundle.py') --verify $bundle
+    if ($LASTEXITCODE -ne 0) { throw 'Invalid review notice bundle' }
+} elseif ($RequireNoticeBundle) { throw 'Required notice bundle missing' }
+$expected = $payload + 'SHA256SUMS.txt'
 foreach ($name in $expected) {
   if (-not (Test-Path -LiteralPath (Join-Path $dest $name) -PathType Leaf)) { throw "Missing package file: $name" }
 }
 $lines = @(Get-Content -LiteralPath (Join-Path $dest 'SHA256SUMS.txt'))
-if ($lines.Count -ne 6) { throw 'Unexpected checksum count' }
-foreach ($name in $expected[0..5]) {
+if ($lines.Count -ne $payload.Count) { throw 'Unexpected checksum count' }
+foreach ($name in $payload) {
   $hash = (Get-FileHash -LiteralPath (Join-Path $dest $name) -Algorithm SHA256).Hash.ToLowerInvariant()
   if ($lines -cnotcontains "$hash  $name") { throw "Checksum mismatch: $name" }
 }

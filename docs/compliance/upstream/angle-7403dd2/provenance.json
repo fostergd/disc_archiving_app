@@ -1,0 +1,11 @@
+{
+  "repository": "google/angle",
+  "commit": "7403dd2cd3764fe96660fe09892e764e9ae1dbca",
+  "upstream_path": "LICENSE",
+  "git_blob_sha1": "0f65fd60fd68d465a2283378849f16532f5ee4f1",
+  "via": {
+    "repository": "rust-windowing/gl-rs",
+    "commit": "f150967b1c44ae888e6676f93f639ebc82771bdc",
+    "path": "khronos_api/api_angle"
+  }
+}
