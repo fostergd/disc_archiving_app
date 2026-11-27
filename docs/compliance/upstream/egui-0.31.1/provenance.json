@@ -1,0 +1,68 @@
+{
+  "repository": "emilk/egui",
+  "tag": "0.31.1",
+  "commit": "1669e52a7ccfc3489c1b0999b9ed48894a0b3887",
+  "scope": "Original upstream notices, not blanket clearance of every dependency or font copyright.",
+  "notices": [
+    {
+      "path": "docs/compliance/upstream/egui-0.31.1/LICENSE-MIT",
+      "upstream_path": "LICENSE-MIT",
+      "git_blob_sha1": "673ea5f0505d6fa65c6a2b6a753c93b8e19d11b9"
+    },
+    {
+      "path": "docs/compliance/upstream/egui-0.31.1/LICENSE-APACHE",
+      "upstream_path": "LICENSE-APACHE",
+      "git_blob_sha1": "11069edd79019f7dafbe3138841cf289209270dd"
+    },
+    {
+      "path": "docs/compliance/upstream/egui-0.31.1/Hack-Regular.txt",
+      "upstream_path": "crates/epaint_default_fonts/fonts/Hack-Regular.txt",
+      "git_blob_sha1": "b0ec74488ab8a68acc95060414c7790a44a27172"
+    },
+    {
+      "path": "docs/compliance/upstream/egui-0.31.1/OFL.txt",
+      "upstream_path": "crates/epaint_default_fonts/fonts/OFL.txt",
+      "git_blob_sha1": "d952d62c065f3f35fb83a173496e90b21525aef3"
+    },
+    {
+      "path": "docs/compliance/upstream/egui-0.31.1/UFL.txt",
+      "upstream_path": "crates/epaint_default_fonts/fonts/UFL.txt",
+      "git_blob_sha1": "ae78a8f94eae372cb1ca4e14b67244342fce604e"
+    },
+    {
+      "path": "docs/compliance/upstream/egui-0.31.1/emoji-icon-font-mit-license.txt",
+      "upstream_path": "crates/epaint_default_fonts/fonts/emoji-icon-font-mit-license.txt",
+      "git_blob_sha1": "99016e120b21a6c77e3388d415968eaf6b504b4a"
+    }
+  ],
+  "shared_rust_license_candidates": [
+    "ecolor",
+    "eframe",
+    "egui",
+    "egui_glow",
+    "egui-winit",
+    "emath",
+    "epaint",
+    "epaint_default_fonts"
+  ],
+  "fonts": [
+    {
+      "file": "Hack-Regular.ttf",
+      "notice": "Hack-Regular.txt"
+    },
+    {
+      "file": "NotoEmoji-Regular.ttf",
+      "notice": "OFL.txt",
+      "note": "Confirm embedded copyright name records"
+    },
+    {
+      "file": "Ubuntu-Light.ttf",
+      "notice": "UFL.txt",
+      "note": "Confirm embedded copyright name records"
+    },
+    {
+      "file": "emoji-icon-font.ttf",
+      "notice": "emoji-icon-font-mit-license.txt"
+    }
+  ]
+}

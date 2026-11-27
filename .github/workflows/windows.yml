@@ -21,6 +21,9 @@ jobs:
       - name: Inventory exact Windows dependency licenses (no artifact upload)
         shell: powershell
         run: ./scripts/inventory-windows-licenses.ps1 -OutputDirectory (Join-Path $env:RUNNER_TEMP 'das-license-review')
+      - name: Collect and validate pinned upstream notice evidence (no upload)
+        shell: powershell
+        run: ./scripts/collect-windows-license-evidence.ps1 -OutputDirectory (Join-Path $env:RUNNER_TEMP 'das-notice-evidence')
       - run: cargo test --locked --all-targets --features gui
       - run: cargo build --locked --release --features gui
       - run: target/release/disc-archive.exe --help
@@ -32,7 +35,7 @@ jobs:
           ./scripts/build-and-test-portable.ps1 -Destination (Join-Path $env:RUNNER_TEMP 'das-portable')
           ./scripts/new-preview-zip.ps1 -PackageDirectory (Join-Path $env:RUNNER_TEMP 'das-portable') -OutputDirectory (Join-Path $env:RUNNER_TEMP 'das-zip-validation')
       - name: Publish requested preview
-        if: ${{ github.event_name == 'workflow_dispatch' && inputs.publish_preview }}
+        if: ${{ github.event.repository.private && github.event_name == 'workflow_dispatch' && inputs.publish_preview }}
         uses: actions/upload-artifact@v4
         with:
           name: disc-archive-windows-x64-preview
