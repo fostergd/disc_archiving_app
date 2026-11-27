@@ -35,6 +35,8 @@ jobs:
           if ($LASTEXITCODE -ne 0) { throw 'Notice bundle regression failed' }
           python ./scripts/inspect-release-runtime.py --self-test
           if ($LASTEXITCODE -ne 0) { throw 'Runtime evidence regression failed' }
+          python ./scripts/inspect-rust-library-notices.py --self-test
+          if ($LASTEXITCODE -ne 0) { throw 'Rust library notice parser regression failed' }
       - name: Inventory exact Windows dependency licenses (no artifact upload)
         shell: powershell
         run: ./scripts/inventory-windows-licenses.ps1 -OutputDirectory (Join-Path $env:RUNNER_TEMP 'das-license-review')
@@ -57,6 +59,11 @@ jobs:
         run: |
           python ./scripts/inspect-release-runtime.py --build-messages (Join-Path $env:RUNNER_TEMP 'das-release-build.jsonl') --output (Join-Path $env:RUNNER_TEMP 'das-runtime-evidence.json')
           if ($LASTEXITCODE -ne 0) { throw 'Runtime evidence inspection failed' }
+      - name: Inspect pinned Rust standard library copyright declarations
+        shell: powershell
+        run: |
+          python ./scripts/inspect-rust-library-notices.py
+          if ($LASTEXITCODE -ne 0) { throw 'Rust library copyright review failed' }
       - name: Assemble and validate review-only license bundle (no upload)
         shell: powershell
         run: |
