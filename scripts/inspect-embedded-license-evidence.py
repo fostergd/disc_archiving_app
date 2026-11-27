@@ -66,9 +66,15 @@ def font_names(data):
         result.append({"platform": platform, "encoding": encoding, "language": language,
                        "name_id": name_id, "text": value,
                        **({"raw_hex": raw.hex()} if value is None else {})})
-    if not any(x["name_id"] == 0 and x["text"] for x in result):
-        raise ValueError("font has no decoded copyright record")
     return result
+
+
+def copyright_status(records):
+    if any(x["name_id"] == 0 and (x["text"] or "").strip() for x in records):
+        return "decoded"
+    if any(x["name_id"] == 0 for x in records):
+        return "present_but_empty_or_undecodable"
+    return "absent"
 
 
 def leading_comments(data):
@@ -129,8 +135,9 @@ def inspect(out):
         raw = (font_root / "fonts" / name).read_bytes()
         if git_blob(raw) != expected_blob:
             raise ValueError("font bytes differ from exact upstream: " + name)
+        names = font_names(raw)
         fonts.append({"file": name, "sha256": sha256(raw), "upstream_git_blob_sha1": expected_blob,
-                      "names": font_names(raw)})
+                      "names": names, "copyright_record_status": copyright_status(names)})
 
     sqlite, features = crate("libsqlite3-sys", "0.30.1")
     if "bundled" not in features or any("sqlcipher" in f for f in features):
@@ -182,6 +189,19 @@ class EvidenceTests(unittest.TestCase):
             font_names(sfnt[:-1])
         with self.assertRaises(ValueError):
             font_names(b"bad")
+
+    def test_copyright_status(self):
+        self.assertEqual(copyright_status([]), "absent")
+        self.assertEqual(copyright_status([{"name_id": 0, "text": None}]),
+                         "present_but_empty_or_undecodable")
+        self.assertEqual(copyright_status([{"name_id": 0, "text": "  "}]),
+                         "present_but_empty_or_undecodable")
+        self.assertEqual(copyright_status([{"name_id": 0, "text": "Copyright fixture"}]), "decoded")
+        text = "Fixture family".encode("utf-16-be")
+        table = struct.pack(">HHH", 0, 1, 18) + struct.pack(">HHHHHH", 3, 1, 1033, 1, len(text), 0) + text
+        sfnt = b"\x00\x01\x00\x00" + struct.pack(">HHHH", 1, 0, 0, 0)
+        sfnt += struct.pack(">4sIII", b"name", 0, 28, len(table)) + table
+        self.assertEqual(copyright_status(font_names(sfnt)), "absent")
 
     def test_comments(self):
         self.assertEqual(leading_comments(b'<?xml version="1.0"?>\n<!-- Copyright X -->\n<registry/>'),

@@ -33,3 +33,6 @@ Pinned public CI 45947538307 passed. Final UI remains CI-green. Public licensing
 License collection CI 45948273940 passed. Exact upstream mapping of all eleven missing registry notice candidates implemented; new CI pending. Remaining embedded/generated/native attribution review and complete notice bundle are prerequisites to public release.
 
 All missing registry notice mappings and 322 notice copies passed CI 45957870828. Embedded/font/native/generated evidence extraction added, CI pending. UI implementation remains green at prior checkpoint; release remains gated.
+
+
+CI 45959680920 at 31d90b71c3e1b67fdd1dddf29a7e1aa503ab5b69 failed after successful locked tests and release build: embedded evidence parser required a decoded copyright name record for every font. Review-only collection now records decoded, absent, or present-but-empty/undecodable status per exact-byte-verified font, preserving raw records and structural validation. Added synthetic regression coverage; new Windows CI pending. Missing metadata is not clearance: require explicit upstream copyright/notice review before any distribution. Public release remains blocked; historical audit outstanding.
