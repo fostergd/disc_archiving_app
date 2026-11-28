@@ -10,6 +10,7 @@ on:
         default: false
 permissions:
   contents: read
+  actions: read
 jobs:
   windows:
     runs-on: windows-2022
@@ -33,6 +34,16 @@ jobs:
           if ($LASTEXITCODE -ne 0) { throw 'Legacy preview audit regression failed' }
           python ./scripts/audit-legacy-preview.py
           if ($LASTEXITCODE -ne 0) { throw 'Legacy preview identity review failed' }
+      - name: Review accessible Actions history and artifact inventory (read only)
+        if: ${{ github.repository == 'fostergd/disc_archiving_app' && github.ref == 'refs/heads/main' && github.event_name == 'push' && !github.event.repository.private }}
+        shell: powershell
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          python ./scripts/audit-actions-history.py --self-test
+          if ($LASTEXITCODE -ne 0) { throw 'Actions history audit regression failed' }
+          python ./scripts/audit-actions-history.py
+          if ($LASTEXITCODE -ne 0) { throw 'Actions history audit tool failed' }
       - run: rustup toolchain install 1.100.0-x86_64-pc-windows-msvc --profile minimal
       - name: Run attribution parser regression tests before dependency builds
         shell: powershell

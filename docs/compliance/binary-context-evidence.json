@@ -1,0 +1,176 @@
+{
+  "source_commit": "8a166e9e804128998ce836dd953f814e45ffdaa0",
+  "run_id": 46099462381,
+  "job_id": 140838359530,
+  "current": {
+    "email_source_comparison": {
+      "distinct_email_patterns": 1,
+      "distinct_patterns_with_candidate_source_match": 0,
+      "distinct_patterns_without_candidate_source_match": 1,
+      "matching_candidate_packages": [],
+      "scanned_bytes": 151921043,
+      "scope": "exact email-pattern correspondence in locked compiled registry candidates; no assertion of attribution or privacy clearance",
+      "skipped_files": 0
+    },
+    "entries": [
+      {
+        "bytes": 9125888,
+        "email_binary_context": {
+          "context_counts": {
+            "byte_executable_section_other_boundaries": 1
+          },
+          "context_occurrences": 1,
+          "counts_agree": true,
+          "original_pattern_occurrences": 1,
+          "scope": "PE section permissions and encoding boundaries only; no attribution or privacy clearance"
+        },
+        "name": "disc-archive-studio.exe",
+        "pattern_counts": {
+          "aws_key": 0,
+          "email": 1,
+          "github_token": 0,
+          "local_user_path": 401,
+          "private_ip": 0,
+          "private_key": 0
+        },
+        "review_classes": {
+          "email_unclassified": 1,
+          "hosted_runner_registry_prefix": 401
+        },
+        "sha256": "10829766e8198bb9cdb70b12a48b80b299361cd2343331470ae75510771e7476"
+      },
+      {
+        "bytes": 4852224,
+        "email_binary_context": {
+          "context_counts": {
+            "byte_executable_section_other_boundaries": 1
+          },
+          "context_occurrences": 1,
+          "counts_agree": true,
+          "original_pattern_occurrences": 1,
+          "scope": "PE section permissions and encoding boundaries only; no attribution or privacy clearance"
+        },
+        "name": "disc-archive.exe",
+        "pattern_counts": {
+          "aws_key": 0,
+          "email": 1,
+          "github_token": 0,
+          "local_user_path": 186,
+          "private_ip": 0,
+          "private_key": 0
+        },
+        "review_classes": {
+          "email_unclassified": 1,
+          "hosted_runner_registry_prefix": 186
+        },
+        "sha256": "4b25fd6fa24fb41412a390b895e036459928f73a67422886d20f7fa3d426f38d"
+      }
+    ],
+    "publication_approved": false,
+    "scope": "new release executables; heuristic counts only"
+  },
+  "legacy": {
+    "asset_sha256": "c3ce19d5f985db8d620599b5f2da08faac640ae1b6eb1ab96cc6b4b9f1a26dca",
+    "entries": [
+      {
+        "bytes": 23511,
+        "name": "README.md",
+        "pattern_counts": {
+          "aws_key": 0,
+          "email": 0,
+          "github_token": 0,
+          "local_user_path": 0,
+          "private_ip": 0,
+          "private_key": 0
+        },
+        "review_classes": {},
+        "sha256": "349f59f05d6dbdfd3182a628b5b5fe5e8f01416e696dde7a5c5c82ce59dfc0e3"
+      },
+      {
+        "bytes": 341,
+        "name": "SHA256SUMS.txt",
+        "pattern_counts": {
+          "aws_key": 0,
+          "email": 0,
+          "github_token": 0,
+          "local_user_path": 0,
+          "private_ip": 0,
+          "private_key": 0
+        },
+        "review_classes": {},
+        "sha256": "97e08fc2aed663765ec52eb0d354e8f8e71d309b51236dfcea42ed8b350500ef"
+      },
+      {
+        "bytes": 2371,
+        "name": "WINDOWS_ACCEPTANCE.md",
+        "pattern_counts": {
+          "aws_key": 0,
+          "email": 0,
+          "github_token": 0,
+          "local_user_path": 0,
+          "private_ip": 0,
+          "private_key": 0
+        },
+        "review_classes": {},
+        "sha256": "a67db74480823f115420d4f9d0120dec56bd97ae107ad45fa5913d0e1ad94e20"
+      },
+      {
+        "bytes": 8965120,
+        "email_binary_context": {
+          "context_counts": {
+            "byte_executable_section_other_boundaries": 1
+          },
+          "context_occurrences": 1,
+          "counts_agree": true,
+          "original_pattern_occurrences": 1,
+          "scope": "PE section permissions and encoding boundaries only; no attribution or privacy clearance"
+        },
+        "name": "disc-archive-studio.exe",
+        "pattern_counts": {
+          "aws_key": 0,
+          "email": 1,
+          "github_token": 0,
+          "local_user_path": 399,
+          "private_ip": 0,
+          "private_key": 0
+        },
+        "review_classes": {
+          "email_unclassified": 1,
+          "hosted_runner_registry_prefix": 399
+        },
+        "sha256": "6371344c7faaa16202db9fc7135e291f346970fdbb45afa6a493d1e1b2c013fc"
+      },
+      {
+        "bytes": 4852224,
+        "email_binary_context": {
+          "context_counts": {
+            "byte_executable_section_other_boundaries": 1
+          },
+          "context_occurrences": 1,
+          "counts_agree": true,
+          "original_pattern_occurrences": 1,
+          "scope": "PE section permissions and encoding boundaries only; no attribution or privacy clearance"
+        },
+        "name": "disc-archive.exe",
+        "pattern_counts": {
+          "aws_key": 0,
+          "email": 1,
+          "github_token": 0,
+          "local_user_path": 186,
+          "private_ip": 0,
+          "private_key": 0
+        },
+        "review_classes": {
+          "email_unclassified": 1,
+          "hosted_runner_registry_prefix": 186
+        },
+        "sha256": "c9d0e9896038fe59a77ed2294a3f53b74ca7394ca61a8c050cf10428ffccb529"
+      }
+    ],
+    "internal_checksums_valid": true,
+    "publication_approved": false,
+    "scope": "legacy public asset byte identity, checksums and heuristic screening; no execution",
+    "sidecar_sha256": "da28a8aabfbcee4a43d90c5124078cb80ffb05b7456106c18700b98b5e1fd052",
+    "third_party_notice_bundle_present": false
+  }
+}
