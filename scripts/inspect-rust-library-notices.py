@@ -93,6 +93,42 @@ def summarize(raw):
     return parser.result()
 
 
+def target_library_inventory(directory, dependencies):
+    # The official report covers more platforms and build/dev tools than
+    # this installed target. Record archive presence, not proof of linkage.
+    names = set()
+    archives = []
+    for path in sorted(directory.glob("*.rlib")):
+        match = re.fullmatch(r"lib([A-Za-z0-9_]+)-([a-f0-9]+)\.rlib", path.name)
+        if not match or not path.is_file() or not path.resolve().is_relative_to(directory.resolve()):
+            raise ValueError("unexpected installed target archive")
+        name = match.group(1)
+        names.add(name)
+        archives.append({"crate": name, "filename": path.name, "bytes": path.stat().st_size})
+    if not {"std", "core", "alloc", "compiler_builtins"} <= names:
+        raise ValueError("required Windows standard library archives missing")
+    exceptional = {"fortanix_sgx_abi", "r_efi", "r_efi_alloc"}
+    if names & exceptional:
+        raise ValueError("unexpected SGX/UEFI archive in Windows target; review required")
+    def crate_name(label):
+        # Split on the first hyphen followed by a numeric version.
+        return re.split(r"-(?=\d)", label, maxsplit=1)[0].replace("-", "_")
+    return {
+        "archives": archives,
+        "matching_report_candidates": sorted(row["crate"] for row in dependencies
+                                             if crate_name(row["crate"]) in names),
+        "report_only_candidates": sorted(row["crate"] for row in dependencies
+                                         if crate_name(row["crate"]) not in names),
+        "sgx_uefi_archive_names_present": [],
+        "scope": "installed Windows target rlib filenames only; not exact linkage or version matching",
+    }
+
+
+def verify_report_baseline(report, expected):
+    if report != expected:
+        raise ValueError("standard library declarations differ from verified report baseline")
+
+
 def inspect():
     base = json.loads((ROOT/"docs/compliance/toolchain-notice-baseline.json").read_text(encoding="utf-8"))
     if base["toolchain_commit"] != COMMIT:
@@ -109,11 +145,39 @@ def inspect():
         raise ValueError("library copyright report differs from baseline")
     report = {"source_sha256": expected[0]["sha256"], "scope": "official standard-library distribution report; not exact executable linkage",
               **summarize(raw), "distribution_approved": False}
+    baseline = json.loads((ROOT/"docs/compliance/rust-library-report-baseline.json").read_text(encoding="utf-8"))
+    verify_report_baseline(report, baseline["evidence"])
+    target_dir = Path(subprocess.check_output(
+        ["rustc","--print","target-libdir","--target","x86_64-pc-windows-msvc"],
+        cwd=ROOT, encoding="utf-8").strip())
+    if not target_dir.resolve().is_relative_to(sysroot.resolve()):
+        raise ValueError("target library directory outside reviewed sysroot")
+    inventory = target_library_inventory(target_dir, report["out_of_tree_dependencies"])
+    print("RUST_WINDOWS_TARGET_ARCHIVES " + json.dumps(inventory,ensure_ascii=True,separators=(",",":")))
     print("RUST_LIBRARY_NOTICE_REVIEW " + json.dumps(report,ensure_ascii=True,separators=(",",":")))
     print("RUST_LIBRARY_NOTICE_REVIEW_PASS")
 
 
 class Tests(unittest.TestCase):
+    def test_target_inventory(self):
+        import tempfile
+        with tempfile.TemporaryDirectory() as tmp:
+            directory = Path(tmp)
+            for name in ("std", "core", "alloc", "compiler_builtins", "hashbrown"):
+                (directory / ("lib" + name + "-abcd.rlib")).write_bytes(b"fixture")
+            rows = [{"crate":"hashbrown-0.17.1"}, {"crate":"fortanix-sgx-abi-0.6.1"}]
+            result = target_library_inventory(directory, rows)
+            self.assertEqual(result["matching_report_candidates"], ["hashbrown-0.17.1"])
+            self.assertEqual(result["report_only_candidates"], ["fortanix-sgx-abi-0.6.1"])
+            (directory / "libfortanix_sgx_abi-abcd.rlib").write_bytes(b"fixture")
+            with self.assertRaisesRegex(ValueError,"SGX/UEFI"):
+                target_library_inventory(directory, rows)
+
+    def test_report_baseline(self):
+        verify_report_baseline({"license":"MIT"},{"license":"MIT"})
+        with self.assertRaises(ValueError):
+            verify_report_baseline({"license":"BSD"},{"license":"MIT"})
+
     def test_template(self):
         fixture = """<h2 id="in-tree-files">In-tree files</h2>
         <div><p><b>License:</b> MIT OR Apache-2.0</p><p><b>Copyright:</b> fixture</p></div>
