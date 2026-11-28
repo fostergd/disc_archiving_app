@@ -16,6 +16,8 @@ PAYLOAD = {"disc-archive.exe", "disc-archive-studio.exe", "README.md",
            "THIRD_PARTY_LICENSES.zip"}
 BINARIES = {"disc-archive.exe", "disc-archive-studio.exe"}
 MAX_ZIP = 128*1024*1024
+REQUIRED_BLOCKERS = {"final_redistribution_review", "binary_pattern_disposition",
+                     "legacy_release_disposition", "owner_release_authorization"}
 
 
 def digest(raw):
@@ -37,7 +39,7 @@ def read_zip(raw, limit):
         return {i.filename:archive.read(i) for i in infos}
 
 
-def verify_package(raw, sidecar, runtime, expected_docs):
+def verify_package(raw, sidecar, runtime, expected_docs, expected_notice_bundle):
     if sidecar.decode("ascii").strip()!=digest(raw)+"  "+ZIP_NAME:
         raise ValueError("external ZIP checksum mismatch")
     items=read_zip(raw,MAX_ZIP)
@@ -60,6 +62,8 @@ def verify_package(raw, sidecar, runtime, expected_docs):
         raise ValueError("expected document set mismatch")
     if any(items[n]!=data for n,data in expected_docs.items()):
         raise ValueError("candidate documents differ from source")
+    if items["THIRD_PARTY_LICENSES.zip"] != expected_notice_bundle:
+        raise ValueError("candidate notice bundle differs from validated archive")
     notices=read_zip(items["THIRD_PARTY_LICENSES.zip"],MAX_ZIP)
     manifest=json.loads(notices.pop("MANIFEST.json"))
     if manifest!={"schema":1,"lock_sha256":runtime["lock_sha256"],
@@ -71,14 +75,17 @@ def verify_package(raw, sidecar, runtime, expected_docs):
     return {"zip_sha256":digest(raw),"zip_bytes":len(raw),
             "payload_sha256":{name:digest(items[name]) for name in sorted(PAYLOAD)},
             "notice_count":len(notices),"runtime_evidence_bound":True,
+            "validated_notice_bundle_bound":True,
             "distribution_approved":False}
 
 
 def validate_hold(hold):
     if (hold.get("schema")!=1 or hold.get("repository")!=REPO
             or hold.get("distribution_approved") is not False
-            or not isinstance(hold.get("blockers"),list) or not hold["blockers"]
-            or any(not isinstance(x,str) or not re.fullmatch(r"[a-z_]+",x) for x in hold["blockers"])):
+            or not isinstance(hold.get("blockers"),list)
+            or any(not isinstance(x,str) or not re.fullmatch(r"[a-z_]+",x) for x in hold["blockers"])
+            or len(hold["blockers"]) != len(REQUIRED_BLOCKERS)
+            or set(hold["blockers"]) != REQUIRED_BLOCKERS):
         raise ValueError("invalid or changed publication hold; new gate implementation required")
     return hold["blockers"]
 
@@ -102,23 +109,50 @@ class Tests(unittest.TestCase):
                  "binaries":[{"name":n,"size":len(items[n]),"sha256":digest(items[n]),"machine":"x86_64"} for n in BINARIES]}
         items["SHA256SUMS.txt"]=("\n".join(digest(b)+"  "+n for n,b in items.items())+"\n").encode()
         raw=pack(items)
-        return raw,(digest(raw)+"  "+ZIP_NAME).encode(),runtime,docs
+        return raw,(digest(raw)+"  "+ZIP_NAME).encode(),runtime,docs,items["THIRD_PARTY_LICENSES.zip"]
 
     def test_candidate(self):
-        raw,sidecar,runtime,docs=self.fixture()
-        report=verify_package(raw,sidecar,runtime,docs)
+        raw,sidecar,runtime,docs,bundle=self.fixture()
+        report=verify_package(raw,sidecar,runtime,docs,bundle)
         self.assertTrue(report["runtime_evidence_bound"])
+        self.assertTrue(report["validated_notice_bundle_bound"])
         self.assertFalse(report["distribution_approved"])
         with self.assertRaisesRegex(ValueError,"external ZIP"):
-            verify_package(raw,b"bad",runtime,docs)
+            verify_package(raw,b"bad",runtime,docs,bundle)
         runtime["binaries"][0]["sha256"]="0"*64
         with self.assertRaisesRegex(ValueError,"differs from inspected"):
-            verify_package(raw,sidecar,runtime,docs)
+            verify_package(raw,sidecar,runtime,docs,bundle)
+
+    def test_rehashed_notice_substitution(self):
+        raw,sidecar,runtime,docs,bundle=self.fixture()
+        def pack(items):
+            stream=io.BytesIO()
+            with zipfile.ZipFile(stream,"w") as archive:
+                for name,data in items.items():
+                    archive.writestr(name,data)
+            return stream.getvalue()
+        # A substituted legal file with regenerated nested manifest and both
+        # outer checksums would pass a self-consistency-only verifier.
+        notices=read_zip(bundle,MAX_ZIP)
+        manifest=json.loads(notices["MANIFEST.json"])
+        notices["n0.txt"]=b"substituted notice"
+        manifest["files"]["n0.txt"]=digest(notices["n0.txt"])
+        notices["MANIFEST.json"]=json.dumps(manifest).encode()
+        items=read_zip(raw,MAX_ZIP)
+        items["THIRD_PARTY_LICENSES.zip"]=pack(notices)
+        items["SHA256SUMS.txt"]=("\n".join(digest(items[n])+"  "+n for n in sorted(PAYLOAD))+"\n").encode()
+        changed=pack(items)
+        changed_sidecar=(digest(changed)+"  "+ZIP_NAME).encode()
+        with self.assertRaisesRegex(ValueError,"differs from validated archive"):
+            verify_package(changed,changed_sidecar,runtime,docs,bundle)
 
     def test_hold(self):
-        hold={"schema":1,"repository":REPO,"distribution_approved":False,"blockers":["review"]}
-        self.assertEqual(validate_hold(hold),["review"])
-        for change in ({"distribution_approved":True},{"blockers":[]},{"repository":"other/repo"}):
+        blockers=sorted(REQUIRED_BLOCKERS)
+        hold={"schema":1,"repository":REPO,"distribution_approved":False,"blockers":blockers}
+        self.assertEqual(validate_hold(hold),blockers)
+        for change in ({"distribution_approved":True},{"blockers":[]},{"repository":"other/repo"},
+                       {"blockers":blockers[:-1]},{"blockers":blockers+blockers[:1]},
+                       {"blockers":blockers[:-1]+["unrelated_review"]}):
             with self.assertRaises(ValueError):
                 validate_hold({**hold,**change})
 
@@ -128,21 +162,24 @@ if __name__=="__main__":
     parser.add_argument("--self-test",action="store_true")
     parser.add_argument("--directory",type=Path)
     parser.add_argument("--runtime-report",type=Path)
+    parser.add_argument("--validated-notice-bundle",type=Path)
     parser.add_argument("--require-publication-approval",action="store_true")
     args=parser.parse_args()
     if args.self_test:
         if not unittest.TextTestRunner(verbosity=2).run(unittest.defaultTestLoader.loadTestsFromTestCase(Tests)).wasSuccessful():
             raise SystemExit(1)
     else:
-        if not args.directory or not args.runtime_report:
-            parser.error("candidate directory and runtime report required")
+        if not args.directory or not args.runtime_report or not args.validated_notice_bundle:
+            parser.error("candidate directory, runtime report and validated notice bundle required")
         zip_path=args.directory/ZIP_NAME
         sidecar=args.directory/(ZIP_NAME+".sha256")
-        if zip_path.stat().st_size>MAX_ZIP or sidecar.stat().st_size>1024:
+        if (zip_path.stat().st_size>MAX_ZIP or sidecar.stat().st_size>1024
+                or args.validated_notice_bundle.stat().st_size>MAX_ZIP):
             raise ValueError("candidate asset exceeds bound")
         runtime=json.loads(args.runtime_report.read_text(encoding="utf-8"))
         docs={name:(ROOT/name).read_bytes() for name in PAYLOAD-BINARIES-{"THIRD_PARTY_LICENSES.zip"}}
-        report=verify_package(zip_path.read_bytes(),sidecar.read_bytes(),runtime,docs)
+        report=verify_package(zip_path.read_bytes(),sidecar.read_bytes(),runtime,docs,
+                              args.validated_notice_bundle.read_bytes())
         hold=json.loads((ROOT/"docs/compliance/public-release-hold.json").read_text(encoding="utf-8"))
         report["publication_blockers"]=validate_hold(hold)
         print("RELEASE_CANDIDATE_VERIFIED "+json.dumps(report,sort_keys=True,separators=(",",":")))

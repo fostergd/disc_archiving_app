@@ -106,8 +106,12 @@ jobs:
         run: |
           python ./scripts/verify-release-candidate.py --self-test
           if ($LASTEXITCODE -ne 0) { throw 'Release candidate regression failed' }
-          python ./scripts/verify-release-candidate.py --directory (Join-Path $env:RUNNER_TEMP 'das-zip-validation') --runtime-report (Join-Path $env:RUNNER_TEMP 'das-runtime-evidence.json')
+          python ./scripts/verify-release-candidate.py --directory (Join-Path $env:RUNNER_TEMP 'das-zip-validation') --runtime-report (Join-Path $env:RUNNER_TEMP 'das-runtime-evidence.json') --validated-notice-bundle (Join-Path $env:RUNNER_TEMP 'THIRD_PARTY_LICENSES.zip')
           if ($LASTEXITCODE -ne 0) { throw 'Release candidate identity failed' }
+          $denied = @(python ./scripts/verify-release-candidate.py --directory (Join-Path $env:RUNNER_TEMP 'das-zip-validation') --runtime-report (Join-Path $env:RUNNER_TEMP 'das-runtime-evidence.json') --validated-notice-bundle (Join-Path $env:RUNNER_TEMP 'THIRD_PARTY_LICENSES.zip') --require-publication-approval)
+          $deniedExit = $LASTEXITCODE
+          if ($deniedExit -ne 1 -or $denied -cnotcontains 'PUBLICATION_BLOCKED' -or @($denied | Where-Object { $_ -cmatch '^RELEASE_CANDIDATE_VERIFIED ' }).Count -ne 1) { throw 'Explicit publication denial regression failed' }
+          Write-Output 'Verified explicit publication request denied after successful candidate validation'
       - name: Publish requested preview
         if: ${{ github.event.repository.private && github.event_name == 'workflow_dispatch' && inputs.publish_preview }}
         uses: actions/upload-artifact@v4

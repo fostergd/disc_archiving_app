@@ -9,6 +9,6 @@
     "legacy_release_disposition",
     "owner_release_authorization"
   ],
-  "historical_review": "75 completed run attempts screened; 1 active at checkpoint; artifact inventory empty; deleted/inaccessible material not established",
+  "historical_review": "76 completed run attempts screened in CI 46107697608; 1 active at checkpoint; artifact inventory empty; deleted/inaccessible material not established",
   "policy": "No publication from this record. A separately reviewed release gate and explicit owner approval are required."
 }
