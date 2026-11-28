@@ -111,6 +111,8 @@ jobs:
           $denied = @(python ./scripts/verify-release-candidate.py --directory (Join-Path $env:RUNNER_TEMP 'das-zip-validation') --runtime-report (Join-Path $env:RUNNER_TEMP 'das-runtime-evidence.json') --validated-notice-bundle (Join-Path $env:RUNNER_TEMP 'THIRD_PARTY_LICENSES.zip') --require-publication-approval)
           $deniedExit = $LASTEXITCODE
           if ($deniedExit -ne 1 -or $denied -cnotcontains 'PUBLICATION_BLOCKED' -or @($denied | Where-Object { $_ -cmatch '^RELEASE_CANDIDATE_VERIFIED ' }).Count -ne 1) { throw 'Explicit publication denial regression failed' }
+          # The expected native failure has been checked above; clear it for the runner's final exit-code check.
+          $global:LASTEXITCODE = 0
           Write-Output 'Verified explicit publication request denied after successful candidate validation'
       - name: Publish requested preview
         if: ${{ github.event.repository.private && github.event_name == 'workflow_dispatch' && inputs.publish_preview }}
