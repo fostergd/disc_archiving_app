@@ -1,0 +1,261 @@
+{
+  "source_commit": "650ab1db12695fd751ed2757f6a89a5bc84ae801",
+  "run_id": 46093086851,
+  "job_id": 140818243520,
+  "evidence": {
+    "archives": [
+      {
+        "crate": "alloc",
+        "filename": "liballoc-49e04345814b5dd6.rlib",
+        "bytes": 702940
+      },
+      {
+        "crate": "cfg_if",
+        "filename": "libcfg_if-c6206fd3d422cb8c.rlib",
+        "bytes": 4756
+      },
+      {
+        "crate": "compiler_builtins",
+        "filename": "libcompiler_builtins-bb836ebc345d4954.rlib",
+        "bytes": 3536514
+      },
+      {
+        "crate": "core",
+        "filename": "libcore-4577d92718737b2b.rlib",
+        "bytes": 2425474
+      },
+      {
+        "crate": "getopts",
+        "filename": "libgetopts-0fd88e956ac24a9f.rlib",
+        "bytes": 530842
+      },
+      {
+        "crate": "hashbrown",
+        "filename": "libhashbrown-a0810f110799609a.rlib",
+        "bytes": 36704
+      },
+      {
+        "crate": "panic_abort",
+        "filename": "libpanic_abort-c7e58c2905fc1e0a.rlib",
+        "bytes": 9646
+      },
+      {
+        "crate": "panic_unwind",
+        "filename": "libpanic_unwind-5c1156e4c72b00ea.rlib",
+        "bytes": 28734
+      },
+      {
+        "crate": "proc_macro",
+        "filename": "libproc_macro-95c9fd6e750999e6.rlib",
+        "bytes": 3381902
+      },
+      {
+        "crate": "profiler_builtins",
+        "filename": "libprofiler_builtins-56d379fdde211e8a.rlib",
+        "bytes": 399724
+      },
+      {
+        "crate": "rustc_demangle",
+        "filename": "librustc_demangle-d07699c9fce4fd41.rlib",
+        "bytes": 230502
+      },
+      {
+        "crate": "rustc_literal_escaper",
+        "filename": "librustc_literal_escaper-3ff0a2831fc2a3e2.rlib",
+        "bytes": 5008
+      },
+      {
+        "crate": "rustc_std_workspace_alloc",
+        "filename": "librustc_std_workspace_alloc-5f67336cc051deb6.rlib",
+        "bytes": 5060
+      },
+      {
+        "crate": "rustc_std_workspace_core",
+        "filename": "librustc_std_workspace_core-d082d92b440c27aa.rlib",
+        "bytes": 5044
+      },
+      {
+        "crate": "rustc_std_workspace_std",
+        "filename": "librustc_std_workspace_std-bab9cb3a4e3a5d20.rlib",
+        "bytes": 5030
+      },
+      {
+        "crate": "std",
+        "filename": "libstd-389636fd4dca543a.rlib",
+        "bytes": 6061188
+      },
+      {
+        "crate": "std_detect",
+        "filename": "libstd_detect-3af49869df76350f.rlib",
+        "bytes": 60262
+      },
+      {
+        "crate": "sysroot",
+        "filename": "libsysroot-7a56c4925d5ff12a.rlib",
+        "bytes": 4800
+      },
+      {
+        "crate": "test",
+        "filename": "libtest-2a7587c2bdf1cec9.rlib",
+        "bytes": 5448760
+      },
+      {
+        "crate": "unwind",
+        "filename": "libunwind-f88a5550abae729d.rlib",
+        "bytes": 4782
+      },
+      {
+        "crate": "windows_link",
+        "filename": "libwindows_link-0415874a97058c62.rlib",
+        "bytes": 4874
+      }
+    ],
+    "matching_report_candidates": [
+      "cfg-if-1.0.4",
+      "getopts-0.2.24",
+      "hashbrown-0.12.3",
+      "hashbrown-0.15.5",
+      "hashbrown-0.16.1",
+      "hashbrown-0.17.1",
+      "rustc-demangle-0.1.28",
+      "rustc-literal-escaper-0.0.8",
+      "windows-link-0.2.1"
+    ],
+    "report_only_candidates": [
+      "aho-corasick-1.1.4",
+      "anstream-1.0.0",
+      "anstyle-1.0.14",
+      "anstyle-parse-1.0.0",
+      "anstyle-query-1.1.5",
+      "anstyle-wincon-3.0.11",
+      "anyhow-1.0.102",
+      "autocfg-1.5.0",
+      "bitflags-2.11.0",
+      "bstr-1.13.1",
+      "cc-1.2.59",
+      "cc-1.4.3",
+      "clap-4.6.0",
+      "clap_builder-4.6.0",
+      "clap_derive-4.6.0",
+      "clap_lex-1.1.0",
+      "colorchoice-1.0.5",
+      "crossbeam-deque-0.8.6",
+      "crossbeam-epoch-0.9.18",
+      "crossbeam-utils-0.8.21",
+      "darling-0.23.0",
+      "darling_core-0.23.0",
+      "darling_macro-0.23.0",
+      "dlmalloc-0.2.14",
+      "either-1.15.0",
+      "env_filter-1.0.1",
+      "env_logger-0.10.2",
+      "env_logger-0.11.10",
+      "equivalent-1.0.2",
+      "errno-0.3.14",
+      "fastrand-2.4.1",
+      "find-msvc-tools-0.1.11",
+      "find-msvc-tools-0.1.9",
+      "foldhash-0.1.5",
+      "foldhash-0.2.0",
+      "fortanix-sgx-abi-0.6.1",
+      "getrandom-0.3.4",
+      "getrandom-0.4.2",
+      "gimli-0.34.0",
+      "heck-0.5.0",
+      "hermit-abi-0.5.2",
+      "hermit-abi-0.5.3",
+      "humantime-2.3.0",
+      "id-arena-2.3.0",
+      "ident_case-1.0.1",
+      "indexmap-1.9.3",
+      "indexmap-2.13.1",
+      "is-terminal-0.4.17",
+      "is_terminal_polyfill-1.70.2",
+      "itertools-0.15.0",
+      "itoa-1.0.18",
+      "leb128fmt-0.1.0",
+      "libc-0.2.184",
+      "libc-0.2.189",
+      "linked-hash-map-0.5.6",
+      "linux-raw-sys-0.12.1",
+      "log-0.4.29",
+      "memchr-2.8.0",
+      "moto-rt-0.17.4",
+      "once_cell-1.21.4",
+      "once_cell_polyfill-1.70.2",
+      "ppv-lite86-0.2.21",
+      "pretty_env_logger-0.5.0",
+      "prettyplease-0.2.37",
+      "proc-macro2-1.0.106",
+      "quick-xml-0.33.0",
+      "quick-xml-0.37.5",
+      "quickcheck-1.1.0",
+      "quote-1.0.45",
+      "r-efi-5.3.0",
+      "r-efi-6.0.0",
+      "r-efi-alloc-2.1.0",
+      "rand-0.10.1",
+      "rand-0.9.4",
+      "rand-0.9.5",
+      "rand_chacha-0.9.0",
+      "rand_core-0.10.0",
+      "rand_core-0.9.5",
+      "rand_xorshift-0.4.0",
+      "rayon-1.11.0",
+      "rayon-core-1.13.0",
+      "regex-1.12.3",
+      "regex-automata-0.4.14",
+      "regex-syntax-0.8.10",
+      "rustix-1.1.4",
+      "ryu-1.0.23",
+      "same-file-1.0.6",
+      "semver-1.0.28",
+      "serde-1.0.228",
+      "serde_core-1.0.228",
+      "serde_derive-1.0.228",
+      "serde_json-1.0.149",
+      "serde_with-3.18.0",
+      "serde_with_macros-3.18.0",
+      "serde_yaml-0.8.26",
+      "shlex-1.3.0",
+      "shlex-2.0.1",
+      "similar-3.2.0",
+      "strsim-0.11.1",
+      "syn-2.0.117",
+      "syscalls-0.6.18",
+      "tempfile-3.27.0",
+      "termcolor-1.4.1",
+      "unicode-ident-1.0.24",
+      "unicode-xid-0.2.6",
+      "unwinding-0.2.10",
+      "utf8parse-0.2.2",
+      "vex-sdk-0.27.1",
+      "walkdir-2.5.0",
+      "wasip1-1.0.0",
+      "wasip2-1.0.2+wasi-0.2.9",
+      "wasip2-2.0.1+wasi-0.2.12",
+      "wasip3-0.4.0+wasi-0.3.0-rc-2026-01-06",
+      "wasip3-0.9.0+wasi-0.3.0",
+      "wasm-encoder-0.244.0",
+      "wasm-metadata-0.244.0",
+      "wasmparser-0.235.0",
+      "wasmparser-0.244.0",
+      "wasmprinter-0.235.0",
+      "winapi-util-0.1.11",
+      "windows-sys-0.61.2",
+      "wit-bindgen-0.51.0",
+      "wit-bindgen-0.62.0",
+      "wit-bindgen-core-0.51.0",
+      "wit-bindgen-rust-0.51.0",
+      "wit-bindgen-rust-macro-0.51.0",
+      "wit-component-0.244.0",
+      "wit-parser-0.244.0",
+      "yaml-rust-0.4.5",
+      "zerocopy-0.8.48",
+      "zerocopy-derive-0.8.48",
+      "zmij-1.0.21"
+    ],
+    "sgx_uefi_archive_names_present": [],
+    "scope": "installed Windows target rlib filenames only; not exact linkage or version matching"
+  }
+}

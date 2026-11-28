@@ -1,0 +1,142 @@
+"""Read-only, bounded inspection of the old public preview. Never execute assets."""
+import argparse
+import hashlib
+import io
+import json
+import re
+import unittest
+import urllib.error
+import urllib.request
+import zipfile
+
+BASE = ("https://github.com/fostergd/disc_archiving_app/releases/download/"
+        "preview-96e0ec3dc921-45907196171-1/")
+ZIP = "disc-archive-windows-x64-preview.zip"
+SIDECAR = ZIP + ".sha256"
+IDENTITIES = {
+    ZIP: (6220532, "c3ce19d5f985db8d620599b5f2da08faac640ae1b6eb1ab96cc6b4b9f1a26dca"),
+    SIDECAR: (104, "da28a8aabfbcee4a43d90c5124078cb80ffb05b7456106c18700b98b5e1fd052"),
+}
+PAYLOAD = {"disc-archive.exe", "disc-archive-studio.exe", "README.md", "WINDOWS_ACCEPTANCE.md"}
+PATTERNS = {
+    "private_key": re.compile(rb"-----BEGIN (?:[A-Z0-9 ]+ )?PRIVATE KEY-----"),
+    "github_token": re.compile(rb"(?:gh[pousr]_[A-Za-z0-9]{30,}|github_pat_[A-Za-z0-9_]{40,})"),
+    "aws_key": re.compile(rb"\b(?:AKIA|ASIA)[A-Z0-9]{16}\b"),
+    "private_ip": re.compile(rb"(?<![0-9.])(?:192\.168|10\.\d{1,3}|172\.(?:1[6-9]|2\d|3[01]))\.\d{1,3}\.\d{1,3}(?![0-9.])"),
+    "local_user_path": re.compile(rb"(?i)(?:[a-z]:\\Users\\[^\\\r\n\"' ]+|/home/[^/\r\n\"' ]+/)"),
+    "email": re.compile(rb"[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}"),
+}
+
+
+def digest(raw):
+    return hashlib.sha256(raw).hexdigest()
+
+
+def download(name):
+    size, sha = IDENTITIES[name]
+    # Public assets only: no token, no credentials, no arbitrary URL input.
+    request = urllib.request.Request(BASE + name, headers={"User-Agent": "Disc-Archive-Studio-review"})
+    with urllib.request.urlopen(request, timeout=45) as response:
+        if not response.geturl().startswith("https://"):
+            raise ValueError("non-HTTPS asset response")
+        raw = response.read(size + 1)
+    if len(raw) != size or digest(raw) != sha:
+        raise ValueError("legacy asset identity mismatch")
+    return raw
+
+
+def scan(raw):
+    # Scan bytes plus ASCII-compatible UTF-16LE/BE strings. Counts only.
+    variants = [raw]
+    for endian in ("utf-16-le", "utf-16-be"):
+        for offset in (0, 1):
+            data = raw[offset:]
+            variants.append(data[:len(data)//2*2].decode(endian, errors="replace").encode("ascii", errors="replace"))
+    return {key: sum(len(pattern.findall(v)) for v in variants) for key, pattern in PATTERNS.items()}
+
+
+def inspect_zip(raw):
+    with zipfile.ZipFile(io.BytesIO(raw)) as z:
+        names = z.namelist()
+        if len(names) != len(set(n.casefold() for n in names)):
+            raise ValueError("duplicate ZIP entry")
+        if set(names) != PAYLOAD | {"SHA256SUMS.txt"}:
+            raise ValueError("unexpected legacy ZIP layout")
+        if sum(i.file_size for i in z.infolist()) > 64 * 1024 * 1024:
+            raise ValueError("legacy ZIP exceeds inspection bound")
+        entries = {name: z.read(name) for name in names}
+    lines = entries["SHA256SUMS.txt"].decode("ascii").splitlines()
+    expected = {digest(entries[name]) + "  " + name for name in PAYLOAD}
+    if len(lines) != len(expected) or set(lines) != expected:
+        raise ValueError("legacy internal checksums mismatch")
+    for name in ("disc-archive.exe", "disc-archive-studio.exe"):
+        if not entries[name].startswith(b"MZ"):
+            raise ValueError("legacy executable header missing")
+    return {
+        "entries": [{"name": name, "bytes": len(data), "sha256": digest(data),
+                     "pattern_counts": scan(data)}
+                    for name, data in sorted(entries.items())],
+        "internal_checksums_valid": True,
+        "third_party_notice_bundle_present": False,
+        "publication_approved": False,
+    }
+
+
+def inspect():
+    raw = download(ZIP)
+    sidecar = download(SIDECAR)
+    if sidecar.decode("ascii").strip() != digest(raw) + "  " + ZIP:
+        raise ValueError("legacy ZIP sidecar mismatch")
+    report = inspect_zip(raw)
+    report.update({"asset_sha256": digest(raw), "sidecar_sha256": digest(sidecar),
+                   "scope": "legacy public asset byte identity, checksums and heuristic screening; no execution"})
+    print("LEGACY_PREVIEW_REVIEW " + json.dumps(report, sort_keys=True, separators=(",", ":")))
+    print("LEGACY_PREVIEW_REVIEW_COMPLETE: legacy package lacks third-party notice bundle; not approved")
+
+
+class Tests(unittest.TestCase):
+    def fixture(self, tamper=False, extra=False):
+        entries = {name: b"MZfixture" if name.endswith(".exe") else b"fixture" for name in PAYLOAD}
+        lines = [digest(data) + "  " + name for name, data in entries.items()]
+        entries["SHA256SUMS.txt"] = ("\n".join(lines) + "\n").encode("ascii")
+        if tamper:
+            entries["README.md"] = b"changed"
+        if extra:
+            entries["unexpected.txt"] = b"extra"
+        stream = io.BytesIO()
+        with zipfile.ZipFile(stream, "w") as z:
+            for name, data in entries.items():
+                z.writestr(name, data)
+        return stream.getvalue()
+
+    def test_layout_and_checksums(self):
+        report = inspect_zip(self.fixture())
+        self.assertTrue(report["internal_checksums_valid"])
+        self.assertFalse(report["publication_approved"])
+        with self.assertRaisesRegex(ValueError, "checksums mismatch"):
+            inspect_zip(self.fixture(tamper=True))
+        with self.assertRaisesRegex(ValueError, "layout"):
+            inspect_zip(self.fixture(extra=True))
+
+    def test_encoded_patterns(self):
+        sample = "gh" + "p_" + "Z" * 36
+        self.assertGreater(scan(sample.encode("utf-16-le"))["github_token"], 0)
+
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--self-test", action="store_true")
+    args = parser.parse_args()
+    if args.self_test:
+        if not unittest.TextTestRunner(verbosity=2).run(unittest.defaultTestLoader.loadTestsFromTestCase(Tests)).wasSuccessful():
+            raise SystemExit(1)
+    else:
+        try:
+            inspect()
+        except (urllib.error.URLError, TimeoutError):
+            # Asset can be withdrawn by owner; never make a build pass imply
+            # that inaccessible assets were inspected or cleared.
+            print("LEGACY_PREVIEW_REVIEW_INCOMPLETE: asset retrieval unavailable; publication remains blocked")
+        except (ValueError, OSError, zipfile.BadZipFile):
+            print("LEGACY_PREVIEW_REVIEW_INCOMPLETE: asset identity or format validation failed")
+            raise SystemExit(1) from None
