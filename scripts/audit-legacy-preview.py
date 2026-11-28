@@ -6,6 +6,7 @@ import json
 from pathlib import Path
 from collections import Counter
 import re
+import subprocess
 import unittest
 import urllib.error
 import urllib.request
@@ -83,8 +84,73 @@ def classify_review(raw):
     return dict(sorted(counts.items()))
 
 
-def inspect_current(directory):
+def compare_email_sources(values, packages, max_bytes=256*1024*1024):
+    # Candidate source correspondence is evidence, not automatic clearance.
+    # Only emit package identities, not matches, hashes of addresses or paths.
+    results = {value: set() for value in values}
+    total = 0
+    skipped = 0
+    for package, root in sorted(packages.items()):
+        for path in sorted(root.rglob("*")):
+            if path.suffix.lower() not in (".rs", ".c", ".h", ".cpp", ".toml", ".md", ".txt", ".xml") and not path.name.upper().startswith(("LICENSE", "NOTICE", "COPYRIGHT")):
+                continue
+            if not path.is_file() or not path.resolve().is_relative_to(root.resolve()):
+                continue
+            size = path.stat().st_size
+            if size > 16*1024*1024 or total + size > max_bytes:
+                skipped += 1
+                continue
+            raw = path.read_bytes()
+            total += len(raw)
+            for match in PATTERNS["email"].finditer(raw):
+                value = match.group()
+                if value in results:
+                    results[value].add(package)
+    return {
+        "distinct_email_patterns": len(results),
+        "distinct_patterns_with_candidate_source_match": sum(bool(v) for v in results.values()),
+        "distinct_patterns_without_candidate_source_match": sum(not v for v in results.values()),
+        "matching_candidate_packages": sorted(set().union(*results.values()) if results else set()),
+        "scanned_bytes": total,
+        "skipped_files": skipped,
+        "scope": "exact email-pattern correspondence in locked compiled registry candidates; no assertion of attribution or privacy clearance",
+    }
+
+
+def registry_candidates(runtime_report):
+    root = Path(__file__).resolve().parents[1]
+    inventory = json.loads((root/"docs/compliance/windows-license-inventory.json").read_text(encoding="utf-8"))
+    if hashlib.sha256((root/"Cargo.lock").read_bytes()).hexdigest() != inventory["lock_sha256"]:
+        raise ValueError("source comparison lock mismatch")
+    # The release build already ran against this locked graph.
+    report = json.loads(runtime_report.read_text(encoding="utf-8"))
+    if report["lock_sha256"] != inventory["lock_sha256"]:
+        raise ValueError("runtime source comparison lock mismatch")
+    compiled = {(p["name"], p["version"]) for p in report["compiled_packages"]}
+    proc = subprocess.run(["cargo","metadata","--locked","--offline","--format-version","1","--filter-platform","x86_64-pc-windows-msvc","--features","gui"],cwd=root,stdout=subprocess.PIPE,stderr=subprocess.PIPE)
+    if proc.returncode:
+        raise ValueError("locked metadata retrieval failed")
+    metadata = json.loads(proc.stdout)
+    packages = {}
+    for p in metadata["packages"]:
+        key = (p["name"],p["version"])
+        if key not in compiled or not (p.get("source") or "").startswith("registry+"):
+            continue
+        manifest = Path(p["manifest_path"])
+        if not manifest.is_file() or manifest.name != "Cargo.toml":
+            raise ValueError("candidate source manifest missing")
+        label = p["name"]+"@"+p["version"]
+        if label in packages:
+            raise ValueError("ambiguous candidate package")
+        packages[label] = manifest.parent
+    if not packages:
+        raise ValueError("no compiled registry candidates")
+    return packages
+
+
+def inspect_current(directory, runtime_report=None):
     entries = []
+    emails = set()
     for name in sorted(n for n in PAYLOAD if n.endswith(".exe")):
         path = directory / name
         if not path.is_file() or not path.resolve().is_relative_to(directory.resolve()):
@@ -95,10 +161,14 @@ def inspect_current(directory):
         if not raw.startswith(b"MZ"):
             raise ValueError("current executable header missing")
         counts = scan(raw)
+        for variant in variants_of(raw):
+            emails.update(m.group() for m in PATTERNS["email"].finditer(variant))
         entries.append({"name": name, "bytes": len(raw), "sha256": digest(raw),
                         "pattern_counts": counts, "review_classes": classify_review(raw)})
     report = {"entries": entries, "scope": "new release executables; heuristic counts only",
               "publication_approved": False}
+    if runtime_report is not None:
+        report["email_source_comparison"] = compare_email_sources(emails, registry_candidates(runtime_report))
     print("CURRENT_BINARY_EXPOSURE_REVIEW " + json.dumps(report, sort_keys=True, separators=(",", ":")))
     if any(row["pattern_counts"][k] for row in entries for k in ("private_key","github_token","aws_key")):
         raise ValueError("possible credential in current executable; review required")
@@ -175,6 +245,20 @@ class Tests(unittest.TestCase):
         self.assertEqual(classify_review(other)["local_path_unclassified"], 1)
         self.assertEqual(classify_review(b"fixture" + b"@example.invalid")["email_unclassified"], 1)
 
+    def test_source_comparison(self):
+        import tempfile
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            address = b"fixture" + b"@example.invalid"
+            (root/"lib.rs").write_bytes(address)
+            other = b"unmatched" + b"@example.invalid"
+            result = compare_email_sources({address,other},{"fixture@1.0":root})
+            self.assertEqual(result["distinct_patterns_with_candidate_source_match"],1)
+            self.assertEqual(result["distinct_patterns_without_candidate_source_match"],1)
+            self.assertEqual(result["matching_candidate_packages"],["fixture@1.0"])
+            self.assertNotIn(address.decode(),json.dumps(result))
+            self.assertEqual(compare_email_sources({address},{"fixture@1.0":root},max_bytes=0)["skipped_files"],1)
+
     def test_encoded_patterns(self):
         sample = "gh" + "p_" + "Z" * 36
         self.assertGreater(scan(sample.encode("utf-16-le"))["github_token"], 0)
@@ -184,13 +268,14 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--self-test", action="store_true")
     parser.add_argument("--current-release-directory", type=Path)
+    parser.add_argument("--runtime-report", type=Path)
     args = parser.parse_args()
     if args.self_test:
         if not unittest.TextTestRunner(verbosity=2).run(unittest.defaultTestLoader.loadTestsFromTestCase(Tests)).wasSuccessful():
             raise SystemExit(1)
     elif args.current_release_directory:
         try:
-            inspect_current(args.current_release_directory)
+            inspect_current(args.current_release_directory, args.runtime_report)
         except (ValueError, OSError):
             print("CURRENT_BINARY_EXPOSURE_REVIEW_INCOMPLETE: review required")
             raise SystemExit(1) from None

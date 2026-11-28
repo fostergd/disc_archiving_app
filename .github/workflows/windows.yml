@@ -70,7 +70,7 @@ jobs:
       - name: Screen newly built Windows executables without execution (counts only)
         shell: powershell
         run: |
-          python ./scripts/audit-legacy-preview.py --current-release-directory target/release
+          python ./scripts/audit-legacy-preview.py --current-release-directory target/release --runtime-report (Join-Path $env:RUNNER_TEMP 'das-runtime-evidence.json')
           if ($LASTEXITCODE -ne 0) { throw 'Current binary exposure review failed' }
       - name: Inspect pinned Rust standard library copyright declarations
         shell: powershell
