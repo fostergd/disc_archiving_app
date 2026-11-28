@@ -1,0 +1,1743 @@
+{
+  "schema": 1,
+  "lock_sha256": "60862ef1ad2cfab8812323835ad07f16294ccd4b09b6a2b32b7ea5dc5cccc567",
+  "scope": "Pinned Windows candidate declaration review and notice navigation; not exact executable linkage or authorization",
+  "distribution_approved": false,
+  "packages": [
+    {
+      "package": "ab_glyph@0.2.32",
+      "declared_license": "Apache-2.0",
+      "proposed_terms": "Apache-2.0",
+      "build_scope": "compiled_candidate",
+      "notice_paths": [
+        "registry/ab_glyph@0.2.32/LICENSE"
+      ]
+    },
+    {
+      "package": "ab_glyph_rasterizer@0.1.10",
+      "declared_license": "Apache-2.0",
+      "proposed_terms": "Apache-2.0",
+      "build_scope": "compiled_candidate",
+      "notice_paths": [
+        "registry/ab_glyph_rasterizer@0.1.10/LICENSE"
+      ]
+    },
+    {
+      "package": "adler2@2.0.1",
+      "declared_license": "0BSD OR MIT OR Apache-2.0",
+      "proposed_terms": "MIT",
+      "build_scope": "compiled_candidate",
+      "notice_paths": [
+        "registry/adler2@2.0.1/LICENSE-0BSD",
+        "registry/adler2@2.0.1/LICENSE-APACHE",
+        "registry/adler2@2.0.1/LICENSE-MIT"
+      ]
+    },
+    {
+      "package": "ahash@0.8.14",
+      "declared_license": "MIT OR Apache-2.0",
+      "proposed_terms": "MIT",
+      "build_scope": "compiled_candidate",
+      "notice_paths": [
+        "registry/ahash@0.8.14/LICENSE-APACHE",
+        "registry/ahash@0.8.14/LICENSE-MIT"
+      ]
+    },
+    {
+      "package": "aho-corasick@1.1.5",
+      "declared_license": "Unlicense OR MIT",
+      "proposed_terms": "MIT",
+      "build_scope": "compiled_candidate",
+      "notice_paths": [
+        "registry/aho-corasick@1.1.5/COPYING",
+        "registry/aho-corasick@1.1.5/LICENSE-MIT",
+        "registry/aho-corasick@1.1.5/UNLICENSE"
+      ]
+    },
+    {
+      "package": "anstream@1.0.0",
+      "declared_license": "MIT OR Apache-2.0",
+      "proposed_terms": "MIT",
+      "build_scope": "compiled_candidate",
+      "notice_paths": [
+        "registry/anstream@1.0.0/LICENSE-APACHE",
+        "registry/anstream@1.0.0/LICENSE-MIT"
+      ]
+    },
+    {
+      "package": "anstyle@1.0.14",
+      "declared_license": "MIT OR Apache-2.0",
+      "proposed_terms": "MIT",
+      "build_scope": "compiled_candidate",
+      "notice_paths": [
+        "registry/anstyle@1.0.14/LICENSE-APACHE",
+        "registry/anstyle@1.0.14/LICENSE-MIT"
+      ]
+    },
+    {
+      "package": "anstyle-parse@1.0.0",
+      "declared_license": "MIT OR Apache-2.0",
+      "proposed_terms": "MIT",
+      "build_scope": "compiled_candidate",
+      "notice_paths": [
+        "registry/anstyle-parse@1.0.0/LICENSE-APACHE",
+        "registry/anstyle-parse@1.0.0/LICENSE-MIT"
+      ]
+    },
+    {
+      "package": "anstyle-query@1.1.5",
+      "declared_license": "MIT OR Apache-2.0",
+      "proposed_terms": "MIT",
+      "build_scope": "compiled_candidate",
+      "notice_paths": [
+        "registry/anstyle-query@1.1.5/LICENSE-APACHE",
+        "registry/anstyle-query@1.1.5/LICENSE-MIT"
+      ]
+    },
+    {
+      "package": "anstyle-wincon@3.0.11",
+      "declared_license": "MIT OR Apache-2.0",
+      "proposed_terms": "MIT",
+      "build_scope": "compiled_candidate",
+      "notice_paths": [
+        "registry/anstyle-wincon@3.0.11/LICENSE-APACHE",
+        "registry/anstyle-wincon@3.0.11/LICENSE-MIT"
+      ]
+    },
+    {
+      "package": "anyhow@1.0.105",
+      "declared_license": "MIT OR Apache-2.0",
+      "proposed_terms": "MIT",
+      "build_scope": "compiled_candidate",
+      "notice_paths": [
+        "registry/anyhow@1.0.105/LICENSE-APACHE",
+        "registry/anyhow@1.0.105/LICENSE-MIT"
+      ]
+    },
+    {
+      "package": "arboard@3.7.0",
+      "declared_license": "MIT OR Apache-2.0",
+      "proposed_terms": "MIT",
+      "build_scope": "compiled_candidate",
+      "notice_paths": [
+        "registry/arboard@3.7.0/LICENSE-APACHE.txt",
+        "registry/arboard@3.7.0/LICENSE-MIT.txt"
+      ]
+    },
+    {
+      "package": "autocfg@1.5.1",
+      "declared_license": "Apache-2.0 OR MIT",
+      "proposed_terms": "MIT",
+      "build_scope": "compiled_candidate",
+      "notice_paths": [
+        "registry/autocfg@1.5.1/LICENSE-APACHE",
+        "registry/autocfg@1.5.1/LICENSE-MIT"
+      ]
+    },
+    {
+      "package": "bitflags@2.13.2",
+      "declared_license": "MIT OR Apache-2.0",
+      "proposed_terms": "MIT",
+      "build_scope": "compiled_candidate",
+      "notice_paths": [
+        "registry/bitflags@2.13.2/LICENSE-APACHE",
+        "registry/bitflags@2.13.2/LICENSE-MIT"
+      ]
+    },
+    {
+      "package": "block-buffer@0.10.4",
+      "declared_license": "MIT OR Apache-2.0",
+      "proposed_terms": "MIT",
+      "build_scope": "compiled_candidate",
+      "notice_paths": [
+        "registry/block-buffer@0.10.4/LICENSE-APACHE",
+        "registry/block-buffer@0.10.4/LICENSE-MIT"
+      ]
+    },
+    {
+      "package": "bstr@1.14.0",
+      "declared_license": "MIT OR Apache-2.0",
+      "proposed_terms": "MIT",
+      "build_scope": "compiled_candidate",
+      "notice_paths": [
+        "registry/bstr@1.14.0/COPYING",
+        "registry/bstr@1.14.0/LICENSE-APACHE",
+        "registry/bstr@1.14.0/LICENSE-MIT"
+      ]
+    },
+    {
+      "package": "bytemuck@1.25.2",
+      "declared_license": "Zlib OR Apache-2.0 OR MIT",
+      "proposed_terms": "MIT",
+      "build_scope": "compiled_candidate",
+      "notice_paths": [
+        "registry/bytemuck@1.25.2/LICENSE-APACHE",
+        "registry/bytemuck@1.25.2/LICENSE-MIT",
+        "registry/bytemuck@1.25.2/LICENSE-ZLIB"
+      ]
+    },
+    {
+      "package": "bytemuck_derive@1.12.1",
+      "declared_license": "Zlib OR Apache-2.0 OR MIT",
+      "proposed_terms": "MIT",
+      "build_scope": "compiled_candidate",
+      "notice_paths": [
+        "registry/bytemuck_derive@1.12.1/LICENSE-APACHE",
+        "registry/bytemuck_derive@1.12.1/LICENSE-MIT",
+        "registry/bytemuck_derive@1.12.1/LICENSE-ZLIB"
+      ]
+    },
+    {
+      "package": "byteorder-lite@0.1.0",
+      "declared_license": "Unlicense OR MIT",
+      "proposed_terms": "MIT",
+      "build_scope": "compiled_candidate",
+      "notice_paths": [
+        "registry/byteorder-lite@0.1.0/LICENSE-MIT",
+        "registry/byteorder-lite@0.1.0/UNLICENSE"
+      ]
+    },
+    {
+      "package": "cc@1.11.3",
+      "declared_license": "MIT OR Apache-2.0",
+      "proposed_terms": "MIT",
+      "build_scope": "compiled_candidate",
+      "notice_paths": [
+        "registry/cc@1.11.3/LICENSE-APACHE",
+        "registry/cc@1.11.3/LICENSE-MIT"
+      ]
+    },
+    {
+      "package": "cfg_aliases@0.2.2",
+      "declared_license": "MIT",
+      "proposed_terms": "MIT",
+      "build_scope": "compiled_candidate",
+      "notice_paths": [
+        "registry/cfg_aliases@0.2.2/LICENSE",
+        "registry/cfg_aliases@0.2.2/NOTICES.md"
+      ]
+    },
+    {
+      "package": "cfg-if@1.0.5",
+      "declared_license": "MIT OR Apache-2.0",
+      "proposed_terms": "MIT",
+      "build_scope": "compiled_candidate",
+      "notice_paths": [
+        "registry/cfg-if@1.0.5/LICENSE-APACHE",
+        "registry/cfg-if@1.0.5/LICENSE-MIT"
+      ]
+    },
+    {
+      "package": "clap@4.6.10",
+      "declared_license": "MIT OR Apache-2.0",
+      "proposed_terms": "MIT",
+      "build_scope": "compiled_candidate",
+      "notice_paths": [
+        "registry/clap@4.6.10/LICENSE-APACHE",
+        "registry/clap@4.6.10/LICENSE-MIT"
+      ]
+    },
+    {
+      "package": "clap_builder@4.6.10",
+      "declared_license": "MIT OR Apache-2.0",
+      "proposed_terms": "MIT",
+      "build_scope": "compiled_candidate",
+      "notice_paths": [
+        "registry/clap_builder@4.6.10/LICENSE-APACHE",
+        "registry/clap_builder@4.6.10/LICENSE-MIT"
+      ]
+    },
+    {
+      "package": "clap_derive@4.6.9",
+      "declared_license": "MIT OR Apache-2.0",
+      "proposed_terms": "MIT",
+      "build_scope": "compiled_candidate",
+      "notice_paths": [
+        "registry/clap_derive@4.6.9/LICENSE-APACHE",
+        "registry/clap_derive@4.6.9/LICENSE-MIT"
+      ]
+    },
+    {
+      "package": "clap_lex@1.1.2",
+      "declared_license": "MIT OR Apache-2.0",
+      "proposed_terms": "MIT",
+      "build_scope": "compiled_candidate",
+      "notice_paths": [
+        "registry/clap_lex@1.1.2/LICENSE-APACHE",
+        "registry/clap_lex@1.1.2/LICENSE-MIT"
+      ]
+    },
+    {
+      "package": "clipboard-win@5.4.3",
+      "declared_license": "BSL-1.0",
+      "proposed_terms": "BSL-1.0",
+      "build_scope": "compiled_candidate",
+      "notice_paths": [
+        "upstream/clipboard-win-5.4.3/LICENSE"
+      ]
+    },
+    {
+      "package": "colorchoice@1.0.5",
+      "declared_license": "MIT OR Apache-2.0",
+      "proposed_terms": "MIT",
+      "build_scope": "compiled_candidate",
+      "notice_paths": [
+        "registry/colorchoice@1.0.5/LICENSE-APACHE",
+        "registry/colorchoice@1.0.5/LICENSE-MIT"
+      ]
+    },
+    {
+      "package": "cpufeatures@0.2.17",
+      "declared_license": "MIT OR Apache-2.0",
+      "proposed_terms": "MIT",
+      "build_scope": "compiled_candidate",
+      "notice_paths": [
+        "registry/cpufeatures@0.2.17/LICENSE-APACHE",
+        "registry/cpufeatures@0.2.17/LICENSE-MIT"
+      ]
+    },
+    {
+      "package": "crc32fast@1.5.6",
+      "declared_license": "MIT OR Apache-2.0",
+      "proposed_terms": "MIT",
+      "build_scope": "compiled_candidate",
+      "notice_paths": [
+        "registry/crc32fast@1.5.6/LICENSE-APACHE",
+        "registry/crc32fast@1.5.6/LICENSE-MIT"
+      ]
+    },
+    {
+      "package": "crypto-common@0.1.7",
+      "declared_license": "MIT OR Apache-2.0",
+      "proposed_terms": "MIT",
+      "build_scope": "compiled_candidate",
+      "notice_paths": [
+        "registry/crypto-common@0.1.7/LICENSE-APACHE",
+        "registry/crypto-common@0.1.7/LICENSE-MIT"
+      ]
+    },
+    {
+      "package": "cursor-icon@1.2.0",
+      "declared_license": "MIT OR Apache-2.0 OR Zlib",
+      "proposed_terms": "MIT",
+      "build_scope": "compiled_candidate",
+      "notice_paths": [
+        "registry/cursor-icon@1.2.0/LICENSE-APACHE",
+        "registry/cursor-icon@1.2.0/LICENSE-MIT",
+        "registry/cursor-icon@1.2.0/LICENSE-ZLIB"
+      ]
+    },
+    {
+      "package": "digest@0.10.7",
+      "declared_license": "MIT OR Apache-2.0",
+      "proposed_terms": "MIT",
+      "build_scope": "compiled_candidate",
+      "notice_paths": [
+        "registry/digest@0.10.7/LICENSE-APACHE",
+        "registry/digest@0.10.7/LICENSE-MIT"
+      ]
+    },
+    {
+      "package": "displaydoc@0.2.7",
+      "declared_license": "MIT OR Apache-2.0",
+      "proposed_terms": "MIT",
+      "build_scope": "compiled_candidate",
+      "notice_paths": [
+        "registry/displaydoc@0.2.7/LICENSE-APACHE",
+        "registry/displaydoc@0.2.7/LICENSE-MIT"
+      ]
+    },
+    {
+      "package": "document-features@0.2.12",
+      "declared_license": "MIT OR Apache-2.0",
+      "proposed_terms": "MIT",
+      "build_scope": "compiled_candidate",
+      "notice_paths": [
+        "registry/document-features@0.2.12/LICENSE-APACHE",
+        "registry/document-features@0.2.12/LICENSE-MIT"
+      ]
+    },
+    {
+      "package": "dpi@0.1.2",
+      "declared_license": "Apache-2.0 AND MIT",
+      "proposed_terms": "Apache-2.0 AND MIT",
+      "build_scope": "compiled_candidate",
+      "notice_paths": [
+        "registry/dpi@0.1.2/LICENSE",
+        "registry/dpi@0.1.2/LICENSE-LIBM-MIT"
+      ]
+    },
+    {
+      "package": "ecolor@0.31.1",
+      "declared_license": "MIT OR Apache-2.0",
+      "proposed_terms": "MIT",
+      "build_scope": "compiled_candidate",
+      "notice_paths": [
+        "upstream/egui-0.31.1/LICENSE-APACHE",
+        "upstream/egui-0.31.1/LICENSE-MIT"
+      ]
+    },
+    {
+      "package": "eframe@0.31.1",
+      "declared_license": "MIT OR Apache-2.0",
+      "proposed_terms": "MIT",
+      "build_scope": "compiled_candidate",
+      "notice_paths": [
+        "upstream/egui-0.31.1/LICENSE-APACHE",
+        "upstream/egui-0.31.1/LICENSE-MIT"
+      ]
+    },
+    {
+      "package": "egui@0.31.1",
+      "declared_license": "MIT OR Apache-2.0",
+      "proposed_terms": "MIT",
+      "build_scope": "compiled_candidate",
+      "notice_paths": [
+        "upstream/egui-0.31.1/LICENSE-APACHE",
+        "upstream/egui-0.31.1/LICENSE-MIT"
+      ]
+    },
+    {
+      "package": "egui_glow@0.31.1",
+      "declared_license": "MIT OR Apache-2.0",
+      "proposed_terms": "MIT",
+      "build_scope": "compiled_candidate",
+      "notice_paths": [
+        "upstream/egui-0.31.1/LICENSE-APACHE",
+        "upstream/egui-0.31.1/LICENSE-MIT"
+      ]
+    },
+    {
+      "package": "egui-winit@0.31.1",
+      "declared_license": "MIT OR Apache-2.0",
+      "proposed_terms": "MIT",
+      "build_scope": "compiled_candidate",
+      "notice_paths": [
+        "upstream/egui-0.31.1/LICENSE-APACHE",
+        "upstream/egui-0.31.1/LICENSE-MIT"
+      ]
+    },
+    {
+      "package": "emath@0.31.1",
+      "declared_license": "MIT OR Apache-2.0",
+      "proposed_terms": "MIT",
+      "build_scope": "compiled_candidate",
+      "notice_paths": [
+        "upstream/egui-0.31.1/LICENSE-APACHE",
+        "upstream/egui-0.31.1/LICENSE-MIT"
+      ]
+    },
+    {
+      "package": "epaint@0.31.1",
+      "declared_license": "MIT OR Apache-2.0",
+      "proposed_terms": "MIT",
+      "build_scope": "compiled_candidate",
+      "notice_paths": [
+        "upstream/egui-0.31.1/LICENSE-APACHE",
+        "upstream/egui-0.31.1/LICENSE-MIT"
+      ]
+    },
+    {
+      "package": "epaint_default_fonts@0.31.1",
+      "declared_license": "(MIT OR Apache-2.0) AND OFL-1.1 AND Ubuntu-font-1.0",
+      "proposed_terms": "MIT AND OFL-1.1 AND Ubuntu-font-1.0",
+      "build_scope": "compiled_candidate",
+      "notice_paths": [
+        "registry/epaint_default_fonts@0.31.1/fonts/OFL.txt",
+        "upstream/egui-0.31.1/Hack-Regular.txt",
+        "upstream/egui-0.31.1/LICENSE-APACHE",
+        "upstream/egui-0.31.1/LICENSE-MIT",
+        "upstream/egui-0.31.1/OFL.txt",
+        "upstream/egui-0.31.1/UFL.txt",
+        "upstream/egui-0.31.1/emoji-icon-font-mit-license.txt"
+      ]
+    },
+    {
+      "package": "error-code@3.4.0",
+      "declared_license": "BSL-1.0",
+      "proposed_terms": "BSL-1.0",
+      "build_scope": "compiled_candidate",
+      "notice_paths": [
+        "registry/error-code@3.4.0/LICENSE"
+      ]
+    },
+    {
+      "package": "fallible-iterator@0.3.0",
+      "declared_license": "MIT/Apache-2.0",
+      "proposed_terms": "MIT/Apache-2.0 (retain both; verify upstream alternative wording)",
+      "build_scope": "compiled_candidate",
+      "notice_paths": [
+        "registry/fallible-iterator@0.3.0/LICENSE-APACHE",
+        "registry/fallible-iterator@0.3.0/LICENSE-MIT"
+      ]
+    },
+    {
+      "package": "fallible-streaming-iterator@0.1.9",
+      "declared_license": "MIT/Apache-2.0",
+      "proposed_terms": "MIT/Apache-2.0 (retain both; verify upstream alternative wording)",
+      "build_scope": "compiled_candidate",
+      "notice_paths": [
+        "registry/fallible-streaming-iterator@0.1.9/LICENSE-APACHE",
+        "registry/fallible-streaming-iterator@0.1.9/LICENSE-MIT"
+      ]
+    },
+    {
+      "package": "fastrand@2.5.0",
+      "declared_license": "Apache-2.0 OR MIT",
+      "proposed_terms": "MIT",
+      "build_scope": "compiled_candidate",
+      "notice_paths": [
+        "registry/fastrand@2.5.0/LICENSE-APACHE",
+        "registry/fastrand@2.5.0/LICENSE-MIT"
+      ]
+    },
+    {
+      "package": "fax@0.2.7",
+      "declared_license": "MIT",
+      "proposed_terms": "MIT",
+      "build_scope": "inventory_only",
+      "notice_paths": [
+        "registry/fax@0.2.7/LICENSE"
+      ]
+    },
+    {
+      "package": "fdeflate@0.3.7",
+      "declared_license": "MIT OR Apache-2.0",
+      "proposed_terms": "MIT",
+      "build_scope": "compiled_candidate",
+      "notice_paths": [
+        "registry/fdeflate@0.3.7/LICENSE-APACHE",
+        "registry/fdeflate@0.3.7/LICENSE-MIT"
+      ]
+    },
+    {
+      "package": "find-msvc-tools@0.1.15",
+      "declared_license": "MIT OR Apache-2.0",
+      "proposed_terms": "MIT",
+      "build_scope": "compiled_candidate",
+      "notice_paths": [
+        "registry/find-msvc-tools@0.1.15/LICENSE-APACHE",
+        "registry/find-msvc-tools@0.1.15/LICENSE-MIT"
+      ]
+    },
+    {
+      "package": "flate2@1.1.11",
+      "declared_license": "MIT OR Apache-2.0",
+      "proposed_terms": "MIT",
+      "build_scope": "compiled_candidate",
+      "notice_paths": [
+        "registry/flate2@1.1.11/LICENSE-APACHE",
+        "registry/flate2@1.1.11/LICENSE-MIT"
+      ]
+    },
+    {
+      "package": "form_urlencoded@1.2.3",
+      "declared_license": "MIT OR Apache-2.0",
+      "proposed_terms": "MIT",
+      "build_scope": "compiled_candidate",
+      "notice_paths": [
+        "registry/form_urlencoded@1.2.3/LICENSE-APACHE",
+        "registry/form_urlencoded@1.2.3/LICENSE-MIT"
+      ]
+    },
+    {
+      "package": "generic-array@0.14.7",
+      "declared_license": "MIT",
+      "proposed_terms": "MIT",
+      "build_scope": "compiled_candidate",
+      "notice_paths": [
+        "registry/generic-array@0.14.7/LICENSE"
+      ]
+    },
+    {
+      "package": "getrandom@0.4.3",
+      "declared_license": "MIT OR Apache-2.0",
+      "proposed_terms": "MIT",
+      "build_scope": "compiled_candidate",
+      "notice_paths": [
+        "registry/getrandom@0.4.3/LICENSE-APACHE",
+        "registry/getrandom@0.4.3/LICENSE-MIT"
+      ]
+    },
+    {
+      "package": "gl_generator@0.14.0",
+      "declared_license": "Apache-2.0",
+      "proposed_terms": "Apache-2.0",
+      "build_scope": "compiled_candidate",
+      "notice_paths": [
+        "upstream/gl-generator-0.14.0/LICENSE"
+      ]
+    },
+    {
+      "package": "globset@0.4.22",
+      "declared_license": "Unlicense OR MIT",
+      "proposed_terms": "MIT",
+      "build_scope": "compiled_candidate",
+      "notice_paths": [
+        "registry/globset@0.4.22/COPYING",
+        "registry/globset@0.4.22/LICENSE-MIT",
+        "registry/globset@0.4.22/UNLICENSE"
+      ]
+    },
+    {
+      "package": "glow@0.16.0",
+      "declared_license": "MIT OR Apache-2.0 OR Zlib",
+      "proposed_terms": "MIT",
+      "build_scope": "compiled_candidate",
+      "notice_paths": [
+        "registry/glow@0.16.0/LICENSE-APACHE",
+        "registry/glow@0.16.0/LICENSE-MIT",
+        "registry/glow@0.16.0/LICENSE-ZLIB"
+      ]
+    },
+    {
+      "package": "glutin@0.32.3",
+      "declared_license": "Apache-2.0",
+      "proposed_terms": "Apache-2.0",
+      "build_scope": "compiled_candidate",
+      "notice_paths": [
+        "registry/glutin@0.32.3/LICENSE"
+      ]
+    },
+    {
+      "package": "glutin_egl_sys@0.7.1",
+      "declared_license": "Apache-2.0",
+      "proposed_terms": "Apache-2.0",
+      "build_scope": "compiled_candidate",
+      "notice_paths": [
+        "registry/glutin_egl_sys@0.7.1/LICENSE"
+      ]
+    },
+    {
+      "package": "glutin_wgl_sys@0.6.1",
+      "declared_license": "Apache-2.0",
+      "proposed_terms": "Apache-2.0",
+      "build_scope": "compiled_candidate",
+      "notice_paths": [
+        "registry/glutin_wgl_sys@0.6.1/LICENSE"
+      ]
+    },
+    {
+      "package": "glutin-winit@0.5.0",
+      "declared_license": "MIT",
+      "proposed_terms": "MIT",
+      "build_scope": "compiled_candidate",
+      "notice_paths": [
+        "registry/glutin-winit@0.5.0/LICENSE"
+      ]
+    },
+    {
+      "package": "half@2.7.1",
+      "declared_license": "MIT OR Apache-2.0",
+      "proposed_terms": "MIT",
+      "build_scope": "inventory_only",
+      "notice_paths": [
+        "registry/half@2.7.1/LICENSE-APACHE",
+        "registry/half@2.7.1/LICENSE-MIT"
+      ]
+    },
+    {
+      "package": "hashbrown@0.14.5",
+      "declared_license": "MIT OR Apache-2.0",
+      "proposed_terms": "MIT",
+      "build_scope": "compiled_candidate",
+      "notice_paths": [
+        "registry/hashbrown@0.14.5/LICENSE-APACHE",
+        "registry/hashbrown@0.14.5/LICENSE-MIT"
+      ]
+    },
+    {
+      "package": "hashlink@0.9.1",
+      "declared_license": "MIT OR Apache-2.0",
+      "proposed_terms": "MIT",
+      "build_scope": "compiled_candidate",
+      "notice_paths": [
+        "registry/hashlink@0.9.1/LICENSE-APACHE",
+        "registry/hashlink@0.9.1/LICENSE-MIT"
+      ]
+    },
+    {
+      "package": "heck@0.5.0",
+      "declared_license": "MIT OR Apache-2.0",
+      "proposed_terms": "MIT",
+      "build_scope": "compiled_candidate",
+      "notice_paths": [
+        "registry/heck@0.5.0/LICENSE-APACHE",
+        "registry/heck@0.5.0/LICENSE-MIT"
+      ]
+    },
+    {
+      "package": "icu_collections@2.4.0",
+      "declared_license": "Unicode-3.0",
+      "proposed_terms": "Unicode-3.0",
+      "build_scope": "compiled_candidate",
+      "notice_paths": [
+        "registry/icu_collections@2.4.0/LICENSE"
+      ]
+    },
+    {
+      "package": "icu_locale_core@2.4.0",
+      "declared_license": "Unicode-3.0",
+      "proposed_terms": "Unicode-3.0",
+      "build_scope": "compiled_candidate",
+      "notice_paths": [
+        "registry/icu_locale_core@2.4.0/LICENSE"
+      ]
+    },
+    {
+      "package": "icu_normalizer@2.4.0",
+      "declared_license": "Unicode-3.0",
+      "proposed_terms": "Unicode-3.0",
+      "build_scope": "compiled_candidate",
+      "notice_paths": [
+        "registry/icu_normalizer@2.4.0/LICENSE"
+      ]
+    },
+    {
+      "package": "icu_normalizer_data@2.4.0",
+      "declared_license": "Unicode-3.0",
+      "proposed_terms": "Unicode-3.0",
+      "build_scope": "compiled_candidate",
+      "notice_paths": [
+        "registry/icu_normalizer_data@2.4.0/LICENSE"
+      ]
+    },
+    {
+      "package": "icu_properties@2.4.0",
+      "declared_license": "Unicode-3.0",
+      "proposed_terms": "Unicode-3.0",
+      "build_scope": "compiled_candidate",
+      "notice_paths": [
+        "registry/icu_properties@2.4.0/LICENSE"
+      ]
+    },
+    {
+      "package": "icu_properties_data@2.4.0",
+      "declared_license": "Unicode-3.0",
+      "proposed_terms": "Unicode-3.0",
+      "build_scope": "compiled_candidate",
+      "notice_paths": [
+        "registry/icu_properties_data@2.4.0/LICENSE"
+      ]
+    },
+    {
+      "package": "icu_provider@2.4.0",
+      "declared_license": "Unicode-3.0",
+      "proposed_terms": "Unicode-3.0",
+      "build_scope": "compiled_candidate",
+      "notice_paths": [
+        "registry/icu_provider@2.4.0/LICENSE"
+      ]
+    },
+    {
+      "package": "idna@1.1.0",
+      "declared_license": "MIT OR Apache-2.0",
+      "proposed_terms": "MIT",
+      "build_scope": "compiled_candidate",
+      "notice_paths": [
+        "registry/idna@1.1.0/LICENSE-APACHE",
+        "registry/idna@1.1.0/LICENSE-MIT"
+      ]
+    },
+    {
+      "package": "idna_adapter@1.2.2",
+      "declared_license": "Apache-2.0 OR MIT",
+      "proposed_terms": "MIT",
+      "build_scope": "compiled_candidate",
+      "notice_paths": [
+        "registry/idna_adapter@1.2.2/LICENSE-APACHE",
+        "registry/idna_adapter@1.2.2/LICENSE-MIT"
+      ]
+    },
+    {
+      "package": "image@0.25.10",
+      "declared_license": "MIT OR Apache-2.0",
+      "proposed_terms": "MIT",
+      "build_scope": "compiled_candidate",
+      "notice_paths": [
+        "registry/image@0.25.10/LICENSE-APACHE",
+        "registry/image@0.25.10/LICENSE-MIT"
+      ]
+    },
+    {
+      "package": "is_terminal_polyfill@1.70.2",
+      "declared_license": "MIT OR Apache-2.0",
+      "proposed_terms": "MIT",
+      "build_scope": "compiled_candidate",
+      "notice_paths": [
+        "registry/is_terminal_polyfill@1.70.2/LICENSE-APACHE",
+        "registry/is_terminal_polyfill@1.70.2/LICENSE-MIT"
+      ]
+    },
+    {
+      "package": "itoa@1.0.19",
+      "declared_license": "MIT OR Apache-2.0",
+      "proposed_terms": "MIT",
+      "build_scope": "compiled_candidate",
+      "notice_paths": [
+        "registry/itoa@1.0.19/LICENSE-APACHE",
+        "registry/itoa@1.0.19/LICENSE-MIT"
+      ]
+    },
+    {
+      "package": "jobserver@0.1.35",
+      "declared_license": "MIT OR Apache-2.0",
+      "proposed_terms": "MIT",
+      "build_scope": "inventory_only",
+      "notice_paths": [
+        "registry/jobserver@0.1.35/LICENSE-APACHE",
+        "registry/jobserver@0.1.35/LICENSE-MIT"
+      ]
+    },
+    {
+      "package": "khronos_api@3.1.0",
+      "declared_license": "Apache-2.0",
+      "proposed_terms": "Apache-2.0",
+      "build_scope": "compiled_candidate",
+      "notice_paths": [
+        "upstream/khronos-api-3.1.0/LICENSE"
+      ]
+    },
+    {
+      "package": "libloading@0.8.9",
+      "declared_license": "ISC",
+      "proposed_terms": "ISC",
+      "build_scope": "compiled_candidate",
+      "notice_paths": [
+        "registry/libloading@0.8.9/LICENSE"
+      ]
+    },
+    {
+      "package": "libsqlite3-sys@0.30.1",
+      "declared_license": "MIT",
+      "proposed_terms": "MIT",
+      "build_scope": "compiled_candidate",
+      "notice_paths": [
+        "registry/libsqlite3-sys@0.30.1/LICENSE",
+        "registry/libsqlite3-sys@0.30.1/sqlcipher/LICENSE"
+      ]
+    },
+    {
+      "package": "litemap@0.8.3",
+      "declared_license": "Unicode-3.0",
+      "proposed_terms": "Unicode-3.0",
+      "build_scope": "compiled_candidate",
+      "notice_paths": [
+        "registry/litemap@0.8.3/LICENSE"
+      ]
+    },
+    {
+      "package": "litrs@1.1.0",
+      "declared_license": "MIT OR Apache-2.0",
+      "proposed_terms": "MIT",
+      "build_scope": "compiled_candidate",
+      "notice_paths": [
+        "registry/litrs@1.1.0/LICENSE-APACHE",
+        "registry/litrs@1.1.0/LICENSE-MIT"
+      ]
+    },
+    {
+      "package": "lock_api@0.4.14",
+      "declared_license": "MIT OR Apache-2.0",
+      "proposed_terms": "MIT",
+      "build_scope": "compiled_candidate",
+      "notice_paths": [
+        "registry/lock_api@0.4.14/LICENSE-APACHE",
+        "registry/lock_api@0.4.14/LICENSE-MIT"
+      ]
+    },
+    {
+      "package": "log@0.4.35",
+      "declared_license": "MIT OR Apache-2.0",
+      "proposed_terms": "MIT",
+      "build_scope": "compiled_candidate",
+      "notice_paths": [
+        "registry/log@0.4.35/LICENSE-APACHE",
+        "registry/log@0.4.35/LICENSE-MIT"
+      ]
+    },
+    {
+      "package": "memchr@2.8.3",
+      "declared_license": "Unlicense OR MIT",
+      "proposed_terms": "MIT",
+      "build_scope": "compiled_candidate",
+      "notice_paths": [
+        "registry/memchr@2.8.3/COPYING",
+        "registry/memchr@2.8.3/LICENSE-MIT",
+        "registry/memchr@2.8.3/UNLICENSE"
+      ]
+    },
+    {
+      "package": "memoffset@0.9.1",
+      "declared_license": "MIT",
+      "proposed_terms": "MIT",
+      "build_scope": "compiled_candidate",
+      "notice_paths": [
+        "registry/memoffset@0.9.1/LICENSE"
+      ]
+    },
+    {
+      "package": "miniz_oxide@0.8.9",
+      "declared_license": "MIT OR Zlib OR Apache-2.0",
+      "proposed_terms": "MIT",
+      "build_scope": "compiled_candidate",
+      "notice_paths": [
+        "registry/miniz_oxide@0.8.9/LICENSE",
+        "registry/miniz_oxide@0.8.9/LICENSE-APACHE.md",
+        "registry/miniz_oxide@0.8.9/LICENSE-MIT.md",
+        "registry/miniz_oxide@0.8.9/LICENSE-ZLIB.md"
+      ]
+    },
+    {
+      "package": "miniz_oxide@0.9.1",
+      "declared_license": "MIT OR Zlib OR Apache-2.0",
+      "proposed_terms": "MIT",
+      "build_scope": "compiled_candidate",
+      "notice_paths": [
+        "registry/miniz_oxide@0.9.1/LICENSE",
+        "registry/miniz_oxide@0.9.1/LICENSE-APACHE.md",
+        "registry/miniz_oxide@0.9.1/LICENSE-MIT.md",
+        "registry/miniz_oxide@0.9.1/LICENSE-ZLIB.md"
+      ]
+    },
+    {
+      "package": "moxcms@0.8.1",
+      "declared_license": "BSD-3-Clause OR Apache-2.0",
+      "proposed_terms": "BSD-3-Clause",
+      "build_scope": "compiled_candidate",
+      "notice_paths": [
+        "registry/moxcms@0.8.1/LICENSE-APACHE.md",
+        "registry/moxcms@0.8.1/LICENSE.md"
+      ]
+    },
+    {
+      "package": "nohash-hasher@0.2.0",
+      "declared_license": "Apache-2.0 OR MIT",
+      "proposed_terms": "MIT",
+      "build_scope": "compiled_candidate",
+      "notice_paths": [
+        "registry/nohash-hasher@0.2.0/LICENSE-APACHE",
+        "registry/nohash-hasher@0.2.0/LICENSE-MIT"
+      ]
+    },
+    {
+      "package": "num-traits@0.2.19",
+      "declared_license": "MIT OR Apache-2.0",
+      "proposed_terms": "MIT",
+      "build_scope": "compiled_candidate",
+      "notice_paths": [
+        "registry/num-traits@0.2.19/LICENSE-APACHE",
+        "registry/num-traits@0.2.19/LICENSE-MIT"
+      ]
+    },
+    {
+      "package": "once_cell@1.21.4",
+      "declared_license": "MIT OR Apache-2.0",
+      "proposed_terms": "MIT",
+      "build_scope": "compiled_candidate",
+      "notice_paths": [
+        "registry/once_cell@1.21.4/LICENSE-APACHE",
+        "registry/once_cell@1.21.4/LICENSE-MIT"
+      ]
+    },
+    {
+      "package": "once_cell_polyfill@1.70.2",
+      "declared_license": "MIT OR Apache-2.0",
+      "proposed_terms": "MIT",
+      "build_scope": "compiled_candidate",
+      "notice_paths": [
+        "registry/once_cell_polyfill@1.70.2/LICENSE-APACHE",
+        "registry/once_cell_polyfill@1.70.2/LICENSE-MIT"
+      ]
+    },
+    {
+      "package": "owned_ttf_parser@0.25.1",
+      "declared_license": "Apache-2.0",
+      "proposed_terms": "Apache-2.0",
+      "build_scope": "compiled_candidate",
+      "notice_paths": [
+        "registry/owned_ttf_parser@0.25.1/LICENSE"
+      ]
+    },
+    {
+      "package": "parking_lot@0.12.5",
+      "declared_license": "MIT OR Apache-2.0",
+      "proposed_terms": "MIT",
+      "build_scope": "compiled_candidate",
+      "notice_paths": [
+        "registry/parking_lot@0.12.5/LICENSE-APACHE",
+        "registry/parking_lot@0.12.5/LICENSE-MIT"
+      ]
+    },
+    {
+      "package": "parking_lot_core@0.9.12",
+      "declared_license": "MIT OR Apache-2.0",
+      "proposed_terms": "MIT",
+      "build_scope": "compiled_candidate",
+      "notice_paths": [
+        "registry/parking_lot_core@0.9.12/LICENSE-APACHE",
+        "registry/parking_lot_core@0.9.12/LICENSE-MIT"
+      ]
+    },
+    {
+      "package": "percent-encoding@2.3.2",
+      "declared_license": "MIT OR Apache-2.0",
+      "proposed_terms": "MIT",
+      "build_scope": "compiled_candidate",
+      "notice_paths": [
+        "registry/percent-encoding@2.3.2/LICENSE-APACHE",
+        "registry/percent-encoding@2.3.2/LICENSE-MIT"
+      ]
+    },
+    {
+      "package": "pin-project-lite@0.2.18",
+      "declared_license": "Apache-2.0 OR MIT",
+      "proposed_terms": "MIT",
+      "build_scope": "compiled_candidate",
+      "notice_paths": [
+        "registry/pin-project-lite@0.2.18/LICENSE-APACHE",
+        "registry/pin-project-lite@0.2.18/LICENSE-MIT"
+      ]
+    },
+    {
+      "package": "pkg-config@0.3.34",
+      "declared_license": "MIT OR Apache-2.0",
+      "proposed_terms": "MIT",
+      "build_scope": "compiled_candidate",
+      "notice_paths": [
+        "registry/pkg-config@0.3.34/LICENSE-APACHE",
+        "registry/pkg-config@0.3.34/LICENSE-MIT"
+      ]
+    },
+    {
+      "package": "png@0.18.1",
+      "declared_license": "MIT OR Apache-2.0",
+      "proposed_terms": "MIT",
+      "build_scope": "compiled_candidate",
+      "notice_paths": [
+        "registry/png@0.18.1/LICENSE-APACHE",
+        "registry/png@0.18.1/LICENSE-MIT"
+      ]
+    },
+    {
+      "package": "potential_utf@0.1.6",
+      "declared_license": "Unicode-3.0",
+      "proposed_terms": "Unicode-3.0",
+      "build_scope": "compiled_candidate",
+      "notice_paths": [
+        "registry/potential_utf@0.1.6/LICENSE"
+      ]
+    },
+    {
+      "package": "proc-macro2@1.0.107",
+      "declared_license": "MIT OR Apache-2.0",
+      "proposed_terms": "MIT",
+      "build_scope": "compiled_candidate",
+      "notice_paths": [
+        "registry/proc-macro2@1.0.107/LICENSE-APACHE",
+        "registry/proc-macro2@1.0.107/LICENSE-MIT"
+      ]
+    },
+    {
+      "package": "profiling@1.0.18",
+      "declared_license": "MIT OR Apache-2.0",
+      "proposed_terms": "MIT",
+      "build_scope": "compiled_candidate",
+      "notice_paths": [
+        "upstream/profiling-1.0.18/LICENSE-APACHE",
+        "upstream/profiling-1.0.18/LICENSE-MIT"
+      ]
+    },
+    {
+      "package": "pxfm@0.1.30",
+      "declared_license": "BSD-3-Clause OR Apache-2.0",
+      "proposed_terms": "BSD-3-Clause",
+      "build_scope": "compiled_candidate",
+      "notice_paths": [
+        "registry/pxfm@0.1.30/LICENSE-APACHE.md",
+        "registry/pxfm@0.1.30/LICENSE.md"
+      ]
+    },
+    {
+      "package": "quick-error@2.0.1",
+      "declared_license": "MIT/Apache-2.0",
+      "proposed_terms": "MIT/Apache-2.0 (retain both; verify upstream alternative wording)",
+      "build_scope": "inventory_only",
+      "notice_paths": [
+        "registry/quick-error@2.0.1/LICENSE-APACHE",
+        "registry/quick-error@2.0.1/LICENSE-MIT"
+      ]
+    },
+    {
+      "package": "quote@1.0.47",
+      "declared_license": "MIT OR Apache-2.0",
+      "proposed_terms": "MIT",
+      "build_scope": "compiled_candidate",
+      "notice_paths": [
+        "registry/quote@1.0.47/LICENSE-APACHE",
+        "registry/quote@1.0.47/LICENSE-MIT"
+      ]
+    },
+    {
+      "package": "raw-window-handle@0.6.2",
+      "declared_license": "MIT OR Apache-2.0 OR Zlib",
+      "proposed_terms": "MIT",
+      "build_scope": "compiled_candidate",
+      "notice_paths": [
+        "registry/raw-window-handle@0.6.2/LICENSE-APACHE.md",
+        "registry/raw-window-handle@0.6.2/LICENSE-MIT.md",
+        "registry/raw-window-handle@0.6.2/LICENSE-ZLIB.md"
+      ]
+    },
+    {
+      "package": "regex-automata@0.4.19",
+      "declared_license": "MIT OR Apache-2.0",
+      "proposed_terms": "MIT",
+      "build_scope": "compiled_candidate",
+      "notice_paths": [
+        "registry/regex-automata@0.4.19/LICENSE-APACHE",
+        "registry/regex-automata@0.4.19/LICENSE-MIT"
+      ]
+    },
+    {
+      "package": "regex-syntax@0.8.12",
+      "declared_license": "MIT OR Apache-2.0",
+      "proposed_terms": "MIT",
+      "build_scope": "compiled_candidate",
+      "notice_paths": [
+        "registry/regex-syntax@0.8.12/LICENSE-APACHE",
+        "registry/regex-syntax@0.8.12/LICENSE-MIT",
+        "registry/regex-syntax@0.8.12/src/unicode_tables/LICENSE-UNICODE"
+      ]
+    },
+    {
+      "package": "rfd@0.15.4",
+      "declared_license": "MIT",
+      "proposed_terms": "MIT",
+      "build_scope": "compiled_candidate",
+      "notice_paths": [
+        "registry/rfd@0.15.4/LICENSE"
+      ]
+    },
+    {
+      "package": "rusqlite@0.32.1",
+      "declared_license": "MIT",
+      "proposed_terms": "MIT",
+      "build_scope": "compiled_candidate",
+      "notice_paths": [
+        "registry/rusqlite@0.32.1/LICENSE"
+      ]
+    },
+    {
+      "package": "same-file@1.0.6",
+      "declared_license": "Unlicense/MIT",
+      "proposed_terms": "Unlicense/MIT (retain both; verify upstream alternative wording)",
+      "build_scope": "compiled_candidate",
+      "notice_paths": [
+        "registry/same-file@1.0.6/COPYING",
+        "registry/same-file@1.0.6/LICENSE-MIT",
+        "registry/same-file@1.0.6/UNLICENSE"
+      ]
+    },
+    {
+      "package": "scopeguard@1.2.0",
+      "declared_license": "MIT OR Apache-2.0",
+      "proposed_terms": "MIT",
+      "build_scope": "compiled_candidate",
+      "notice_paths": [
+        "registry/scopeguard@1.2.0/LICENSE-APACHE",
+        "registry/scopeguard@1.2.0/LICENSE-MIT"
+      ]
+    },
+    {
+      "package": "serde@1.0.229",
+      "declared_license": "MIT OR Apache-2.0",
+      "proposed_terms": "MIT",
+      "build_scope": "compiled_candidate",
+      "notice_paths": [
+        "registry/serde@1.0.229/LICENSE-APACHE",
+        "registry/serde@1.0.229/LICENSE-MIT"
+      ]
+    },
+    {
+      "package": "serde_core@1.0.229",
+      "declared_license": "MIT OR Apache-2.0",
+      "proposed_terms": "MIT",
+      "build_scope": "compiled_candidate",
+      "notice_paths": [
+        "registry/serde_core@1.0.229/LICENSE-APACHE",
+        "registry/serde_core@1.0.229/LICENSE-MIT"
+      ]
+    },
+    {
+      "package": "serde_derive@1.0.229",
+      "declared_license": "MIT OR Apache-2.0",
+      "proposed_terms": "MIT",
+      "build_scope": "compiled_candidate",
+      "notice_paths": [
+        "registry/serde_derive@1.0.229/LICENSE-APACHE",
+        "registry/serde_derive@1.0.229/LICENSE-MIT"
+      ]
+    },
+    {
+      "package": "serde_json@1.0.154",
+      "declared_license": "MIT OR Apache-2.0",
+      "proposed_terms": "MIT",
+      "build_scope": "compiled_candidate",
+      "notice_paths": [
+        "registry/serde_json@1.0.154/LICENSE-APACHE",
+        "registry/serde_json@1.0.154/LICENSE-MIT"
+      ]
+    },
+    {
+      "package": "sha2@0.10.9",
+      "declared_license": "MIT OR Apache-2.0",
+      "proposed_terms": "MIT",
+      "build_scope": "compiled_candidate",
+      "notice_paths": [
+        "registry/sha2@0.10.9/LICENSE-APACHE",
+        "registry/sha2@0.10.9/LICENSE-MIT"
+      ]
+    },
+    {
+      "package": "shlex@2.0.1",
+      "declared_license": "MIT OR Apache-2.0",
+      "proposed_terms": "MIT",
+      "build_scope": "compiled_candidate",
+      "notice_paths": [
+        "registry/shlex@2.0.1/LICENSE-APACHE",
+        "registry/shlex@2.0.1/LICENSE-MIT"
+      ]
+    },
+    {
+      "package": "simd-adler32@0.3.10",
+      "declared_license": "MIT",
+      "proposed_terms": "MIT",
+      "build_scope": "compiled_candidate",
+      "notice_paths": [
+        "registry/simd-adler32@0.3.10/LICENSE.md"
+      ]
+    },
+    {
+      "package": "smallvec@1.16.6",
+      "declared_license": "MIT OR Apache-2.0",
+      "proposed_terms": "MIT",
+      "build_scope": "compiled_candidate",
+      "notice_paths": [
+        "registry/smallvec@1.16.6/LICENSE-APACHE",
+        "registry/smallvec@1.16.6/LICENSE-MIT"
+      ]
+    },
+    {
+      "package": "smol_str@0.2.2",
+      "declared_license": "MIT OR Apache-2.0",
+      "proposed_terms": "MIT",
+      "build_scope": "compiled_candidate",
+      "notice_paths": [
+        "registry/smol_str@0.2.2/LICENSE-APACHE",
+        "registry/smol_str@0.2.2/LICENSE-MIT"
+      ]
+    },
+    {
+      "package": "stable_deref_trait@1.2.1",
+      "declared_license": "MIT OR Apache-2.0",
+      "proposed_terms": "MIT",
+      "build_scope": "compiled_candidate",
+      "notice_paths": [
+        "registry/stable_deref_trait@1.2.1/LICENSE-APACHE",
+        "registry/stable_deref_trait@1.2.1/LICENSE-MIT"
+      ]
+    },
+    {
+      "package": "static_assertions@1.1.0",
+      "declared_license": "MIT OR Apache-2.0",
+      "proposed_terms": "MIT",
+      "build_scope": "compiled_candidate",
+      "notice_paths": [
+        "registry/static_assertions@1.1.0/LICENSE-APACHE",
+        "registry/static_assertions@1.1.0/LICENSE-MIT"
+      ]
+    },
+    {
+      "package": "strsim@0.11.1",
+      "declared_license": "MIT",
+      "proposed_terms": "MIT",
+      "build_scope": "compiled_candidate",
+      "notice_paths": [
+        "registry/strsim@0.11.1/LICENSE"
+      ]
+    },
+    {
+      "package": "syn@2.0.119",
+      "declared_license": "MIT OR Apache-2.0",
+      "proposed_terms": "MIT",
+      "build_scope": "inventory_only",
+      "notice_paths": [
+        "registry/syn@2.0.119/LICENSE-APACHE",
+        "registry/syn@2.0.119/LICENSE-MIT"
+      ]
+    },
+    {
+      "package": "syn@3.0.10",
+      "declared_license": "MIT OR Apache-2.0",
+      "proposed_terms": "MIT",
+      "build_scope": "compiled_candidate",
+      "notice_paths": [
+        "registry/syn@3.0.10/LICENSE-APACHE",
+        "registry/syn@3.0.10/LICENSE-MIT"
+      ]
+    },
+    {
+      "package": "synstructure@0.14.0",
+      "declared_license": "MIT",
+      "proposed_terms": "MIT",
+      "build_scope": "compiled_candidate",
+      "notice_paths": [
+        "registry/synstructure@0.14.0/LICENSE"
+      ]
+    },
+    {
+      "package": "tempfile@3.27.0",
+      "declared_license": "MIT OR Apache-2.0",
+      "proposed_terms": "MIT",
+      "build_scope": "compiled_candidate",
+      "notice_paths": [
+        "registry/tempfile@3.27.0/LICENSE-APACHE",
+        "registry/tempfile@3.27.0/LICENSE-MIT"
+      ]
+    },
+    {
+      "package": "tiff@0.11.3",
+      "declared_license": "MIT",
+      "proposed_terms": "MIT",
+      "build_scope": "inventory_only",
+      "notice_paths": [
+        "registry/tiff@0.11.3/LICENSE",
+        "registry/tiff@0.11.3/tests/COPYRIGHT"
+      ]
+    },
+    {
+      "package": "tinystr@0.8.5",
+      "declared_license": "Unicode-3.0",
+      "proposed_terms": "Unicode-3.0",
+      "build_scope": "compiled_candidate",
+      "notice_paths": [
+        "registry/tinystr@0.8.5/LICENSE"
+      ]
+    },
+    {
+      "package": "tracing@0.1.44",
+      "declared_license": "MIT",
+      "proposed_terms": "MIT",
+      "build_scope": "compiled_candidate",
+      "notice_paths": [
+        "registry/tracing@0.1.44/LICENSE"
+      ]
+    },
+    {
+      "package": "tracing-attributes@0.1.31",
+      "declared_license": "MIT",
+      "proposed_terms": "MIT",
+      "build_scope": "inventory_only",
+      "notice_paths": [
+        "registry/tracing-attributes@0.1.31/LICENSE"
+      ]
+    },
+    {
+      "package": "tracing-core@0.1.36",
+      "declared_license": "MIT",
+      "proposed_terms": "MIT",
+      "build_scope": "compiled_candidate",
+      "notice_paths": [
+        "registry/tracing-core@0.1.36/LICENSE",
+        "registry/tracing-core@0.1.36/src/spin/LICENSE"
+      ]
+    },
+    {
+      "package": "ttf-parser@0.25.1",
+      "declared_license": "MIT OR Apache-2.0",
+      "proposed_terms": "MIT",
+      "build_scope": "compiled_candidate",
+      "notice_paths": [
+        "registry/ttf-parser@0.25.1/LICENSE-APACHE",
+        "registry/ttf-parser@0.25.1/LICENSE-MIT"
+      ]
+    },
+    {
+      "package": "typenum@1.20.1",
+      "declared_license": "MIT OR Apache-2.0",
+      "proposed_terms": "MIT",
+      "build_scope": "compiled_candidate",
+      "notice_paths": [
+        "registry/typenum@1.20.1/LICENSE",
+        "registry/typenum@1.20.1/LICENSE-APACHE",
+        "registry/typenum@1.20.1/LICENSE-MIT"
+      ]
+    },
+    {
+      "package": "unicode-ident@1.0.27",
+      "declared_license": "(MIT OR Apache-2.0) AND Unicode-3.0",
+      "proposed_terms": "MIT AND Unicode-3.0",
+      "build_scope": "compiled_candidate",
+      "notice_paths": [
+        "registry/unicode-ident@1.0.27/LICENSE-APACHE",
+        "registry/unicode-ident@1.0.27/LICENSE-MIT",
+        "registry/unicode-ident@1.0.27/LICENSE-UNICODE"
+      ]
+    },
+    {
+      "package": "unicode-segmentation@1.13.3",
+      "declared_license": "MIT OR Apache-2.0",
+      "proposed_terms": "MIT",
+      "build_scope": "compiled_candidate",
+      "notice_paths": [
+        "registry/unicode-segmentation@1.13.3/COPYRIGHT",
+        "registry/unicode-segmentation@1.13.3/LICENSE-APACHE",
+        "registry/unicode-segmentation@1.13.3/LICENSE-MIT"
+      ]
+    },
+    {
+      "package": "url@2.5.9",
+      "declared_license": "MIT OR Apache-2.0",
+      "proposed_terms": "MIT",
+      "build_scope": "compiled_candidate",
+      "notice_paths": [
+        "registry/url@2.5.9/LICENSE-APACHE",
+        "registry/url@2.5.9/LICENSE-MIT"
+      ]
+    },
+    {
+      "package": "utf_types@1.0.0",
+      "declared_license": "Apache-2.0 OR MIT",
+      "proposed_terms": "MIT",
+      "build_scope": "compiled_candidate",
+      "notice_paths": [
+        "registry/utf_types@1.0.0/COPYRIGHT",
+        "registry/utf_types@1.0.0/LICENSE-APACHE",
+        "registry/utf_types@1.0.0/LICENSE-MIT"
+      ]
+    },
+    {
+      "package": "utf8_iter@1.1.0",
+      "declared_license": "Apache-2.0 OR MIT",
+      "proposed_terms": "MIT",
+      "build_scope": "compiled_candidate",
+      "notice_paths": [
+        "registry/utf8_iter@1.1.0/COPYRIGHT",
+        "registry/utf8_iter@1.1.0/LICENSE-APACHE",
+        "registry/utf8_iter@1.1.0/LICENSE-MIT"
+      ]
+    },
+    {
+      "package": "utf8parse@0.2.2",
+      "declared_license": "Apache-2.0 OR MIT",
+      "proposed_terms": "MIT",
+      "build_scope": "compiled_candidate",
+      "notice_paths": [
+        "registry/utf8parse@0.2.2/LICENSE-APACHE",
+        "registry/utf8parse@0.2.2/LICENSE-MIT"
+      ]
+    },
+    {
+      "package": "vcpkg@0.2.15",
+      "declared_license": "MIT/Apache-2.0",
+      "proposed_terms": "MIT/Apache-2.0 (retain both; verify upstream alternative wording)",
+      "build_scope": "compiled_candidate",
+      "notice_paths": [
+        "registry/vcpkg@0.2.15/LICENSE-APACHE",
+        "registry/vcpkg@0.2.15/LICENSE-MIT"
+      ]
+    },
+    {
+      "package": "version_check@0.9.5",
+      "declared_license": "MIT/Apache-2.0",
+      "proposed_terms": "MIT/Apache-2.0 (retain both; verify upstream alternative wording)",
+      "build_scope": "compiled_candidate",
+      "notice_paths": [
+        "registry/version_check@0.9.5/LICENSE-APACHE",
+        "registry/version_check@0.9.5/LICENSE-MIT"
+      ]
+    },
+    {
+      "package": "walkdir@2.5.1",
+      "declared_license": "Unlicense/MIT",
+      "proposed_terms": "Unlicense/MIT (retain both; verify upstream alternative wording)",
+      "build_scope": "compiled_candidate",
+      "notice_paths": [
+        "registry/walkdir@2.5.1/COPYING",
+        "registry/walkdir@2.5.1/LICENSE-MIT",
+        "registry/walkdir@2.5.1/UNLICENSE"
+      ]
+    },
+    {
+      "package": "webbrowser@1.2.7",
+      "declared_license": "MIT OR Apache-2.0",
+      "proposed_terms": "MIT",
+      "build_scope": "compiled_candidate",
+      "notice_paths": [
+        "registry/webbrowser@1.2.7/LICENSE-APACHE",
+        "registry/webbrowser@1.2.7/LICENSE-MIT"
+      ]
+    },
+    {
+      "package": "web-time@1.1.0",
+      "declared_license": "MIT OR Apache-2.0",
+      "proposed_terms": "MIT",
+      "build_scope": "compiled_candidate",
+      "notice_paths": [
+        "registry/web-time@1.1.0/LICENSE-APACHE",
+        "registry/web-time@1.1.0/LICENSE-MIT"
+      ]
+    },
+    {
+      "package": "weezl@0.1.12",
+      "declared_license": "MIT OR Apache-2.0",
+      "proposed_terms": "MIT",
+      "build_scope": "inventory_only",
+      "notice_paths": [
+        "registry/weezl@0.1.12/LICENSE-APACHE",
+        "registry/weezl@0.1.12/LICENSE-MIT"
+      ]
+    },
+    {
+      "package": "winapi@0.3.9",
+      "declared_license": "MIT/Apache-2.0",
+      "proposed_terms": "MIT/Apache-2.0 (retain both; verify upstream alternative wording)",
+      "build_scope": "compiled_candidate",
+      "notice_paths": [
+        "registry/winapi@0.3.9/LICENSE-APACHE",
+        "registry/winapi@0.3.9/LICENSE-MIT"
+      ]
+    },
+    {
+      "package": "winapi-util@0.1.11",
+      "declared_license": "Unlicense OR MIT",
+      "proposed_terms": "MIT",
+      "build_scope": "compiled_candidate",
+      "notice_paths": [
+        "registry/winapi-util@0.1.11/COPYING",
+        "registry/winapi-util@0.1.11/LICENSE-MIT",
+        "registry/winapi-util@0.1.11/UNLICENSE"
+      ]
+    },
+    {
+      "package": "windows_x86_64_msvc@0.52.6",
+      "declared_license": "MIT OR Apache-2.0",
+      "proposed_terms": "MIT",
+      "build_scope": "compiled_candidate",
+      "notice_paths": [
+        "registry/windows_x86_64_msvc@0.52.6/license-apache-2.0",
+        "registry/windows_x86_64_msvc@0.52.6/license-mit"
+      ]
+    },
+    {
+      "package": "windows-link@0.2.1",
+      "declared_license": "MIT OR Apache-2.0",
+      "proposed_terms": "MIT",
+      "build_scope": "compiled_candidate",
+      "notice_paths": [
+        "registry/windows-link@0.2.1/license-apache-2.0",
+        "registry/windows-link@0.2.1/license-mit"
+      ]
+    },
+    {
+      "package": "windows-sys@0.52.0",
+      "declared_license": "MIT OR Apache-2.0",
+      "proposed_terms": "MIT",
+      "build_scope": "compiled_candidate",
+      "notice_paths": [
+        "registry/windows-sys@0.52.0/license-apache-2.0",
+        "registry/windows-sys@0.52.0/license-mit"
+      ]
+    },
+    {
+      "package": "windows-sys@0.59.0",
+      "declared_license": "MIT OR Apache-2.0",
+      "proposed_terms": "MIT",
+      "build_scope": "compiled_candidate",
+      "notice_paths": [
+        "registry/windows-sys@0.59.0/license-apache-2.0",
+        "registry/windows-sys@0.59.0/license-mit"
+      ]
+    },
+    {
+      "package": "windows-sys@0.61.2",
+      "declared_license": "MIT OR Apache-2.0",
+      "proposed_terms": "MIT",
+      "build_scope": "compiled_candidate",
+      "notice_paths": [
+        "registry/windows-sys@0.61.2/license-apache-2.0",
+        "registry/windows-sys@0.61.2/license-mit"
+      ]
+    },
+    {
+      "package": "windows-targets@0.52.6",
+      "declared_license": "MIT OR Apache-2.0",
+      "proposed_terms": "MIT",
+      "build_scope": "compiled_candidate",
+      "notice_paths": [
+        "registry/windows-targets@0.52.6/license-apache-2.0",
+        "registry/windows-targets@0.52.6/license-mit"
+      ]
+    },
+    {
+      "package": "winit@0.30.13",
+      "declared_license": "Apache-2.0",
+      "proposed_terms": "Apache-2.0",
+      "build_scope": "compiled_candidate",
+      "notice_paths": [
+        "registry/winit@0.30.13/LICENSE"
+      ]
+    },
+    {
+      "package": "writeable@0.6.4",
+      "declared_license": "Unicode-3.0",
+      "proposed_terms": "Unicode-3.0",
+      "build_scope": "compiled_candidate",
+      "notice_paths": [
+        "registry/writeable@0.6.4/LICENSE"
+      ]
+    },
+    {
+      "package": "xml-rs@0.8.29",
+      "declared_license": "MIT",
+      "proposed_terms": "MIT",
+      "build_scope": "compiled_candidate",
+      "notice_paths": [
+        "registry/xml-rs@0.8.29/LICENSE"
+      ]
+    },
+    {
+      "package": "yoke@0.8.4",
+      "declared_license": "Unicode-3.0",
+      "proposed_terms": "Unicode-3.0",
+      "build_scope": "compiled_candidate",
+      "notice_paths": [
+        "registry/yoke@0.8.4/LICENSE"
+      ]
+    },
+    {
+      "package": "yoke-derive@0.8.4",
+      "declared_license": "Unicode-3.0",
+      "proposed_terms": "Unicode-3.0",
+      "build_scope": "compiled_candidate",
+      "notice_paths": [
+        "registry/yoke-derive@0.8.4/LICENSE"
+      ]
+    },
+    {
+      "package": "zerocopy@0.8.66",
+      "declared_license": "BSD-2-Clause OR Apache-2.0 OR MIT",
+      "proposed_terms": "MIT",
+      "build_scope": "compiled_candidate",
+      "notice_paths": [
+        "registry/zerocopy@0.8.66/LICENSE-APACHE",
+        "registry/zerocopy@0.8.66/LICENSE-BSD",
+        "registry/zerocopy@0.8.66/LICENSE-MIT"
+      ]
+    },
+    {
+      "package": "zerocopy-derive@0.8.66",
+      "declared_license": "BSD-2-Clause OR Apache-2.0 OR MIT",
+      "proposed_terms": "MIT",
+      "build_scope": "inventory_only",
+      "notice_paths": [
+        "registry/zerocopy-derive@0.8.66/LICENSE-APACHE",
+        "registry/zerocopy-derive@0.8.66/LICENSE-BSD",
+        "registry/zerocopy-derive@0.8.66/LICENSE-MIT"
+      ]
+    },
+    {
+      "package": "zerofrom@0.1.8",
+      "declared_license": "Unicode-3.0",
+      "proposed_terms": "Unicode-3.0",
+      "build_scope": "compiled_candidate",
+      "notice_paths": [
+        "registry/zerofrom@0.1.8/LICENSE"
+      ]
+    },
+    {
+      "package": "zerofrom-derive@0.1.8",
+      "declared_license": "Unicode-3.0",
+      "proposed_terms": "Unicode-3.0",
+      "build_scope": "compiled_candidate",
+      "notice_paths": [
+        "registry/zerofrom-derive@0.1.8/LICENSE"
+      ]
+    },
+    {
+      "package": "zerotrie@0.2.5",
+      "declared_license": "Unicode-3.0",
+      "proposed_terms": "Unicode-3.0",
+      "build_scope": "compiled_candidate",
+      "notice_paths": [
+        "registry/zerotrie@0.2.5/LICENSE"
+      ]
+    },
+    {
+      "package": "zerovec@0.11.9",
+      "declared_license": "Unicode-3.0",
+      "proposed_terms": "Unicode-3.0",
+      "build_scope": "compiled_candidate",
+      "notice_paths": [
+        "registry/zerovec@0.11.9/LICENSE"
+      ]
+    },
+    {
+      "package": "zerovec-derive@0.11.7",
+      "declared_license": "Unicode-3.0",
+      "proposed_terms": "Unicode-3.0",
+      "build_scope": "compiled_candidate",
+      "notice_paths": [
+        "registry/zerovec-derive@0.11.7/LICENSE"
+      ]
+    },
+    {
+      "package": "zlib-rs@0.6.9",
+      "declared_license": "Zlib",
+      "proposed_terms": "Zlib",
+      "build_scope": "inventory_only",
+      "notice_paths": [
+        "registry/zlib-rs@0.6.9/LICENSE"
+      ]
+    },
+    {
+      "package": "zmij@1.0.23",
+      "declared_license": "MIT",
+      "proposed_terms": "MIT",
+      "build_scope": "compiled_candidate",
+      "notice_paths": [
+        "registry/zmij@1.0.23/LICENSE-MIT"
+      ]
+    },
+    {
+      "package": "zune-core@0.5.3",
+      "declared_license": "MIT OR Apache-2.0 OR Zlib",
+      "proposed_terms": "MIT",
+      "build_scope": "inventory_only",
+      "notice_paths": [
+        "registry/zune-core@0.5.3/LICENSE-APACHE",
+        "registry/zune-core@0.5.3/LICENSE-MIT",
+        "registry/zune-core@0.5.3/LICENSE-ZLIB"
+      ]
+    },
+    {
+      "package": "zune-jpeg@0.5.15",
+      "declared_license": "MIT OR Apache-2.0 OR Zlib",
+      "proposed_terms": "MIT",
+      "build_scope": "inventory_only",
+      "notice_paths": [
+        "registry/zune-jpeg@0.5.15/LICENSE-APACHE",
+        "registry/zune-jpeg@0.5.15/LICENSE-MIT",
+        "registry/zune-jpeg@0.5.15/LICENSE-ZLIB"
+      ]
+    }
+  ],
+  "additional_attribution": [
+    "attribution/embedded-evidence.json",
+    "attribution/EMBEDDED_ATTRIBUTION_REVIEW.md",
+    "upstream/angle-7403dd2/LICENSE",
+    "toolchain/distribution/COPYRIGHT.html",
+    "toolchain/distribution/COPYRIGHT-library.html"
+  ]
+}

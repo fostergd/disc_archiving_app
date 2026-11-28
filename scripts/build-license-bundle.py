@@ -13,6 +13,7 @@ LOCK_HASH = "60862ef1ad2cfab8812323835ad07f16294ccd4b09b6a2b32b7ea5dc5cccc567"
 MANIFEST = "MANIFEST.json"
 EXTRA = {
     "attribution/embedded-evidence.json",
+    "attribution/windows-redistribution-index.json",
     "attribution/EMBEDDED_ATTRIBUTION_REVIEW.md",
     "upstream/angle-7403dd2/LICENSE",
     "upstream/angle-7403dd2/provenance.json",
@@ -117,6 +118,37 @@ def expected_notices():
     return expected
 
 
+def verify_index(index, inventory, runtime, mappings, fonts, items):
+    # Index is a reviewed navigation/terms record, not publication approval.
+    if (index.get("schema") != 1 or index.get("lock_sha256") != inventory["lock_sha256"]
+            or index.get("distribution_approved") is not False):
+        raise ValueError("redistribution index identity mismatch")
+    rows = index["packages"]
+    identities = {p["name"]+"@"+p["version"]:p for p in inventory["packages"]}
+    if len(rows) != len(identities) or {p["package"] for p in rows} != set(identities):
+        raise ValueError("redistribution index coverage mismatch")
+    compiled = {p["name"]+"@"+p["version"] for p in runtime["compiled_packages"]}
+    only = {p["name"]+"@"+p["version"] for p in runtime["candidate_only_packages"]}
+    if compiled & only or compiled | only != set(identities):
+        raise ValueError("redistribution scope mismatch")
+    supplemental = {m["package"]:{"upstream/"+n for n in m["notices"]} for m in mappings}
+    for row in rows:
+        key = row["package"]
+        original = identities[key]
+        expected_paths = {"registry/"+key+"/"+f["path"].replace(chr(92),"/") for f in original["legal_files"]}
+        expected_paths |= supplemental.get(key,set())
+        if key.startswith("epaint_default_fonts@"):
+            expected_paths |= {n["path"].removeprefix("docs/compliance/") for n in fonts}
+        if (row["declared_license"] != original["license"] or not row["proposed_terms"]
+                or row["build_scope"] != ("compiled_candidate" if key in compiled else "inventory_only")
+                or not expected_paths or set(row["notice_paths"]) != expected_paths
+                or len(row["notice_paths"]) != len(expected_paths)
+                or not expected_paths <= set(items)):
+            raise ValueError("redistribution index package evidence mismatch: "+key)
+    if not set(index["additional_attribution"]) <= set(items):
+        raise ValueError("redistribution index additional attribution missing")
+
+
 def verify_bytes(items, expected):
     toolchain = toolchain_notices()
     baseline = load(ROOT / "docs/compliance/toolchain-notice-baseline.json")
@@ -143,6 +175,16 @@ def verify_bytes(items, expected):
     baseline = load(ROOT / "docs/compliance/embedded-evidence-xml.json")["evidence"]
     if report != baseline or report["lock_sha256"] != LOCK_HASH:
         raise ValueError("embedded attribution differs from reviewed baseline")
+    index_path = ROOT / "docs/compliance/windows-redistribution-index.json"
+    index_raw = items["attribution/windows-redistribution-index.json"]
+    if index_raw != index_path.read_bytes():
+        raise ValueError("redistribution index differs from reviewed source")
+    verify_index(json.loads(index_raw),
+                 load(ROOT / "docs/compliance/windows-license-inventory.json"),
+                 load(ROOT / "docs/compliance/runtime-evidence-baseline.json")["evidence"],
+                 load(ROOT / "docs/compliance/upstream/missing-registry-provenance.json")["mappings"],
+                 load(ROOT / "docs/compliance/upstream/egui-0.31.1/provenance.json")["notices"],
+                 items)
     if not items["README.txt"].startswith(b"REVIEW ONLY"):
         raise ValueError("review-only warning missing")
 
@@ -193,6 +235,7 @@ def build(notice_dir, embedded, destination):
             raise ValueError("collected notice changed")
         items[name] = raw
     items["attribution/embedded-evidence.json"] = embedded.read_bytes()
+    items["attribution/windows-redistribution-index.json"] = (ROOT / "docs/compliance/windows-redistribution-index.json").read_bytes()
     items["attribution/EMBEDDED_ATTRIBUTION_REVIEW.md"] = (ROOT / "docs/compliance/EMBEDDED_ATTRIBUTION_REVIEW.md").read_bytes()
     for name in ("LICENSE", "provenance.json"):
         path = "upstream/angle-7403dd2/" + name
@@ -241,6 +284,20 @@ class BundleTests(unittest.TestCase):
                         {**items, "toolchain/a.txt": b"tamper"}):
             with self.assertRaisesRegex(ValueError, "baseline differs"):
                 verify_toolchain_baseline(changed, expected)
+
+    def test_redistribution_index(self):
+        inventory = {"lock_sha256":"fixture","packages":[{"name":"a","version":"1","license":"MIT","legal_files":[{"path":"LICENSE"}]}]}
+        runtime = {"compiled_packages":[{"name":"a","version":"1"}],"candidate_only_packages":[]}
+        path = "registry/a@1/LICENSE"
+        row = {"package":"a@1","declared_license":"MIT","proposed_terms":"MIT","build_scope":"compiled_candidate","notice_paths":[path]}
+        index = {"schema":1,"lock_sha256":"fixture","distribution_approved":False,"packages":[row],"additional_attribution":[]}
+        verify_index(index, inventory, runtime, [], [], {path:b"fixture"})
+        for altered in ({**index,"packages":[]},{**index,"packages":[{**row,"notice_paths":["wrong"]}]},
+                        {**index,"distribution_approved":True}):
+            with self.assertRaises(ValueError):
+                verify_index(altered, inventory, runtime, [], [], {path:b"fixture"})
+        with self.assertRaises(ValueError):
+            verify_index(index, inventory, runtime, [], [], {})
 
     def test_path_validation(self):
         for name in ("../bad", "/bad", "a//b", "a\\b", "C:/bad", "a/./b"):

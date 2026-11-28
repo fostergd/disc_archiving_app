@@ -70,7 +70,7 @@ def verify_package(raw, sidecar, runtime, expected_docs, expected_notice_bundle)
                   "distribution_approved":False,
                   "files":{name:digest(data) for name,data in notices.items()}}:
         raise ValueError("notice manifest or lock identity mismatch")
-    if len(notices)!=348:
+    if len(notices)!=349:
         raise ValueError("unexpected notice count")
     return {"zip_sha256":digest(raw),"zip_bytes":len(raw),
             "payload_sha256":{name:digest(items[name]) for name in sorted(PAYLOAD)},
@@ -93,7 +93,7 @@ def validate_hold(hold):
 class Tests(unittest.TestCase):
     def fixture(self):
         lock="a"*64
-        notices={f"n{i}.txt":b"notice" for i in range(348)}
+        notices={f"n{i}.txt":b"notice" for i in range(349)}
         manifest={"schema":1,"lock_sha256":lock,"distribution_approved":False,
                   "files":{n:digest(b) for n,b in notices.items()}}
         def pack(items):
