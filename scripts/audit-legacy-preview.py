@@ -3,6 +3,8 @@ import argparse
 import hashlib
 import io
 import json
+from pathlib import Path
+from collections import Counter
 import re
 import unittest
 import urllib.error
@@ -45,14 +47,62 @@ def download(name):
     return raw
 
 
-def scan(raw):
+def variants_of(raw):
     # Scan bytes plus ASCII-compatible UTF-16LE/BE strings. Counts only.
     variants = [raw]
     for endian in ("utf-16-le", "utf-16-be"):
         for offset in (0, 1):
             data = raw[offset:]
             variants.append(data[:len(data)//2*2].decode(endian, errors="replace").encode("ascii", errors="replace"))
+    return variants
+
+
+def scan(raw):
+    variants = variants_of(raw)
     return {key: sum(len(pattern.findall(v)) for v in variants) for key, pattern in PATTERNS.items()}
+
+
+def classify_review(raw):
+    # Identify only the exact public hosted-runner Cargo/rustup directory
+    # prefixes, not arbitrary accounts, drives, or paths. Never emit matches.
+    counts = Counter()
+    for v in variants_of(raw):
+        for m in PATTERNS["local_user_path"].finditer(v):
+            prefix = v[m.start():m.start()+160].lower()
+            if re.match(rb"[a-z]:\\users\\runneradmin\\\.cargo\\registry\\src\\", prefix):
+                counts["hosted_runner_registry_prefix"] += 1
+            elif re.match(rb"[a-z]:\\users\\runneradmin\\\.rustup\\toolchains\\", prefix):
+                counts["hosted_runner_toolchain_prefix"] += 1
+            else:
+                counts["local_path_unclassified"] += 1
+        for m in PATTERNS["email"].finditer(v):
+            # An email-shaped string in executable data is not proof of
+            # attribution or personal exposure. Leave it unresolved unless
+            # independently established; never print it or a hash of it.
+            counts["email_unclassified"] += 1
+    return dict(sorted(counts.items()))
+
+
+def inspect_current(directory):
+    entries = []
+    for name in sorted(n for n in PAYLOAD if n.endswith(".exe")):
+        path = directory / name
+        if not path.is_file() or not path.resolve().is_relative_to(directory.resolve()):
+            raise ValueError("current executable missing or outside release directory")
+        if path.stat().st_size > 64 * 1024 * 1024:
+            raise ValueError("current executable exceeds inspection bound")
+        raw = path.read_bytes()
+        if not raw.startswith(b"MZ"):
+            raise ValueError("current executable header missing")
+        counts = scan(raw)
+        entries.append({"name": name, "bytes": len(raw), "sha256": digest(raw),
+                        "pattern_counts": counts, "review_classes": classify_review(raw)})
+    report = {"entries": entries, "scope": "new release executables; heuristic counts only",
+              "publication_approved": False}
+    print("CURRENT_BINARY_EXPOSURE_REVIEW " + json.dumps(report, sort_keys=True, separators=(",", ":")))
+    if any(row["pattern_counts"][k] for row in entries for k in ("private_key","github_token","aws_key")):
+        raise ValueError("possible credential in current executable; review required")
+
 
 
 def inspect_zip(raw):
@@ -74,7 +124,7 @@ def inspect_zip(raw):
             raise ValueError("legacy executable header missing")
     return {
         "entries": [{"name": name, "bytes": len(data), "sha256": digest(data),
-                     "pattern_counts": scan(data)}
+                     "pattern_counts": scan(data), "review_classes": classify_review(data)}
                     for name, data in sorted(entries.items())],
         "internal_checksums_valid": True,
         "third_party_notice_bundle_present": False,
@@ -118,6 +168,13 @@ class Tests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "layout"):
             inspect_zip(self.fixture(extra=True))
 
+    def test_review_classes(self):
+        runner = b"C:" + b"\\Users\\" + b"runneradmin\\.cargo\\registry\\src\\crate\\lib.rs"
+        other = b"C:" + b"\\Users\\" + b"fixture\\private"
+        self.assertEqual(classify_review(runner)["hosted_runner_registry_prefix"], 1)
+        self.assertEqual(classify_review(other)["local_path_unclassified"], 1)
+        self.assertEqual(classify_review(b"fixture" + b"@example.invalid")["email_unclassified"], 1)
+
     def test_encoded_patterns(self):
         sample = "gh" + "p_" + "Z" * 36
         self.assertGreater(scan(sample.encode("utf-16-le"))["github_token"], 0)
@@ -126,10 +183,17 @@ class Tests(unittest.TestCase):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--self-test", action="store_true")
+    parser.add_argument("--current-release-directory", type=Path)
     args = parser.parse_args()
     if args.self_test:
         if not unittest.TextTestRunner(verbosity=2).run(unittest.defaultTestLoader.loadTestsFromTestCase(Tests)).wasSuccessful():
             raise SystemExit(1)
+    elif args.current_release_directory:
+        try:
+            inspect_current(args.current_release_directory)
+        except (ValueError, OSError):
+            print("CURRENT_BINARY_EXPOSURE_REVIEW_INCOMPLETE: review required")
+            raise SystemExit(1) from None
     else:
         try:
             inspect()

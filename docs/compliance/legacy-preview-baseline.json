@@ -1,0 +1,80 @@
+{
+  "source_commit": "c9d7e6e766d5b0b443bde699f6bd72a285c33a8f",
+  "run_id": 46094606957,
+  "job_id": 140822990975,
+  "evidence": {
+    "asset_sha256": "c3ce19d5f985db8d620599b5f2da08faac640ae1b6eb1ab96cc6b4b9f1a26dca",
+    "entries": [
+      {
+        "bytes": 23511,
+        "name": "README.md",
+        "pattern_counts": {
+          "aws_key": 0,
+          "email": 0,
+          "github_token": 0,
+          "local_user_path": 0,
+          "private_ip": 0,
+          "private_key": 0
+        },
+        "sha256": "349f59f05d6dbdfd3182a628b5b5fe5e8f01416e696dde7a5c5c82ce59dfc0e3"
+      },
+      {
+        "bytes": 341,
+        "name": "SHA256SUMS.txt",
+        "pattern_counts": {
+          "aws_key": 0,
+          "email": 0,
+          "github_token": 0,
+          "local_user_path": 0,
+          "private_ip": 0,
+          "private_key": 0
+        },
+        "sha256": "97e08fc2aed663765ec52eb0d354e8f8e71d309b51236dfcea42ed8b350500ef"
+      },
+      {
+        "bytes": 2371,
+        "name": "WINDOWS_ACCEPTANCE.md",
+        "pattern_counts": {
+          "aws_key": 0,
+          "email": 0,
+          "github_token": 0,
+          "local_user_path": 0,
+          "private_ip": 0,
+          "private_key": 0
+        },
+        "sha256": "a67db74480823f115420d4f9d0120dec56bd97ae107ad45fa5913d0e1ad94e20"
+      },
+      {
+        "bytes": 8965120,
+        "name": "disc-archive-studio.exe",
+        "pattern_counts": {
+          "aws_key": 0,
+          "email": 1,
+          "github_token": 0,
+          "local_user_path": 399,
+          "private_ip": 0,
+          "private_key": 0
+        },
+        "sha256": "6371344c7faaa16202db9fc7135e291f346970fdbb45afa6a493d1e1b2c013fc"
+      },
+      {
+        "bytes": 4852224,
+        "name": "disc-archive.exe",
+        "pattern_counts": {
+          "aws_key": 0,
+          "email": 1,
+          "github_token": 0,
+          "local_user_path": 186,
+          "private_ip": 0,
+          "private_key": 0
+        },
+        "sha256": "c9d0e9896038fe59a77ed2294a3f53b74ca7394ca61a8c050cf10428ffccb529"
+      }
+    ],
+    "internal_checksums_valid": true,
+    "publication_approved": false,
+    "scope": "legacy public asset byte identity, checksums and heuristic screening; no execution",
+    "sidecar_sha256": "da28a8aabfbcee4a43d90c5124078cb80ffb05b7456106c18700b98b5e1fd052",
+    "third_party_notice_bundle_present": false
+  }
+}
