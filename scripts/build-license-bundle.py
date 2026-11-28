@@ -129,6 +129,12 @@ def verify_index(index, inventory, runtime, mappings, fonts, items):
         raise ValueError("redistribution index coverage mismatch")
     compiled = {p["name"]+"@"+p["version"] for p in runtime["compiled_packages"]}
     only = {p["name"]+"@"+p["version"] for p in runtime["candidate_only_packages"]}
+    # Runtime includes our first-party binary/library, unlike registry inventory.
+    # Exclude only the exact reviewed application identity, never arbitrary extras.
+    first_party = "disc-archive@0.1.0"
+    if first_party not in compiled or first_party in only or first_party in identities:
+        raise ValueError("first-party runtime identity mismatch")
+    compiled.remove(first_party)
     if compiled & only or compiled | only != set(identities):
         raise ValueError("redistribution scope mismatch")
     supplemental = {m["package"]:{"upstream/"+n for n in m["notices"]} for m in mappings}
@@ -287,11 +293,18 @@ class BundleTests(unittest.TestCase):
 
     def test_redistribution_index(self):
         inventory = {"lock_sha256":"fixture","packages":[{"name":"a","version":"1","license":"MIT","legal_files":[{"path":"LICENSE"}]}]}
-        runtime = {"compiled_packages":[{"name":"a","version":"1"}],"candidate_only_packages":[]}
+        runtime = {"compiled_packages":[{"name":"a","version":"1"},{"name":"disc-archive","version":"0.1.0"}],"candidate_only_packages":[]}
         path = "registry/a@1/LICENSE"
         row = {"package":"a@1","declared_license":"MIT","proposed_terms":"MIT","build_scope":"compiled_candidate","notice_paths":[path]}
         index = {"schema":1,"lock_sha256":"fixture","distribution_approved":False,"packages":[row],"additional_attribution":[]}
         verify_index(index, inventory, runtime, [], [], {path:b"fixture"})
+        for bad_runtime in (
+            {**runtime, "compiled_packages": [{"name":"a","version":"1"}]},
+            {**runtime, "compiled_packages": runtime["compiled_packages"] + [{"name":"unknown","version":"1"}]},
+            {**runtime, "candidate_only_packages": [{"name":"disc-archive","version":"0.1.0"}]},
+        ):
+            with self.assertRaises(ValueError):
+                verify_index(index, inventory, bad_runtime, [], [], {path:b"fixture"})
         for altered in ({**index,"packages":[]},{**index,"packages":[{**row,"notice_paths":["wrong"]}]},
                         {**index,"distribution_approved":True}):
             with self.assertRaises(ValueError):
