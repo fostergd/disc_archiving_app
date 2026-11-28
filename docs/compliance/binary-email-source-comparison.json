@@ -1,0 +1,54 @@
+{
+  "source_commit": "8c896379ddfe2ff128928c3e05a856ff44efabe2",
+  "run_id": 46097494372,
+  "job_id": 140832115479,
+  "evidence": {
+    "email_source_comparison": {
+      "distinct_email_patterns": 1,
+      "distinct_patterns_with_candidate_source_match": 0,
+      "distinct_patterns_without_candidate_source_match": 1,
+      "matching_candidate_packages": [],
+      "scanned_bytes": 151921043,
+      "scope": "exact email-pattern correspondence in locked compiled registry candidates; no assertion of attribution or privacy clearance",
+      "skipped_files": 0
+    },
+    "entries": [
+      {
+        "bytes": 9125888,
+        "name": "disc-archive-studio.exe",
+        "pattern_counts": {
+          "aws_key": 0,
+          "email": 1,
+          "github_token": 0,
+          "local_user_path": 401,
+          "private_ip": 0,
+          "private_key": 0
+        },
+        "review_classes": {
+          "email_unclassified": 1,
+          "hosted_runner_registry_prefix": 401
+        },
+        "sha256": "a9250721c1d179be9213eea5d071e5032192d9d0bf792d8a85271c05db7ab644"
+      },
+      {
+        "bytes": 4852224,
+        "name": "disc-archive.exe",
+        "pattern_counts": {
+          "aws_key": 0,
+          "email": 1,
+          "github_token": 0,
+          "local_user_path": 186,
+          "private_ip": 0,
+          "private_key": 0
+        },
+        "review_classes": {
+          "email_unclassified": 1,
+          "hosted_runner_registry_prefix": 186
+        },
+        "sha256": "d8540f54cf541fa65cfab0a775dc5f7a9cadd83398a8ec8d0451a50db5dce5dc"
+      }
+    ],
+    "publication_approved": false,
+    "scope": "new release executables; heuristic counts only"
+  }
+}

@@ -7,6 +7,7 @@ from pathlib import Path
 from collections import Counter
 import re
 import subprocess
+import struct
 import unittest
 import urllib.error
 import urllib.request
@@ -61,6 +62,72 @@ def variants_of(raw):
 def scan(raw):
     variants = variants_of(raw)
     return {key: sum(len(pattern.findall(v)) for v in variants) for key, pattern in PATTERNS.items()}
+
+
+def pe_section_context(raw):
+    # Report only coarse section types, encoding and occurrence counts.
+    # Never output matched bytes, addresses, offsets or surrounding strings.
+    if len(raw) < 64 or raw[:2] != b"MZ":
+        raise ValueError("missing DOS header")
+    pe = struct.unpack_from("<I", raw, 60)[0]
+    if pe+24 > len(raw) or raw[pe:pe+4] != b"PE\0\0":
+        raise ValueError("missing PE header")
+    machine, count = struct.unpack_from("<HH", raw, pe+4)
+    optional = struct.unpack_from("<H", raw, pe+20)[0]
+    table = pe+24+optional
+    if machine != 0x8664 or not 1 <= count <= 96 or table+count*40 > len(raw):
+        raise ValueError("unexpected PE section layout")
+    ranges = []
+    for index in range(count):
+        off = table+40*index
+        size, ptr = struct.unpack_from("<II", raw, off+16)
+        flags = struct.unpack_from("<I", raw, off+36)[0]
+        if not size:
+            continue
+        if ptr < table+count*40 or ptr+size > len(raw):
+            raise ValueError("invalid section bounds")
+        if flags & 0x20000000:
+            kind = "executable_section"
+        elif flags & 0x80000000:
+            kind = "writable_section"
+        else:
+            kind = "non_executable_readonly_section"
+        ranges.append((ptr,ptr+size,kind))
+    ranges.sort()
+    if any(a[1] > b[0] for a,b in zip(ranges,ranges[1:])):
+        raise ValueError("overlapping PE sections")
+    return ranges
+
+
+def email_binary_context(raw):
+    ranges = pe_section_context(raw)
+    counts = Counter()
+    # Build an offset-preserving view for each encoding/alignment.
+    # ASCII-range bytes map to themselves; all others are separators.
+    # No Unicode surrogate contraction or offset ambiguity is possible.
+    views = [("byte", raw, 1, 0)]
+    for endian in ("le","be"):
+        for align in (0,1):
+            chunk = raw[align:]
+            chunk = chunk[:len(chunk)//2*2]
+            low, high = (chunk[::2],chunk[1::2]) if endian == "le" else (chunk[1::2],chunk[::2])
+            view = bytes(a if b == 0 and a < 128 else 0 for a,b in zip(low,high))
+            views.append(("utf16"+endian,view,2,align))
+    for enc, view, stride, align in views:
+        for match in PATTERNS["email"].finditer(view):
+            start,end = align+stride*match.start(),align+stride*match.end()
+            kinds = [kind for lo,hi,kind in ranges if lo <= start and end <= hi]
+            kind = kinds[0] if len(kinds)==1 else "outside_or_crossing_sections"
+            before = view[match.start()-1] if match.start() else 0
+            after = view[match.end()] if match.end()<len(view) else 0
+            boundary = "nul_both" if before==0 and after==0 else "other_boundaries"
+            counts[enc+"_"+kind+"_"+boundary] += 1
+    original = scan(raw)["email"]
+    return {"context_counts":dict(sorted(counts.items())),
+            "original_pattern_occurrences":original,
+            "context_occurrences":sum(counts.values()),
+            "counts_agree":original==sum(counts.values()),
+            "scope":"PE section permissions and encoding boundaries only; no attribution or privacy clearance"}
 
 
 def classify_review(raw):
@@ -164,7 +231,8 @@ def inspect_current(directory, runtime_report=None):
         for variant in variants_of(raw):
             emails.update(m.group() for m in PATTERNS["email"].finditer(variant))
         entries.append({"name": name, "bytes": len(raw), "sha256": digest(raw),
-                        "pattern_counts": counts, "review_classes": classify_review(raw)})
+                        "pattern_counts": counts, "review_classes": classify_review(raw),
+                        "email_binary_context": email_binary_context(raw)})
     report = {"entries": entries, "scope": "new release executables; heuristic counts only",
               "publication_approved": False}
     if runtime_report is not None:
@@ -194,7 +262,9 @@ def inspect_zip(raw):
             raise ValueError("legacy executable header missing")
     return {
         "entries": [{"name": name, "bytes": len(data), "sha256": digest(data),
-                     "pattern_counts": scan(data), "review_classes": classify_review(data)}
+                     "pattern_counts": scan(data), "review_classes": classify_review(data),
+                     **({"email_binary_context": email_binary_context(data)}
+                        if name.endswith(".exe") and data[:2] == b"MZ" and len(data) >= 64 else {})}
                     for name, data in sorted(entries.items())],
         "internal_checksums_valid": True,
         "third_party_notice_bundle_present": False,
@@ -244,6 +314,25 @@ class Tests(unittest.TestCase):
         self.assertEqual(classify_review(runner)["hosted_runner_registry_prefix"], 1)
         self.assertEqual(classify_review(other)["local_path_unclassified"], 1)
         self.assertEqual(classify_review(b"fixture" + b"@example.invalid")["email_unclassified"], 1)
+
+    def test_pe_email_context(self):
+        raw = bytearray(1024)
+        raw[:2] = b"MZ"
+        struct.pack_into("<I",raw,60,64)
+        raw[64:68] = b"PE\0\0"
+        struct.pack_into("<HH",raw,68,0x8664,1)
+        struct.pack_into("<H",raw,84,240)
+        off=88+240
+        struct.pack_into("<II",raw,off+16,512,512)
+        struct.pack_into("<I",raw,off+36,0x60000020)
+        sample = b"fixture" + b"@example.invalid"
+        raw[520:520+len(sample)] = sample
+        result = email_binary_context(bytes(raw))
+        self.assertEqual(result["context_counts"],{"byte_executable_section_nul_both":1})
+        self.assertTrue(result["counts_agree"])
+        self.assertNotIn(sample.decode(),json.dumps(result))
+        with self.assertRaises(ValueError):
+            pe_section_context(bytes(raw[:600]))
 
     def test_source_comparison(self):
         import tempfile
