@@ -101,6 +101,13 @@ jobs:
         run: |
           ./scripts/build-and-test-portable.ps1 -Destination (Join-Path $env:RUNNER_TEMP 'das-portable') -NoticeBundle (Join-Path $env:RUNNER_TEMP 'THIRD_PARTY_LICENSES.zip')
           ./scripts/new-preview-zip.ps1 -PackageDirectory (Join-Path $env:RUNNER_TEMP 'das-portable') -OutputDirectory (Join-Path $env:RUNNER_TEMP 'das-zip-validation') -RequireNoticeBundle
+      - name: Bind final portable ZIP to inspected executables and verify publication hold
+        shell: powershell
+        run: |
+          python ./scripts/verify-release-candidate.py --self-test
+          if ($LASTEXITCODE -ne 0) { throw 'Release candidate regression failed' }
+          python ./scripts/verify-release-candidate.py --directory (Join-Path $env:RUNNER_TEMP 'das-zip-validation') --runtime-report (Join-Path $env:RUNNER_TEMP 'das-runtime-evidence.json')
+          if ($LASTEXITCODE -ne 0) { throw 'Release candidate identity failed' }
       - name: Publish requested preview
         if: ${{ github.event.repository.private && github.event_name == 'workflow_dispatch' && inputs.publish_preview }}
         uses: actions/upload-artifact@v4

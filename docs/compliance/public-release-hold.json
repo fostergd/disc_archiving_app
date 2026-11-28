@@ -1,0 +1,14 @@
+{
+  "schema": 1,
+  "distribution_approved": false,
+  "repository": "fostergd/disc_archiving_app",
+  "channel": "unsigned Windows x64 preview",
+  "blockers": [
+    "final_redistribution_review",
+    "binary_pattern_disposition",
+    "legacy_release_disposition",
+    "owner_release_authorization"
+  ],
+  "historical_review": "75 completed run attempts screened; 1 active at checkpoint; artifact inventory empty; deleted/inaccessible material not established",
+  "policy": "No publication from this record. A separately reviewed release gate and explicit owner approval are required."
+}

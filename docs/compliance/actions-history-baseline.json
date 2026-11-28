@@ -1,0 +1,996 @@
+{
+  "source_commit": "4d7ac67f37ebedd5604b7a5b5dcee11e632f1cf0",
+  "run_id": 46103440106,
+  "job_id": 140850801919,
+  "evidence": {
+    "artifact_inventory_complete": true,
+    "artifacts": [],
+    "expanded_bytes": 12369129,
+    "listed_runs": 76,
+    "log_inventory_complete": false,
+    "publication_approved": false,
+    "runs": [
+      {
+        "attempt": 1,
+        "expanded_bytes": 24793,
+        "pattern_counts": {
+          "aws_key": 0,
+          "email": 0,
+          "github_token": 0,
+          "private_ip": 0,
+          "private_key": 0
+        },
+        "run_id": 45550969959,
+        "status": "screened"
+      },
+      {
+        "attempt": 1,
+        "expanded_bytes": 23456,
+        "pattern_counts": {
+          "aws_key": 0,
+          "email": 0,
+          "github_token": 0,
+          "private_ip": 0,
+          "private_key": 0
+        },
+        "run_id": 45552059343,
+        "status": "screened"
+      },
+      {
+        "attempt": 1,
+        "expanded_bytes": 23683,
+        "pattern_counts": {
+          "aws_key": 0,
+          "email": 0,
+          "github_token": 0,
+          "private_ip": 0,
+          "private_key": 0
+        },
+        "run_id": 45552945695,
+        "status": "screened"
+      },
+      {
+        "attempt": 1,
+        "expanded_bytes": 24080,
+        "pattern_counts": {
+          "aws_key": 0,
+          "email": 0,
+          "github_token": 0,
+          "private_ip": 0,
+          "private_key": 0
+        },
+        "run_id": 45554861337,
+        "status": "screened"
+      },
+      {
+        "attempt": 1,
+        "expanded_bytes": 24261,
+        "pattern_counts": {
+          "aws_key": 0,
+          "email": 0,
+          "github_token": 0,
+          "private_ip": 0,
+          "private_key": 0
+        },
+        "run_id": 45555862684,
+        "status": "screened"
+      },
+      {
+        "attempt": 1,
+        "expanded_bytes": 24682,
+        "pattern_counts": {
+          "aws_key": 0,
+          "email": 0,
+          "github_token": 0,
+          "private_ip": 0,
+          "private_key": 0
+        },
+        "run_id": 45660643685,
+        "status": "screened"
+      },
+      {
+        "attempt": 1,
+        "expanded_bytes": 24845,
+        "pattern_counts": {
+          "aws_key": 0,
+          "email": 0,
+          "github_token": 0,
+          "private_ip": 0,
+          "private_key": 0
+        },
+        "run_id": 45663677277,
+        "status": "screened"
+      },
+      {
+        "attempt": 1,
+        "expanded_bytes": 45157,
+        "pattern_counts": {
+          "aws_key": 0,
+          "email": 0,
+          "github_token": 0,
+          "private_ip": 0,
+          "private_key": 0
+        },
+        "run_id": 45664210436,
+        "status": "screened"
+      },
+      {
+        "attempt": 1,
+        "expanded_bytes": 45151,
+        "pattern_counts": {
+          "aws_key": 0,
+          "email": 0,
+          "github_token": 0,
+          "private_ip": 0,
+          "private_key": 0
+        },
+        "run_id": 45666195792,
+        "status": "screened"
+      },
+      {
+        "attempt": 1,
+        "expanded_bytes": 45704,
+        "pattern_counts": {
+          "aws_key": 0,
+          "email": 0,
+          "github_token": 0,
+          "private_ip": 0,
+          "private_key": 0
+        },
+        "run_id": 45667332315,
+        "status": "screened"
+      },
+      {
+        "attempt": 1,
+        "expanded_bytes": 48310,
+        "pattern_counts": {
+          "aws_key": 0,
+          "email": 0,
+          "github_token": 0,
+          "private_ip": 0,
+          "private_key": 0
+        },
+        "run_id": 45668845035,
+        "status": "screened"
+      },
+      {
+        "attempt": 1,
+        "expanded_bytes": 48308,
+        "pattern_counts": {
+          "aws_key": 0,
+          "email": 0,
+          "github_token": 0,
+          "private_ip": 0,
+          "private_key": 0
+        },
+        "run_id": 45670221464,
+        "status": "screened"
+      },
+      {
+        "attempt": 1,
+        "expanded_bytes": 48535,
+        "pattern_counts": {
+          "aws_key": 0,
+          "email": 0,
+          "github_token": 0,
+          "private_ip": 0,
+          "private_key": 0
+        },
+        "run_id": 45674653922,
+        "status": "screened"
+      },
+      {
+        "attempt": 1,
+        "expanded_bytes": 48587,
+        "pattern_counts": {
+          "aws_key": 0,
+          "email": 0,
+          "github_token": 0,
+          "private_ip": 0,
+          "private_key": 0
+        },
+        "run_id": 45677919449,
+        "status": "screened"
+      },
+      {
+        "attempt": 1,
+        "expanded_bytes": 48681,
+        "pattern_counts": {
+          "aws_key": 0,
+          "email": 0,
+          "github_token": 0,
+          "private_ip": 0,
+          "private_key": 0
+        },
+        "run_id": 45680063273,
+        "status": "screened"
+      },
+      {
+        "attempt": 1,
+        "expanded_bytes": 37012,
+        "pattern_counts": {
+          "aws_key": 0,
+          "email": 0,
+          "github_token": 0,
+          "private_ip": 0,
+          "private_key": 0
+        },
+        "run_id": 45681698303,
+        "status": "screened"
+      },
+      {
+        "attempt": 1,
+        "expanded_bytes": 48725,
+        "pattern_counts": {
+          "aws_key": 0,
+          "email": 0,
+          "github_token": 0,
+          "private_ip": 0,
+          "private_key": 0
+        },
+        "run_id": 45683300848,
+        "status": "screened"
+      },
+      {
+        "attempt": 1,
+        "expanded_bytes": 48725,
+        "pattern_counts": {
+          "aws_key": 0,
+          "email": 0,
+          "github_token": 0,
+          "private_ip": 0,
+          "private_key": 0
+        },
+        "run_id": 45684966328,
+        "status": "screened"
+      },
+      {
+        "attempt": 1,
+        "expanded_bytes": 49015,
+        "pattern_counts": {
+          "aws_key": 0,
+          "email": 0,
+          "github_token": 0,
+          "private_ip": 0,
+          "private_key": 0
+        },
+        "run_id": 45686771020,
+        "status": "screened"
+      },
+      {
+        "attempt": 1,
+        "expanded_bytes": 49020,
+        "pattern_counts": {
+          "aws_key": 0,
+          "email": 0,
+          "github_token": 0,
+          "private_ip": 0,
+          "private_key": 0
+        },
+        "run_id": 45688799320,
+        "status": "screened"
+      },
+      {
+        "attempt": 1,
+        "expanded_bytes": 49166,
+        "pattern_counts": {
+          "aws_key": 0,
+          "email": 0,
+          "github_token": 0,
+          "private_ip": 0,
+          "private_key": 0
+        },
+        "run_id": 45691657060,
+        "status": "screened"
+      },
+      {
+        "attempt": 1,
+        "expanded_bytes": 49473,
+        "pattern_counts": {
+          "aws_key": 0,
+          "email": 0,
+          "github_token": 0,
+          "private_ip": 0,
+          "private_key": 0
+        },
+        "run_id": 45694499015,
+        "status": "screened"
+      },
+      {
+        "attempt": 1,
+        "expanded_bytes": 49676,
+        "pattern_counts": {
+          "aws_key": 0,
+          "email": 0,
+          "github_token": 0,
+          "private_ip": 0,
+          "private_key": 0
+        },
+        "run_id": 45696489111,
+        "status": "screened"
+      },
+      {
+        "attempt": 1,
+        "expanded_bytes": 49811,
+        "pattern_counts": {
+          "aws_key": 0,
+          "email": 0,
+          "github_token": 0,
+          "private_ip": 0,
+          "private_key": 0
+        },
+        "run_id": 45700312169,
+        "status": "screened"
+      },
+      {
+        "attempt": 1,
+        "expanded_bytes": 49875,
+        "pattern_counts": {
+          "aws_key": 0,
+          "email": 0,
+          "github_token": 0,
+          "private_ip": 0,
+          "private_key": 0
+        },
+        "run_id": 45702225489,
+        "status": "screened"
+      },
+      {
+        "attempt": 1,
+        "expanded_bytes": 50126,
+        "pattern_counts": {
+          "aws_key": 0,
+          "email": 0,
+          "github_token": 0,
+          "private_ip": 0,
+          "private_key": 0
+        },
+        "run_id": 45709242434,
+        "status": "screened"
+      },
+      {
+        "attempt": 1,
+        "expanded_bytes": 50272,
+        "pattern_counts": {
+          "aws_key": 0,
+          "email": 0,
+          "github_token": 0,
+          "private_ip": 0,
+          "private_key": 0
+        },
+        "run_id": 45712768178,
+        "status": "screened"
+      },
+      {
+        "attempt": 1,
+        "expanded_bytes": 50403,
+        "pattern_counts": {
+          "aws_key": 0,
+          "email": 0,
+          "github_token": 0,
+          "private_ip": 0,
+          "private_key": 0
+        },
+        "run_id": 45715661693,
+        "status": "screened"
+      },
+      {
+        "attempt": 1,
+        "expanded_bytes": 50401,
+        "pattern_counts": {
+          "aws_key": 0,
+          "email": 0,
+          "github_token": 0,
+          "private_ip": 0,
+          "private_key": 0
+        },
+        "run_id": 45727345050,
+        "status": "screened"
+      },
+      {
+        "attempt": 1,
+        "expanded_bytes": 50401,
+        "pattern_counts": {
+          "aws_key": 0,
+          "email": 0,
+          "github_token": 0,
+          "private_ip": 0,
+          "private_key": 0
+        },
+        "run_id": 45728362650,
+        "status": "screened"
+      },
+      {
+        "attempt": 1,
+        "expanded_bytes": 50509,
+        "pattern_counts": {
+          "aws_key": 0,
+          "email": 0,
+          "github_token": 0,
+          "private_ip": 0,
+          "private_key": 0
+        },
+        "run_id": 45729855815,
+        "status": "screened"
+      },
+      {
+        "attempt": 1,
+        "expanded_bytes": 50801,
+        "pattern_counts": {
+          "aws_key": 0,
+          "email": 0,
+          "github_token": 0,
+          "private_ip": 0,
+          "private_key": 0
+        },
+        "run_id": 45731443856,
+        "status": "screened"
+      },
+      {
+        "attempt": 1,
+        "expanded_bytes": 50799,
+        "pattern_counts": {
+          "aws_key": 0,
+          "email": 0,
+          "github_token": 0,
+          "private_ip": 0,
+          "private_key": 0
+        },
+        "run_id": 45737912807,
+        "status": "screened"
+      },
+      {
+        "attempt": 1,
+        "expanded_bytes": 50905,
+        "pattern_counts": {
+          "aws_key": 0,
+          "email": 0,
+          "github_token": 0,
+          "private_ip": 0,
+          "private_key": 0
+        },
+        "run_id": 45750494175,
+        "status": "screened"
+      },
+      {
+        "attempt": 1,
+        "expanded_bytes": 51119,
+        "pattern_counts": {
+          "aws_key": 0,
+          "email": 0,
+          "github_token": 0,
+          "private_ip": 0,
+          "private_key": 0
+        },
+        "run_id": 45769776994,
+        "status": "screened"
+      },
+      {
+        "attempt": 1,
+        "expanded_bytes": 51219,
+        "pattern_counts": {
+          "aws_key": 0,
+          "email": 0,
+          "github_token": 0,
+          "private_ip": 0,
+          "private_key": 0
+        },
+        "run_id": 45785400276,
+        "status": "screened"
+      },
+      {
+        "attempt": 1,
+        "expanded_bytes": 51322,
+        "pattern_counts": {
+          "aws_key": 0,
+          "email": 0,
+          "github_token": 0,
+          "private_ip": 0,
+          "private_key": 0
+        },
+        "run_id": 45794379920,
+        "status": "screened"
+      },
+      {
+        "attempt": 1,
+        "expanded_bytes": 51417,
+        "pattern_counts": {
+          "aws_key": 0,
+          "email": 0,
+          "github_token": 0,
+          "private_ip": 0,
+          "private_key": 0
+        },
+        "run_id": 45813309486,
+        "status": "screened"
+      },
+      {
+        "attempt": 1,
+        "expanded_bytes": 51519,
+        "pattern_counts": {
+          "aws_key": 0,
+          "email": 0,
+          "github_token": 0,
+          "private_ip": 0,
+          "private_key": 0
+        },
+        "run_id": 45831506197,
+        "status": "screened"
+      },
+      {
+        "attempt": 1,
+        "expanded_bytes": 51622,
+        "pattern_counts": {
+          "aws_key": 0,
+          "email": 0,
+          "github_token": 0,
+          "private_ip": 0,
+          "private_key": 0
+        },
+        "run_id": 45842442553,
+        "status": "screened"
+      },
+      {
+        "attempt": 1,
+        "expanded_bytes": 55688,
+        "pattern_counts": {
+          "aws_key": 0,
+          "email": 0,
+          "github_token": 0,
+          "private_ip": 0,
+          "private_key": 0
+        },
+        "run_id": 45852090628,
+        "status": "screened"
+      },
+      {
+        "attempt": 1,
+        "expanded_bytes": 55690,
+        "pattern_counts": {
+          "aws_key": 0,
+          "email": 0,
+          "github_token": 0,
+          "private_ip": 0,
+          "private_key": 0
+        },
+        "run_id": 45861032404,
+        "status": "screened"
+      },
+      {
+        "attempt": 1,
+        "expanded_bytes": 55994,
+        "pattern_counts": {
+          "aws_key": 0,
+          "email": 0,
+          "github_token": 0,
+          "private_ip": 0,
+          "private_key": 0
+        },
+        "run_id": 45886214292,
+        "status": "screened"
+      },
+      {
+        "attempt": 1,
+        "expanded_bytes": 57381,
+        "pattern_counts": {
+          "aws_key": 0,
+          "email": 0,
+          "github_token": 0,
+          "private_ip": 0,
+          "private_key": 0
+        },
+        "run_id": 45903256825,
+        "status": "screened"
+      },
+      {
+        "attempt": 1,
+        "expanded_bytes": 60924,
+        "pattern_counts": {
+          "aws_key": 0,
+          "email": 0,
+          "github_token": 0,
+          "private_ip": 0,
+          "private_key": 0
+        },
+        "run_id": 45906022568,
+        "status": "screened"
+      },
+      {
+        "attempt": 1,
+        "expanded_bytes": 60651,
+        "pattern_counts": {
+          "aws_key": 0,
+          "email": 0,
+          "github_token": 0,
+          "private_ip": 0,
+          "private_key": 0
+        },
+        "run_id": 45907196171,
+        "status": "screened"
+      },
+      {
+        "attempt": 1,
+        "expanded_bytes": 61007,
+        "pattern_counts": {
+          "aws_key": 0,
+          "email": 0,
+          "github_token": 0,
+          "private_ip": 0,
+          "private_key": 0
+        },
+        "run_id": 45912233115,
+        "status": "screened"
+      },
+      {
+        "attempt": 1,
+        "expanded_bytes": 61233,
+        "pattern_counts": {
+          "aws_key": 0,
+          "email": 0,
+          "github_token": 0,
+          "private_ip": 0,
+          "private_key": 0
+        },
+        "run_id": 45919724275,
+        "status": "screened"
+      },
+      {
+        "attempt": 1,
+        "expanded_bytes": 61305,
+        "pattern_counts": {
+          "aws_key": 0,
+          "email": 0,
+          "github_token": 0,
+          "private_ip": 0,
+          "private_key": 0
+        },
+        "run_id": 45921114930,
+        "status": "screened"
+      },
+      {
+        "attempt": 1,
+        "expanded_bytes": 61390,
+        "pattern_counts": {
+          "aws_key": 0,
+          "email": 0,
+          "github_token": 0,
+          "private_ip": 0,
+          "private_key": 0
+        },
+        "run_id": 45940393862,
+        "status": "screened"
+      },
+      {
+        "attempt": 1,
+        "expanded_bytes": 61467,
+        "pattern_counts": {
+          "aws_key": 0,
+          "email": 0,
+          "github_token": 0,
+          "private_ip": 0,
+          "private_key": 0
+        },
+        "run_id": 45941462305,
+        "status": "screened"
+      },
+      {
+        "attempt": 1,
+        "expanded_bytes": 0,
+        "pattern_counts": {
+          "aws_key": 0,
+          "email": 0,
+          "github_token": 0,
+          "private_ip": 0,
+          "private_key": 0
+        },
+        "run_id": 45942238607,
+        "status": "screened"
+      },
+      {
+        "attempt": 1,
+        "expanded_bytes": 367874,
+        "pattern_counts": {
+          "aws_key": 0,
+          "email": 0,
+          "github_token": 0,
+          "private_ip": 0,
+          "private_key": 0
+        },
+        "run_id": 45946699269,
+        "status": "screened"
+      },
+      {
+        "attempt": 1,
+        "expanded_bytes": 367396,
+        "pattern_counts": {
+          "aws_key": 0,
+          "email": 0,
+          "github_token": 0,
+          "private_ip": 0,
+          "private_key": 0
+        },
+        "run_id": 45947538307,
+        "status": "screened"
+      },
+      {
+        "attempt": 1,
+        "expanded_bytes": 370844,
+        "pattern_counts": {
+          "aws_key": 0,
+          "email": 0,
+          "github_token": 0,
+          "private_ip": 0,
+          "private_key": 0
+        },
+        "run_id": 45948273940,
+        "status": "screened"
+      },
+      {
+        "attempt": 1,
+        "expanded_bytes": 370914,
+        "pattern_counts": {
+          "aws_key": 0,
+          "email": 0,
+          "github_token": 0,
+          "private_ip": 0,
+          "private_key": 0
+        },
+        "run_id": 45957870828,
+        "status": "screened"
+      },
+      {
+        "attempt": 1,
+        "expanded_bytes": 361433,
+        "pattern_counts": {
+          "aws_key": 0,
+          "email": 0,
+          "github_token": 0,
+          "private_ip": 0,
+          "private_key": 0
+        },
+        "run_id": 45959680920,
+        "status": "screened"
+      },
+      {
+        "attempt": 1,
+        "expanded_bytes": 361273,
+        "pattern_counts": {
+          "aws_key": 0,
+          "email": 0,
+          "github_token": 0,
+          "private_ip": 0,
+          "private_key": 0
+        },
+        "run_id": 45975739797,
+        "status": "screened"
+      },
+      {
+        "attempt": 1,
+        "expanded_bytes": 361936,
+        "pattern_counts": {
+          "aws_key": 0,
+          "email": 0,
+          "github_token": 0,
+          "private_ip": 0,
+          "private_key": 0
+        },
+        "run_id": 46018629677,
+        "status": "screened"
+      },
+      {
+        "attempt": 1,
+        "expanded_bytes": 361401,
+        "pattern_counts": {
+          "aws_key": 0,
+          "email": 0,
+          "github_token": 0,
+          "private_ip": 0,
+          "private_key": 0
+        },
+        "run_id": 46036294816,
+        "status": "screened"
+      },
+      {
+        "attempt": 1,
+        "expanded_bytes": 362603,
+        "pattern_counts": {
+          "aws_key": 0,
+          "email": 0,
+          "github_token": 0,
+          "private_ip": 0,
+          "private_key": 0
+        },
+        "run_id": 46061766658,
+        "status": "screened"
+      },
+      {
+        "attempt": 1,
+        "expanded_bytes": 403211,
+        "pattern_counts": {
+          "aws_key": 0,
+          "email": 0,
+          "github_token": 0,
+          "private_ip": 0,
+          "private_key": 0
+        },
+        "run_id": 46064755192,
+        "status": "screened"
+      },
+      {
+        "attempt": 1,
+        "expanded_bytes": 413502,
+        "pattern_counts": {
+          "aws_key": 0,
+          "email": 0,
+          "github_token": 0,
+          "private_ip": 0,
+          "private_key": 0
+        },
+        "run_id": 46065482256,
+        "status": "screened"
+      },
+      {
+        "attempt": 1,
+        "expanded_bytes": 415794,
+        "pattern_counts": {
+          "aws_key": 0,
+          "email": 0,
+          "github_token": 0,
+          "private_ip": 0,
+          "private_key": 0
+        },
+        "run_id": 46066997607,
+        "status": "screened"
+      },
+      {
+        "attempt": 1,
+        "expanded_bytes": 418002,
+        "pattern_counts": {
+          "aws_key": 0,
+          "email": 0,
+          "github_token": 0,
+          "private_ip": 0,
+          "private_key": 0
+        },
+        "run_id": 46068498978,
+        "status": "screened"
+      },
+      {
+        "attempt": 1,
+        "expanded_bytes": 437028,
+        "pattern_counts": {
+          "aws_key": 0,
+          "email": 0,
+          "github_token": 0,
+          "private_ip": 0,
+          "private_key": 0
+        },
+        "run_id": 46072903762,
+        "status": "screened"
+      },
+      {
+        "attempt": 1,
+        "expanded_bytes": 437165,
+        "pattern_counts": {
+          "aws_key": 0,
+          "email": 0,
+          "github_token": 0,
+          "private_ip": 0,
+          "private_key": 0
+        },
+        "run_id": 46078156707,
+        "status": "screened"
+      },
+      {
+        "attempt": 1,
+        "expanded_bytes": 440538,
+        "pattern_counts": {
+          "aws_key": 0,
+          "email": 0,
+          "github_token": 0,
+          "private_ip": 0,
+          "private_key": 0
+        },
+        "run_id": 46082221895,
+        "status": "screened"
+      },
+      {
+        "attempt": 1,
+        "expanded_bytes": 440646,
+        "pattern_counts": {
+          "aws_key": 0,
+          "email": 0,
+          "github_token": 0,
+          "private_ip": 0,
+          "private_key": 0
+        },
+        "run_id": 46082702323,
+        "status": "screened"
+      },
+      {
+        "attempt": 1,
+        "expanded_bytes": 454082,
+        "pattern_counts": {
+          "aws_key": 0,
+          "email": 0,
+          "github_token": 0,
+          "private_ip": 0,
+          "private_key": 0
+        },
+        "run_id": 46084693862,
+        "status": "screened"
+      },
+      {
+        "attempt": 1,
+        "expanded_bytes": 459168,
+        "pattern_counts": {
+          "aws_key": 0,
+          "email": 0,
+          "github_token": 0,
+          "private_ip": 0,
+          "private_key": 0
+        },
+        "run_id": 46093086851,
+        "status": "screened"
+      },
+      {
+        "attempt": 1,
+        "expanded_bytes": 461977,
+        "pattern_counts": {
+          "aws_key": 0,
+          "email": 0,
+          "github_token": 0,
+          "private_ip": 0,
+          "private_key": 0
+        },
+        "run_id": 46094606957,
+        "status": "screened"
+      },
+      {
+        "attempt": 1,
+        "expanded_bytes": 463605,
+        "pattern_counts": {
+          "aws_key": 0,
+          "email": 0,
+          "github_token": 0,
+          "private_ip": 0,
+          "private_key": 0
+        },
+        "run_id": 46095634382,
+        "status": "screened"
+      },
+      {
+        "attempt": 1,
+        "expanded_bytes": 464218,
+        "pattern_counts": {
+          "aws_key": 0,
+          "email": 0,
+          "github_token": 0,
+          "private_ip": 0,
+          "private_key": 0
+        },
+        "run_id": 46097494372,
+        "status": "screened"
+      },
+      {
+        "attempt": 1,
+        "expanded_bytes": 930223,
+        "pattern_counts": {
+          "aws_key": 0,
+          "email": 0,
+          "github_token": 0,
+          "private_ip": 0,
+          "private_key": 0
+        },
+        "run_id": 46099462381,
+        "status": "screened"
+      },
+      {
+        "attempt": 1,
+        "run_id": 46103440106,
+        "status": "active_not_screened"
+      }
+    ],
+    "scope": "accessible Actions run-attempt logs and artifact metadata; counts only"
+  }
+}
